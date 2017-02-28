@@ -2,3 +2,5 @@
 ./vscode/*
 .idea/*
 __pycache__/*
+data/stanford/*
+data/pipeline_*/*
