@@ -34,6 +34,7 @@ class ReadCorpusTask(luigi.Task):
 	Luigi task that reads a corpus.
 	"""
 	corpus_path = luigi.Parameter()
+	lines = []
 
 	def output(self):
 		return luigi.LocalTarget(FRENCH_SENTENCES_PATH)
@@ -67,7 +68,7 @@ class NERTask(luigi.Task):
 					tokenized_line = self.tokenizer.tokenize(line)
 					ner_tagged_line = self.ner_tagger.tag(tokenized_line)
 					print(ner_tagged_line)
-					nes_file.write(ner_tagged_line)
+					nes_file.write(str(ner_tagged_line) + "\n")
 
 
 class DependencyParseTask(luigi.Task):
@@ -91,7 +92,7 @@ class DependencyParseTask(luigi.Task):
 				for line in sentences_file:
 					parsed_text = self.dependency_parser.raw_parse(line)
 					print(parsed_text)
-					dependency_file.write(parsed_text)
+					dependency_file.write(str(parsed_text) + "\n")
 
 
 class OpenRelationExtractionTask(luigi.Task):
@@ -120,16 +121,16 @@ def _anti_pipeline():
 	)
 
 	with codecs.open(FRENCH_CORPUS_PATH, "rb", "utf-8") as corpus_file:
-			for line in corpus_file.readlines():
-				tokenized_line = tokenizer.tokenize(line)
-				ner_tagged_line = ner_tagger.tag(tokenized_line)
-				print(ner_tagged_line)
+		for line in corpus_file.readlines():
+			tokenized_line = tokenizer.tokenize(line)
+			ner_tagged_line = ner_tagger.tag(tokenized_line)
+			print(ner_tagged_line)
 
-				parsed_text = dependency_parser.raw_parse(line)
-				print(parsed_text)
+			parsed_text = dependency_parser.raw_parse(line)
+			print(parsed_text)
 
 
 if __name__ == "__main__":
-	_anti_pipeline()
-	#luigi.build([OpenRelationExtractionTask()], local_scheduler=True)  # TODO: Use remote scheduler for server deployment
+	#_anti_pipeline()
+	luigi.build([OpenRelationExtractionTask()], local_scheduler=True)  # TODO: Use remote scheduler for server deployment
 	#luigi.run(["OpenRelationExtractionTask"])
