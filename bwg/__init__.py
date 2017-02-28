@@ -1,6 +1,13 @@
+# -*- coding: utf-8 -*-
 """
-Project version info.
+Version info.
 """
+import sys
+import os
+
+sys.path.append(
+	os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+)
 
 __version_info__ = (0, 2, 0)
-__version__ = '.'.join([int(num) for num in __version_info__])
+__version__ = '.'.join([str(num) for num in __version_info__])
