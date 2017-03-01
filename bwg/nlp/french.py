@@ -7,8 +7,8 @@ NLP Pipeline tasks for french texts.
 import luigi
 
 # PROJECT
-from bwg.nlp.standard_tasks import OpenRelationExtractionTask
-from bwg.nlp.utilities import build_task_config_for_language
+from bwg.nlp.standard_tasks import NaiveOpenRelationExtractionTask
+from bwg.nlp.config_management import build_task_config_for_language
 
 if __name__ == "__main__":
     # TODO: Use remote scheduler for server deployment
@@ -20,8 +20,8 @@ if __name__ == "__main__":
             "open_relation_extraction"
         ],
         language="french",
-        config_file_path="../../config.py"
+        config_file_path="../../pipeline_config.py"
     )
     pass
-    luigi.build([OpenRelationExtractionTask(task_config=french_task_config)], local_scheduler=True)
+    luigi.build([NaiveOpenRelationExtractionTask(task_config=french_task_config)], local_scheduler=True)
     # luigi.run(["OpenRelationExtractionTask"])
