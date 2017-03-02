@@ -7,6 +7,7 @@
 #   - open_relation_extraction
 CONFIG_DEPENDENCIES = {
     "all": [
+        "PIPELINE_DEBUG"
     ],
     "optional": [
         "PRETTY_SERIALIZATION"
@@ -35,6 +36,8 @@ CONFIG_DEPENDENCIES = {
         "{language}_STANFORD_DEPENDENCY_MODEL_PATH"
     ],
     "open_relation_extraction": [
+        "MODERATING_NODE_CTAGS",
+        "NER_TAGSET",
         "{language}_DEPENDENCY_FILE_PATH",
         "{language}_NES_FILE_PATH",
         "{language}_RELATIONS_FILE_PATH"
@@ -47,10 +50,11 @@ SUPPORTED_LANGUAGES = [
 # --------------------------------- General config --------------------------------------
 STANFORD_CORENLP_MODELS_PATH = "../../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
 PRETTY_SERIALIZATION = False
-DEPENDENCY_TREE_KEEP_FIELDS = [
-    "address", "ctag", "deps", "word", "head", "rel"
-]
+DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
 STANFORD_PATH = "../../data/stanford/models/"
+MODERATING_NODE_CTAGS = ["VBP", "VBZ"]
+NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
+PIPELINE_DEBUG = True
 
 # ------------------------------- French configurations ---------------------------------
 # Paths for Luigi task outputs

@@ -5,6 +5,7 @@ Defining standard tasks for the NLP pipeline.
 
 # STD
 import codecs
+import os
 import uuid
 
 # EXT
@@ -18,7 +19,8 @@ from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_ne_tagged_sentence,
     deserialize_line,
-    get_serialized_dependency_tree_connections
+    deserialize_dependency_tree,
+    get_serialized_dependency_tree_connections,
 )
 
 
@@ -29,12 +31,12 @@ class ReadCorpusTask(luigi.Task):
     task_config = luigi.DictParameter()
 
     def output(self):
-        sentences_file_path = self.task_config["sentences_file_path"]
+        sentences_file_path = self.task_config["SENTENCES_FILE_PATH"]
         return luigi.LocalTarget(sentences_file_path)
 
     def run(self):
         # Init necessary resources
-        corpus_file_path = self.task_config["corpus_file_path"]
+        corpus_file_path = self.task_config["CORPUS_FILE_PATH"]
 
         # Main work
         with codecs.open(corpus_file_path, "rb", "utf-8") as corpus_file, self.output().open("w") as sentences_file:
@@ -53,14 +55,14 @@ class NERTask(luigi.Task):
         return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
-        nes_file_path = self.task_config["nes_file_path"]
+        nes_file_path = self.task_config["NES_FILE_PATH"]
         return luigi.LocalTarget(nes_file_path)
 
     def run(self):
         # Init necessary resources
-        pretty_serialization = self.task_config["pretty_serialization"]
-        stanford_models_path = self.task_config["stanford_models_path"]
-        stanford_ner_model_path = self.task_config["stanford_ner_model_path"]
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+        stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
+        stanford_ner_model_path = self.task_config["STANFORD_NER_MODEL_PATH"]
         tokenizer = StanfordTokenizer(stanford_models_path, encoding='utf-8')
         ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path, encoding='utf-8')
 
@@ -86,14 +88,14 @@ class DependencyParseTask(luigi.Task):
         return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
-        dependency_file_path = self.task_config["dependency_file_path"]
+        dependency_file_path = self.task_config["DEPENDENCY_FILE_PATH"]
         return luigi.LocalTarget(dependency_file_path)
 
     def run(self):
         # Init necessary resources
-        pretty_serialization = self.task_config["pretty_serialization"]
-        stanford_dependency_model_path = self.task_config["stanford_dependency_model_path"]
-        stanford_corenlp_models_path = self.task_config["stanford_corenlp_models_path"]
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+        stanford_dependency_model_path = self.task_config["STANFORD_DEPENDENCY_MODEL_PATH"]
+        stanford_corenlp_models_path = self.task_config["STANFORD_CORENLP_MODELS_PATH"]
         dependency_parser = StanfordDependencyParser(stanford_dependency_model_path, stanford_corenlp_models_path)
 
         # Main work
@@ -117,7 +119,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         return NERTask(task_config=self.task_config), DependencyParseTask(task_config=self.task_config)
 
     def output(self):
-        relations_file_path = self.task_config["relations_file_path"]
+        relations_file_path = self.task_config["RELATIONS_FILE_PATH"]
         return luigi.LocalTarget(relations_file_path)
 
     def run(self):
@@ -127,21 +129,76 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
             with self.output().open("w") as relations_file:
                 for nes_line, dependency_line in zip(nes_file, dependency_file):
                     sentence_id_1, ne_tagged_line = deserialize_line(nes_line)
-                    sentence_id_2, dependency_tree = deserialize_line(dependency_line)
+                    sentence_id_2, dependency_tree = deserialize_dependency_tree(dependency_line)
                     assert sentence_id_1 == sentence_id_2
 
-                    get_serialized_dependency_tree_connections(dependency_tree)
+                    #get_serialized_dependency_tree_connections(dependency_tree)
+
+                    self.extract_relations(dependency_tree, ne_tagged_line)
 
     def _extract_moderating_nodes(self, dependency_tree):
-        pass
-        # if node["ctag"] in ("VBZ", "VBD")  # TODO: Add this to config
-        # return nodes
+        """
+        Extract those moderating (verb) nodes with a direct subject (nsubj) and object (dobj).
+        """
+        moderating_node_ctags = self.task_config["MODERATING_NODE_CTAGS"]
+        moderating_nodes = []
+
+        for address, node in dependency_tree["nodes"].items():
+            if node["ctag"] in moderating_node_ctags:
+                if "nsubj" in node["deps"] and "dobj" in node["deps"]:
+                    moderating_nodes.append(node)
+
+        return moderating_nodes
 
     def _check_moderating_nodes_children_importance(self, moderating_nodes, ner_tagged_line):
         pass
 
-    def _resolve_phrase(self, node_number):
-        pass
+    def _expand_node(self, node, dependency_tree):
+        expanded_node = [(node["address"], node["word"])]
 
-    def extract_relations(self, connections, dependency_tree, ne_tagged_line):
-        pass
+        for dependency in node["deps"]:
+            if dependency == "rel":
+                continue
+
+            for address in node["deps"][dependency]:
+                expanded_node.extend(self._expand_node(dependency_tree["nodes"][address], dependency_tree))
+
+        return expanded_node
+
+    def _word_is_ne_tagged(self, word_index, ne_tagged_line):
+        word, ne_tag = ne_tagged_line[word_index]
+        return ne_tag in self.task_config["NER_TAGSET"]
+
+    def _expanded_node_is_ne_tagged(self, expanded_node, ne_tagged_line):
+        return any(
+            [
+                self._word_is_ne_tagged(address-1, ne_tagged_line)
+                for address, word in expanded_node
+            ]
+        )
+
+    @staticmethod
+    def _join_expanded_node(expanded_node):
+        sorted_expanded_node = sorted(expanded_node, key=lambda x: x[0])
+        return " ".join([word for address, word in sorted_expanded_node])
+
+    def extract_relations(self, dependency_tree, ne_tagged_line):
+        moderating_nodes = self._extract_moderating_nodes(dependency_tree)
+        extracted_relations = []
+
+        for moderating_node in moderating_nodes:
+            subj_node_index = moderating_node["deps"]["nsubj"][0]
+            obj_node_index = moderating_node["deps"]["dobj"][0]
+
+            expanded_subj_node = self._expand_node(dependency_tree["nodes"][subj_node_index], dependency_tree)
+            expanded_obj_node = self._expand_node(dependency_tree["nodes"][obj_node_index], dependency_tree)
+
+            # subj_phrase = self._join_expanded_node(expanded_subj_node)
+            # obj_phrase = self._join_expanded_node(expanded_obj_node)
+
+            # TODO: Use extended corpus? (1.)
+            # TODO: Extend definition of moderating nodes? (2.)
+
+            if self._expanded_node_is_ne_tagged(expanded_subj_node, ne_tagged_line) or\
+                self._expanded_node_is_ne_tagged(expanded_obj_node, ne_tagged_line):
+                    pass

@@ -88,9 +88,9 @@ def format_task_config_key(config_parameter):
     Format the name of config parameter to be included as in the final task config, without any language references
     (because the names of parameters in Luigi tasks are language agnostic).
     """
-    if "{language" in config_parameter:
-        return "_".join(config_parameter.split("_")[1:]).lower()
-    return config_parameter.lower()
+    if "{language}" in config_parameter:
+        return "_".join(config_parameter.split("_")[1:])
+    return config_parameter
 
 
 def _add_from_config_dependencies(target_config, raw_config, language, dependency_name, dependencies):
