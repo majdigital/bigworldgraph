@@ -5,41 +5,68 @@ Utilities for the NLP pipeline.
 
 # STD
 from collections import defaultdict
+import pkgutil
+import importlib
 import json
 import luigi
 import os
+import inspect
+from functools import reduce
+import sys
+import pyclbr
 
 # PROJECT
 from bwg.misc.helpers import filter_dict
-from bwg.nlp.config_management import MissingConfigParameterException
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
-class DebuggablePipelineTask(luigi.Task):
-    # TODO: Is broken :-(
+class TaskRequirementsFromConfigMixin(object):
+    task_config = luigi.DictParameter()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def requires(self):
+        required_tasks = self.task_config["PIPELINE_DEPENDENCIES"]
+        requirements = [
+            self._get_task_cls_from_str(required_task)(task_config=self.task_config)
+            for required_task in required_tasks
+            ]
+        return requirements
 
-        self._check_task_config()
+    def _get_task_cls_from_str(self, cls_str):
+        """
+        Turn a string of a Luigi Task class into an actual class object.
+        """
+        package_name = ".".join(__name__.split(".")[:-1])
+        module_classes = self._load_task_classes(package_name)
 
-        if self.task_config["PIPELINE_DEBUG"]:
-            outputs = luigi.task.flatten(self.output())
-            for out in outputs:
-                if out.exists():
-                    os.remove(self.output().path)
+        try:
+            return module_classes[cls_str]
+        except:
+            raise KeyError(
+                "No task class called '{}' found in any module of package {}.".format(cls_str, package_name)
+            )
 
-    def complete(self):
-        if os.path.exists(self.output().path):
-            return True
-        return False
+    @staticmethod
+    def _load_task_classes(package):
+        """
+        Load all the classes in all the modules of a package.
+        """
+        module_names = []
+        classes = {}
 
-    def _check_task_config(self):
-        if not hasattr(self, "task_config"):
-            raise MissingConfigParameterException("No task_config attribute found for this task.")
+        for importer, module_name, ispkg in pkgutil.iter_modules("../"):
+            module_names.append(package + "." + module_name)
 
-        if "PIPELINE_DEBUG" not in self.task_config:
-            raise MissingConfigParameterException("DEBUG not found among parameters in task_config.")
+        for module_name in module_names:
+            __import__(module_name)
+            classes.update(
+                {
+                    module_class_name: module_class
+                    for module_class_name, module_class in inspect.getmembers(sys.modules[module_name], inspect.isclass)
+                    if module_class_name.endswith("Task")
+                }
+            )
+
+        return classes
 
 
 def serialize_ne_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
@@ -65,6 +92,7 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
     Serialize a dependency parse tree for a sentence.
     """
     options = {}
+
     parse_tree = vars([tree for tree in parse_trees][0])
     simplified_tree = {
         "root": parse_tree["root"]["address"],
@@ -100,10 +128,12 @@ def deserialize_dependency_tree(line):
     """
     sentence_id, raw_tree = deserialize_line(line)
     final_tree = dict({"root": raw_tree["root"]})
+
     final_tree["nodes"] = {
-        int(address): node
-        for address, node in raw_tree["nodes"].items()
-    }
+            int(address): node
+            for address, node in raw_tree["nodes"].items()
+        }
+
     return sentence_id, final_tree
 
 

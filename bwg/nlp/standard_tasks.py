@@ -20,11 +20,13 @@ from bwg.nlp.utilities import (
     serialize_ne_tagged_sentence,
     deserialize_line,
     deserialize_dependency_tree,
-    get_serialized_dependency_tree_connections,
+    TaskRequirementsFromConfigMixin
 )
 
+# TODO: Make requirements agnostic (?)
 
-class ReadCorpusTask(luigi.Task):
+
+class ReadCorpusTask(TaskRequirementsFromConfigMixin, luigi.Task):
     """
     Luigi task that reads a corpus.
     """
@@ -45,14 +47,11 @@ class ReadCorpusTask(luigi.Task):
                 sentences_file.write("{}\t{}\n".format(sentence_id, line.strip()))
 
 
-class NERTask(luigi.Task):
+class NERTask(TaskRequirementsFromConfigMixin, luigi.Task):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
     """
     task_config = luigi.DictParameter()
-
-    def requires(self):
-        return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
         nes_file_path = self.task_config["NES_FILE_PATH"]
@@ -78,14 +77,11 @@ class NERTask(luigi.Task):
                 nes_file.write("{}\n".format(serialized_sentence))
 
 
-class DependencyParseTask(luigi.Task):
+class DependencyParseTask(TaskRequirementsFromConfigMixin, luigi.Task):
     """
     Luigi task that dependency-parses sentences in a corpus.
     """
     task_config = luigi.DictParameter()
-
-    def requires(self):
-        return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
         dependency_file_path = self.task_config["DEPENDENCY_FILE_PATH"]
@@ -109,14 +105,11 @@ class DependencyParseTask(luigi.Task):
                 dependency_file.write("{}\n".format(serialized_tree))
 
 
-class NaiveOpenRelationExtractionTask(luigi.Task):
+class NaiveOpenRelationExtractionTask(TaskRequirementsFromConfigMixin, luigi.Task):
     """
     Luigi task that performs Open Relation extraction on a corpus.
     """
     task_config = luigi.DictParameter()
-
-    def requires(self):
-        return NERTask(task_config=self.task_config), DependencyParseTask(task_config=self.task_config)
 
     def output(self):
         relations_file_path = self.task_config["RELATIONS_FILE_PATH"]
