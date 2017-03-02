@@ -150,10 +150,11 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
 
         return moderating_nodes
 
-    def _check_moderating_nodes_children_importance(self, moderating_nodes, ner_tagged_line):
-        pass
-
     def _expand_node(self, node, dependency_tree):
+        """
+        Expand a node from a dependency graph s.t. it includes the address and the word of all nodes that are dependent
+        from it.
+        """
         expanded_node = [(node["address"], node["word"])]
 
         for dependency in node["deps"]:
@@ -166,10 +167,16 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         return expanded_node
 
     def _word_is_ne_tagged(self, word_index, ne_tagged_line):
+        """
+        Check if a word is Named Entity tagged.
+        """
         word, ne_tag = ne_tagged_line[word_index]
         return ne_tag in self.task_config["NER_TAGSET"]
 
     def _expanded_node_is_ne_tagged(self, expanded_node, ne_tagged_line):
+        """
+        Check if a word within an expanded node was assigned a Named Entity tag.
+        """
         return any(
             [
                 self._word_is_ne_tagged(address-1, ne_tagged_line)
@@ -179,10 +186,16 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
 
     @staticmethod
     def _join_expanded_node(expanded_node):
+        """
+        Join all the words from an extended word into a phrase.
+        """
         sorted_expanded_node = sorted(expanded_node, key=lambda x: x[0])
         return " ".join([word for address, word in sorted_expanded_node])
 
     def extract_relations(self, dependency_tree, ne_tagged_line):
+        """
+        Extract relations involving Named Entities from a sentence, using a dependency graph and named entity tags.
+        """
         moderating_nodes = self._extract_moderating_nodes(dependency_tree)
         extracted_relations = []
 
@@ -193,12 +206,13 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
             expanded_subj_node = self._expand_node(dependency_tree["nodes"][subj_node_index], dependency_tree)
             expanded_obj_node = self._expand_node(dependency_tree["nodes"][obj_node_index], dependency_tree)
 
-            # subj_phrase = self._join_expanded_node(expanded_subj_node)
-            # obj_phrase = self._join_expanded_node(expanded_obj_node)
-
             # TODO: Use extended corpus? (1.)
             # TODO: Extend definition of moderating nodes? (2.)
 
             if self._expanded_node_is_ne_tagged(expanded_subj_node, ne_tagged_line) or\
                 self._expanded_node_is_ne_tagged(expanded_obj_node, ne_tagged_line):
+                    # TODO: Add relation if constraints are fulfilled
+                    # subj_phrase = self._join_expanded_node(expanded_subj_node)
+                    # obj_phrase = self._join_expanded_node(expanded_obj_node)
+                    # extracted_relations.append((subj_phrase, moderating_node.word, obj_phrase))
                     pass
