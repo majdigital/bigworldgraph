@@ -10,6 +10,7 @@ import re
 # EXT
 import luigi
 import nltk.tokenize
+import nltk.data
 
 # PROJECT
 from bwg.nlp.standard_tasks import (
@@ -26,14 +27,15 @@ class FrenchWikipediaCorpusCleaningTask(luigi.Task):
     A Luigi task that cleans the corpus of certain Wikipedia artifacts, like
         * Deleting references from words ("décolé21" -> "décolé" / "Kwan3,4" -> "Kwan")
         * Deleting leftover Wikipedia markup, like "[masquer]"
-        * Change encoding to UTF-8
+        * Change encoding
         * Removes empty lines
     """
     task_config = luigi.DictParameter()
 
     def output(self):
+        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
         output_path = self.task_config["WIKIPEDIA_CLEANING_OUTPUT_PATH"]
-        return luigi.LocalTarget(output_path)
+        return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
         input_path = self.task_config["WIKIPEDIA_CLEANING_INPUT_PATH"]
@@ -70,17 +72,33 @@ class FrenchWikipediaSentenceSplittingTask(luigi.Task):
     A Luigi task that splits sentences in the Wikipedia corpus.
     """
     task_config = luigi.DictParameter()
-    # TODO: Remove empty lines
-    # TODO: Split sentences
 
     def requires(self):
         return FrenchWikipediaCorpusCleaningTask(task_config=self.task_config)
 
     def output(self):
-        pass
+        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
+        output_path = self.task_config["WIKIPEDIA_SPLITTING_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
-        pass
+        with self.input().open("r") as input_file, self.output().open("w") as output_file:
+            for line in input_file.readlines():
+                for sentence in self._split_into_sentences(line):
+                    output_file.write("{}\n".format(sentence))
+
+    @staticmethod
+    def _split_into_sentences(line):
+        french_sentence_tokenizer = "tokenizers/punkt/PY3/french.pickle"
+
+        try:
+            nltk.data.find(french_sentence_tokenizer)
+        except LookupError:
+            nltk.download("punkt")
+
+        tokenizer = nltk.data.load(french_sentence_tokenizer)
+        sentences = tokenizer.tokenize(line)
+        return sentences
 
 
 class FrenchIDTaggingTask(IDTaggingTask):

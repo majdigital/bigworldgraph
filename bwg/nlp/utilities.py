@@ -71,7 +71,7 @@ def serialize_ne_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
     """
     Serialize a sentence tagged with Nnmed entitiy tags s.t. it can be passed between Luigi tasks.
     """
-    options = {}
+    options = {"ensure_ascii": False}
 
     if pretty:
         options.update({"indent": 4, "sort_keys": True})
@@ -89,7 +89,7 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
     """
     Serialize a dependency parse tree for a sentence.
     """
-    options = {}
+    options = {"ensure_ascii": False}
 
     parse_tree = vars([tree for tree in parse_trees][0])
     simplified_tree = {
@@ -109,6 +109,29 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
             "data": simplified_tree
         },
         **options
+    )
+
+
+def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pretty=False):
+    """
+    Serialize an extracted relation.
+    """
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options.update({"indent": 4, "sort_keys": True})
+
+    return json.dumps(
+        {
+            "sentence_id": sentence_id,
+            "data": {
+                "subject_phrase": subj_phrase,
+                "verb_phrase": verb,
+                "object_phrase": obj_phrase,
+                "sentence": sentence
+            },
+            **options
+        }
     )
 
 

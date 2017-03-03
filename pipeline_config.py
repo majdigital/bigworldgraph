@@ -4,7 +4,8 @@
 # Finds out which parts of the config are necessary for a specific task
 CONFIG_DEPENDENCIES = {
     "all": [
-        "PIPELINE_DEBUG"
+        "PIPELINE_DEBUG",
+        "CORPUS_ENCODING"
     ],
     "optional": [
         "PRETTY_SERIALIZATION"
@@ -54,7 +55,7 @@ STANFORD_PATH = "../../data/stanford/models/"
 MODERATING_NODE_CTAGS = ["VBP", "VBZ"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 PIPELINE_DEBUG = True
-CORPUS_ENCODING = "latin-1"
+CORPUS_ENCODING = "iso-8859-1"
 
 # ------------------------------- French configurations ---------------------------------
 # Luigi task dependencies
@@ -73,7 +74,7 @@ FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "nes_fr.txt"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "dependencies_fr.txt"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "relations_fr.txt"
 FRENCH_WIKIPEDIA_CLEANING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_cleaned_fr.txt"
-FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_fr.txt"
+FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_100_fr.txt"
 FRENCH_WIKIPEDIA_SPLITTING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_split_fr.txt"
 FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 
