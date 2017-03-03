@@ -60,7 +60,9 @@ CORPUS_ENCODING = "iso-8859-1"
 # ------------------------------- French configurations ---------------------------------
 # Luigi task dependencies
 # This would be cool if it worked but it doesn't due to weird Luigi scheduler problems.
-# TODO: Ask this on Stack overflow? / Luigi Github?
+# TODO (INQUIRY): Ask this on Stack overflow? / Luigi Github? (Done on 02.03.17 / 03.03.17, waiting for responses)
+# Stackoverflow: http://stackoverflow.com/questions/42563175/how-to-enable-dynamic-requirements-in-luigi
+# Luigi GitHub: https://github.com/spotify/luigi/issues/2052
 #FRENCH_PIPELINE_DEPENDENCIES = {
 #    "ReadCorpusTask": [],
 #    "NERTask": ["ReadCorpusTask"],
@@ -69,6 +71,7 @@ CORPUS_ENCODING = "iso-8859-1"
 #}
 
 # Paths for Luigi task outputs
+# TODO (FEATURE): Separate corpora paths from paths for Luigi task results
 FRENCH_LUIGI_DATA_PATH = "../../data/pipeline_french/"
 FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "nes_fr.txt"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "dependencies_fr.txt"

@@ -156,27 +156,3 @@ def deserialize_dependency_tree(line):
         }
 
     return sentence_id, final_tree
-
-
-def get_serialized_dependency_tree_connections(serialized_dependency_tree):
-    """
-    Extract the connection from a dependency parse tree.
-    """
-    connections = defaultdict(set)
-
-    nodes = serialized_dependency_tree["nodes"]
-    for address, node in nodes.items():
-        if address == 0:
-            continue
-
-        if node["head"] is not None:
-            connections[address].add(node["head"])
-
-        for dependency, target_nodes in node["deps"].items():
-            if dependency == "rel":
-                continue
-
-            for target_node in target_nodes:
-                connections[address].add(target_node)
-
-    return connections

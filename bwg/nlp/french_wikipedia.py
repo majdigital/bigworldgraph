@@ -9,6 +9,7 @@ import re
 
 # EXT
 import luigi
+import luigi.format
 import nltk.tokenize
 import nltk.data
 
@@ -52,9 +53,15 @@ class FrenchWikipediaCorpusCleaningTask(luigi.Task):
 
     @staticmethod
     def _clean_markup(line):
+        """
+        Cleans Wikipedia in Markup.
+        """
         return re.sub("\[.+?\]", "", line)
 
     def _clean_references(self, line):
+        """
+        Cleans references from words.
+        """
         whitespace_tokenizer = nltk.tokenize.WhitespaceTokenizer()
         wikipedia_reference_pattern = self.task_config["WIKIPEDIA_REFERENCE_PATTERN"]
         cleaned_words = []
@@ -89,8 +96,12 @@ class FrenchWikipediaSentenceSplittingTask(luigi.Task):
 
     @staticmethod
     def _split_into_sentences(line):
+        """
+        Split text in a corpus into single sentences.
+        """
         french_sentence_tokenizer = "tokenizers/punkt/PY3/french.pickle"
 
+        # Download resource if necessary
         try:
             nltk.data.find(french_sentence_tokenizer)
         except LookupError:
@@ -135,7 +146,7 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
 
 
 if __name__ == "__main__":
-    # TODO: Use remote scheduler for server deployment
+    # TODO (FEATURE): Use remote scheduler for server deployment
     french_task_config = build_task_config_for_language(
         tasks=[
             "wikipedia_corpus_cleaning",
@@ -152,4 +163,3 @@ if __name__ == "__main__":
         [FrenchNaiveOpenRelationExtractionTask(task_config=french_task_config)],
         local_scheduler=True
     )
-    # luigi.run(["OpenRelationExtractionTask"])

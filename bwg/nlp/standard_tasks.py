@@ -129,7 +129,6 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
 
     def run(self):
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
-        # TODO: Do Open Relation Extraction
 
         with self.input()[0].open("r") as nes_input_file, self.input()[1].open("r") as dependency_input_file:
             with self.output().open("w") as output_file:
@@ -137,8 +136,6 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
                     sentence_id_1, ne_tagged_line = deserialize_line(nes_line)
                     sentence_id_2, dependency_tree = deserialize_dependency_tree(dependency_line)
                     assert sentence_id_1 == sentence_id_2
-
-                    #get_serialized_dependency_tree_connections(dependency_tree)
 
                     relations = self.extract_relations(dependency_tree, ne_tagged_line)
                     for subj_phrase, verb, obj_phrase in relations:
@@ -228,11 +225,12 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
             subj_node_index = moderating_node["deps"]["nsubj"][0]
             obj_node_index = moderating_node["deps"]["dobj"][0]
 
+            # TODO (BUG): Words in Dependency parse don't corresppond 1:1 to words in NE tagged sentence
             expanded_subj_node = self._expand_node(dependency_tree["nodes"][subj_node_index], dependency_tree)
             expanded_obj_node = self._expand_node(dependency_tree["nodes"][obj_node_index], dependency_tree)
 
-            # TODO: Use extended corpus? (1.)
-            # TODO: Extend definition of moderating nodes? (2.)
+            # TODO (FEATURE): Use extended corpus? (1.)
+            # TODO (FEATURE): Extend definition of moderating nodes? (Allow more patterns) (2.)
 
             if self._expanded_node_is_ne_tagged(expanded_subj_node, ne_tagged_line) or\
                 self._expanded_node_is_ne_tagged(expanded_obj_node, ne_tagged_line):
