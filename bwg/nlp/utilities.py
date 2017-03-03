@@ -5,48 +5,73 @@ Utilities for the NLP pipeline.
 
 # STD
 from collections import defaultdict
+import pkgutil
 import json
 import luigi
-import os
+import inspect
+import sys
 
 # PROJECT
 from bwg.misc.helpers import filter_dict
-from bwg.nlp.config_management import MissingConfigParameterException
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
-class DebuggablePipelineTask(luigi.Task):
-    # TODO: Is broken :-(
+class TaskRequirementsFromConfigMixin(object):
+    task_config = luigi.DictParameter()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def requires(self):
+        required_tasks = self.task_config["PIPELINE_DEPENDENCIES"]
+        requirements = [
+            self._get_task_cls_from_str(required_task)(task_config=self.task_config)
+            for required_task in required_tasks
+        ]
+        if len(requirements) == 1:
+            return requirements[0]
+        return requirements
 
-        self._check_task_config()
+    def _get_task_cls_from_str(self, cls_str):
+        """
+        Turn a string of a Luigi Task class into an actual type.
+        """
+        package_name = ".".join(__name__.split(".")[:-1])
+        module_classes = self._load_task_classes(package_name)
 
-        if self.task_config["PIPELINE_DEBUG"]:
-            outputs = luigi.task.flatten(self.output())
-            for out in outputs:
-                if out.exists():
-                    os.remove(self.output().path)
+        try:
+            return module_classes[cls_str]
+        except:
+            raise KeyError(
+                "No task class called '{}' found in any module of package {}.".format(cls_str, package_name)
+            )
 
-    def complete(self):
-        if os.path.exists(self.output().path):
-            return True
-        return False
+    @staticmethod
+    def _load_task_classes(package):
+        """
+        Load all the classes in all the modules of a package.
+        """
+        module_names = []
+        classes = {}
 
-    def _check_task_config(self):
-        if not hasattr(self, "task_config"):
-            raise MissingConfigParameterException("No task_config attribute found for this task.")
+        for importer, module_name, ispkg in pkgutil.iter_modules("../"):
+            module_names.append(package + "." + module_name)
 
-        if "PIPELINE_DEBUG" not in self.task_config:
-            raise MissingConfigParameterException("DEBUG not found among parameters in task_config.")
+        for module_name in module_names:
+            __import__(module_name)
+            classes.update(
+                {
+                    module_class_name: module_class
+                    for module_class_name, module_class in inspect.getmembers(sys.modules[module_name], inspect.isclass)
+                    if module_class_name.endswith("Task")
+                }
+            )
+
+        return classes
 
 
 def serialize_ne_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
     """
     Serialize a sentence tagged with Nnmed entitiy tags s.t. it can be passed between Luigi tasks.
     """
-    options = {}
+    options = {"ensure_ascii": False}
 
     if pretty:
         options.update({"indent": 4, "sort_keys": True})
@@ -64,7 +89,8 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
     """
     Serialize a dependency parse tree for a sentence.
     """
-    options = {}
+    options = {"ensure_ascii": False}
+
     parse_tree = vars([tree for tree in parse_trees][0])
     simplified_tree = {
         "root": parse_tree["root"]["address"],
@@ -86,6 +112,29 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
     )
 
 
+def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pretty=False):
+    """
+    Serialize an extracted relation.
+    """
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options.update({"indent": 4, "sort_keys": True})
+
+    return json.dumps(
+        {
+            "sentence_id": sentence_id,
+            "data": {
+                "subject_phrase": subj_phrase,
+                "verb_phrase": verb,
+                "object_phrase": obj_phrase,
+                "sentence": sentence
+            },
+            **options
+        }
+    )
+
+
 def deserialize_line(line):
     """
     Transform a line in a file that was created as a result from a Luigi task into a sentence id and sentence data.
@@ -100,32 +149,10 @@ def deserialize_dependency_tree(line):
     """
     sentence_id, raw_tree = deserialize_line(line)
     final_tree = dict({"root": raw_tree["root"]})
+
     final_tree["nodes"] = {
-        int(address): node
-        for address, node in raw_tree["nodes"].items()
-    }
+            int(address): node
+            for address, node in raw_tree["nodes"].items()
+        }
+
     return sentence_id, final_tree
-
-
-def get_serialized_dependency_tree_connections(serialized_dependency_tree):
-    """
-    Extract the connection from a dependency parse tree.
-    """
-    connections = defaultdict(set)
-
-    nodes = serialized_dependency_tree["nodes"]
-    for address, node in nodes.items():
-        if address == 0:
-            continue
-
-        if node["head"] is not None:
-            connections[address].add(node["head"])
-
-        for dependency, target_nodes in node["deps"].items():
-            if dependency == "rel":
-                continue
-
-            for target_node in target_nodes:
-                connections[address].add(target_node)
-
-    return connections
