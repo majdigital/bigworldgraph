@@ -6,14 +6,10 @@ Utilities for the NLP pipeline.
 # STD
 from collections import defaultdict
 import pkgutil
-import importlib
 import json
 import luigi
-import os
 import inspect
-from functools import reduce
 import sys
-import pyclbr
 
 # PROJECT
 from bwg.misc.helpers import filter_dict
@@ -28,12 +24,14 @@ class TaskRequirementsFromConfigMixin(object):
         requirements = [
             self._get_task_cls_from_str(required_task)(task_config=self.task_config)
             for required_task in required_tasks
-            ]
+        ]
+        if len(requirements) == 1:
+            return requirements[0]
         return requirements
 
     def _get_task_cls_from_str(self, cls_str):
         """
-        Turn a string of a Luigi Task class into an actual class object.
+        Turn a string of a Luigi Task class into an actual type.
         """
         package_name = ".".join(__name__.split(".")[:-1])
         module_classes = self._load_task_classes(package_name)

@@ -5,7 +5,6 @@ Defining standard tasks for the NLP pipeline.
 
 # STD
 import codecs
-import os
 import uuid
 
 # EXT
@@ -19,14 +18,11 @@ from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_ne_tagged_sentence,
     deserialize_line,
-    deserialize_dependency_tree,
-    TaskRequirementsFromConfigMixin
+    deserialize_dependency_tree
 )
 
-# TODO: Make requirements agnostic (?)
 
-
-class ReadCorpusTask(TaskRequirementsFromConfigMixin, luigi.Task):
+class ReadCorpusTask(luigi.Task):
     """
     Luigi task that reads a corpus.
     """
@@ -47,11 +43,14 @@ class ReadCorpusTask(TaskRequirementsFromConfigMixin, luigi.Task):
                 sentences_file.write("{}\t{}\n".format(sentence_id, line.strip()))
 
 
-class NERTask(TaskRequirementsFromConfigMixin, luigi.Task):
+class NERTask(luigi.Task):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
     """
     task_config = luigi.DictParameter()
+
+    def requires(self):
+        return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
         nes_file_path = self.task_config["NES_FILE_PATH"]
@@ -77,11 +76,14 @@ class NERTask(TaskRequirementsFromConfigMixin, luigi.Task):
                 nes_file.write("{}\n".format(serialized_sentence))
 
 
-class DependencyParseTask(TaskRequirementsFromConfigMixin, luigi.Task):
+class DependencyParseTask(luigi.Task):
     """
     Luigi task that dependency-parses sentences in a corpus.
     """
     task_config = luigi.DictParameter()
+
+    def requires(self):
+        return ReadCorpusTask(task_config=self.task_config)
 
     def output(self):
         dependency_file_path = self.task_config["DEPENDENCY_FILE_PATH"]
@@ -105,11 +107,14 @@ class DependencyParseTask(TaskRequirementsFromConfigMixin, luigi.Task):
                 dependency_file.write("{}\n".format(serialized_tree))
 
 
-class NaiveOpenRelationExtractionTask(TaskRequirementsFromConfigMixin, luigi.Task):
+class NaiveOpenRelationExtractionTask(luigi.Task):
     """
     Luigi task that performs Open Relation extraction on a corpus.
     """
     task_config = luigi.DictParameter()
+
+    def requires(self):
+        return NERTask(task_config=self.task_config), DependencyParseTask(task_config=self.task_config)
 
     def output(self):
         relations_file_path = self.task_config["RELATIONS_FILE_PATH"]

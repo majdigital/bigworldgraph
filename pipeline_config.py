@@ -7,8 +7,7 @@
 #   - open_relation_extraction
 CONFIG_DEPENDENCIES = {
     "all": [
-        "PIPELINE_DEBUG",
-        "{language}_PIPELINE_DEPENDENCIES"
+        "PIPELINE_DEBUG"
     ],
     "optional": [
         "PRETTY_SERIALIZATION"
@@ -62,6 +61,7 @@ CORPUS_ENCODING = "latin-1"
 # ------------------------------- French configurations ---------------------------------
 # Luigi task dependencies
 # This would be cool if it worked but it doesn't due to weird Luigi scheduler problems.
+# TODO: Ask this on Stack overflow? / Luigi Github?
 #FRENCH_PIPELINE_DEPENDENCIES = {
 #    "ReadCorpusTask": [],
 #    "NERTask": ["ReadCorpusTask"],
