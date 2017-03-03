@@ -8,7 +8,7 @@ import luigi
 
 # PROJECT
 from bwg.nlp.standard_tasks import (
-    ReadCorpusTask,
+    IDTaggingTask,
     NERTask,
     DependencyParseTask,
     NaiveOpenRelationExtractionTask
@@ -22,6 +22,7 @@ class FrenchWikipediaCorpusCleaningTask(luigi.task):
         * Deleting references from words ("décolé21" -> "décolé" / "Kwan3,4" -> "Kwan")
         * Deleting leftover Wikipedia markup, like "[masquer]"
         * Joining shortened articles with their nouns ("L enquête" -> "L'enquête")
+        * Change encoding to UTF-8
     """
     task_config = luigi.DictParameter()
     # TODO: Delete references from words
@@ -53,7 +54,7 @@ class FrenchWikipediaSentenceSplittingTask(luigi.task):
         pass
 
 
-class FrenchReadCorpusTask(ReadCorpusTask):
+class FrenchIDTaggingTask(IDTaggingTask):
     """
     A luigi task reading a corpus, but it's specific for the french Wikipedia.
     """
@@ -66,7 +67,7 @@ class FrenchNERTask(NERTask):
     A luigi task tagging Named Entities in a sentence, but it's specific for the french Wikipedia.
     """
     def requires(self):
-        return FrenchReadCorpusTask(task_config=self.task_config)
+        return FrenchIDTaggingTask(task_config=self.task_config)
 
 
 class FrenchDependencyParseTask(DependencyParseTask):
@@ -74,7 +75,7 @@ class FrenchDependencyParseTask(DependencyParseTask):
     A luigi task dependency-parsing a sentence, but it's specific for the french Wikipedia.
     """
     def requires(self):
-        return FrenchReadCorpusTask(task_config=self.task_config)
+        return FrenchIDTaggingTask(task_config=self.task_config)
 
 
 class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):

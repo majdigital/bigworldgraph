@@ -22,25 +22,25 @@ from bwg.nlp.utilities import (
 )
 
 
-class ReadCorpusTask(luigi.Task):
+class IDTaggingTask(luigi.Task):
     """
-    Luigi task that reads a corpus.
+    Luigi task that reads a corpus and assigns each sentence an ID.
     """
     task_config = luigi.DictParameter()
 
     def output(self):
-        sentences_file_path = self.task_config["SENTENCES_FILE_PATH"]
-        return luigi.LocalTarget(sentences_file_path)
+        output_path = self.task_config["ID_TAGGING_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path)
 
     def run(self):
         # Init necessary resources
-        corpus_file_path = self.task_config["CORPUS_FILE_PATH"]
+        id_tagging_input_path = self.task_config["ID_TAGGING_INPUT_PATH"]
 
         # Main work
-        with codecs.open(corpus_file_path, "rb", "utf-8") as corpus_file, self.output().open("w") as sentences_file:
-            for line in corpus_file.readlines():
+        with codecs.open(id_tagging_input_path, "rb", "utf-8") as input_file, self.output().open("w") as output_file:
+            for line in input_file.readlines():
                 sentence_id = uuid.uuid4()
-                sentences_file.write("{}\t{}\n".format(sentence_id, line.strip()))
+                output_file.write("{}\t{}\n".format(sentence_id, line.strip()))
 
 
 class NERTask(luigi.Task):
@@ -50,11 +50,11 @@ class NERTask(luigi.Task):
     task_config = luigi.DictParameter()
 
     def requires(self):
-        return ReadCorpusTask(task_config=self.task_config)
+        return IDTaggingTask(task_config=self.task_config)
 
     def output(self):
-        nes_file_path = self.task_config["NES_FILE_PATH"]
-        return luigi.LocalTarget(nes_file_path)
+        output_path = self.task_config["NES_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path)
 
     def run(self):
         # Init necessary resources
@@ -65,15 +65,15 @@ class NERTask(luigi.Task):
         ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path, encoding='utf-8')
 
         # Main work
-        with self.input().open("r") as sentences_file, self.output().open("w") as nes_file:
-            for line in sentences_file:
+        with self.input().open("r") as input_file, self.output().open("w") as output_file:
+            for line in input_file:
                 sentence_id, sentence = line.split("\t")
                 tokenized_sentence = tokenizer.tokenize(sentence)
                 ner_tagged_sentence = ner_tagger.tag(tokenized_sentence)
                 serialized_sentence = serialize_ne_tagged_sentence(
                     sentence_id, ner_tagged_sentence, pretty=pretty_serialization
                 )
-                nes_file.write("{}\n".format(serialized_sentence))
+                output_file.write("{}\n".format(serialized_sentence))
 
 
 class DependencyParseTask(luigi.Task):
@@ -83,11 +83,11 @@ class DependencyParseTask(luigi.Task):
     task_config = luigi.DictParameter()
 
     def requires(self):
-        return ReadCorpusTask(task_config=self.task_config)
+        return IDTaggingTask(task_config=self.task_config)
 
     def output(self):
-        dependency_file_path = self.task_config["DEPENDENCY_FILE_PATH"]
-        return luigi.LocalTarget(dependency_file_path)
+        output_path = self.task_config["DEPENDENCY_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path)
 
     def run(self):
         # Init necessary resources
@@ -97,14 +97,14 @@ class DependencyParseTask(luigi.Task):
         dependency_parser = StanfordDependencyParser(stanford_dependency_model_path, stanford_corenlp_models_path)
 
         # Main work
-        with self.input().open("r") as sentences_file, self.output().open("w") as dependency_file:
-            for line in sentences_file:
+        with self.input().open("r") as input_file, self.output().open("w") as output_file:
+            for line in input_file:
                 sentence_id, sentence = line.split("\t")
                 parsed_sentence = dependency_parser.raw_parse(sentence)
                 serialized_tree = serialize_dependency_parse_tree(
                     sentence_id, parsed_sentence, pretty=pretty_serialization
                 )
-                dependency_file.write("{}\n".format(serialized_tree))
+                output_file.write("{}\n".format(serialized_tree))
 
 
 class NaiveOpenRelationExtractionTask(luigi.Task):
@@ -117,15 +117,15 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         return NERTask(task_config=self.task_config), DependencyParseTask(task_config=self.task_config)
 
     def output(self):
-        relations_file_path = self.task_config["RELATIONS_FILE_PATH"]
-        return luigi.LocalTarget(relations_file_path)
+        output_path = self.task_config["RELATIONS_FILE_PATH"]
+        return luigi.LocalTarget(output_path)
 
     def run(self):
         # TODO: Do Open Relation Extraction
 
-        with self.input()[0].open("r") as nes_file, self.input()[1].open("r") as dependency_file:
+        with self.input()[0].open("r") as nes_input_file, self.input()[1].open("r") as dependency_input_file:
             with self.output().open("w") as relations_file:
-                for nes_line, dependency_line in zip(nes_file, dependency_file):
+                for nes_line, dependency_line in zip(nes_input_file, dependency_input_file):
                     sentence_id_1, ne_tagged_line = deserialize_line(nes_line)
                     sentence_id_2, dependency_tree = deserialize_dependency_tree(dependency_line)
                     assert sentence_id_1 == sentence_id_2
