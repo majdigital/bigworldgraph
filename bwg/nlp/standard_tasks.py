@@ -117,7 +117,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         return NERTask(task_config=self.task_config), DependencyParseTask(task_config=self.task_config)
 
     def output(self):
-        output_path = self.task_config["RELATIONS_FILE_PATH"]
+        output_path = self.task_config["ORE_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path)
 
     def run(self):

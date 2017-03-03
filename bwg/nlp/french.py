@@ -3,8 +3,13 @@
 NLP Pipeline tasks for french texts.
 """
 
+# STD
+import codecs
+import re
+
 # EXT
 import luigi
+import nltk.tokenize
 
 # PROJECT
 from bwg.nlp.standard_tasks import (
@@ -16,29 +21,53 @@ from bwg.nlp.standard_tasks import (
 from bwg.nlp.config_management import build_task_config_for_language
 
 
-class FrenchWikipediaCorpusCleaningTask(luigi.task):
+class FrenchWikipediaCorpusCleaningTask(luigi.Task):
     """
     A Luigi task that cleans the corpus of certain Wikipedia artifacts, like
         * Deleting references from words ("décolé21" -> "décolé" / "Kwan3,4" -> "Kwan")
         * Deleting leftover Wikipedia markup, like "[masquer]"
-        * Joining shortened articles with their nouns ("L enquête" -> "L'enquête")
         * Change encoding to UTF-8
+        * Removes empty lines
     """
     task_config = luigi.DictParameter()
-    # TODO: Delete references from words
-    # TODO: Delete wikipedia markup
-    # TODO: Join L-articles with words
 
     def output(self):
-        pass
+        output_path = self.task_config["WIKIPEDIA_CLEANING_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path)
 
     def run(self):
-        pass
+        input_path = self.task_config["WIKIPEDIA_CLEANING_INPUT_PATH"]
+        corpus_encoding = self.task_config["CORPUS_ENCODING"]
+
+        with codecs.open(input_path, "r", corpus_encoding) as input_file, self.output().open("w") as output_file:
+            for line in input_file.readlines():
+                if not line.strip():
+                    continue  # Skip empty lines
+
+                line = self._clean_markup(line)
+                line = self._clean_references(line)
+                output_file.write("{}\n".format(line))
+
+    @staticmethod
+    def _clean_markup(line):
+        return re.sub("\[.+?\]", "", line)
+
+    def _clean_references(self, line):
+        whitespace_tokenizer = nltk.tokenize.WhitespaceTokenizer()
+        wikipedia_reference_pattern = self.task_config["WIKIPEDIA_REFERENCE_PATTERN"]
+        cleaned_words = []
+
+        for word in whitespace_tokenizer.tokenize(line):
+            if re.match(wikipedia_reference_pattern, word):
+                word = re.sub("\d+((,\d+)+)?", "", word)
+            cleaned_words.append(word)
+
+        return " ".join(cleaned_words)
 
 
-class FrenchWikipediaSentenceSplittingTask(luigi.task):
+class FrenchWikipediaSentenceSplittingTask(luigi.Task):
     """
-    A Luigi task that splits sentences in the Wikipedia corpus and removes useless, empty lines.
+    A Luigi task that splits sentences in the Wikipedia corpus.
     """
     task_config = luigi.DictParameter()
     # TODO: Remove empty lines
@@ -91,7 +120,9 @@ if __name__ == "__main__":
     # TODO: Use remote scheduler for server deployment
     french_task_config = build_task_config_for_language(
         tasks=[
-            "corpus_reading",
+            "wikipedia_corpus_cleaning",
+            "wikipedia_sentence_splitting",
+            "id_tagging",
             "named_entity_recognition",
             "dependency_parsing",
             "open_relation_extraction"
@@ -101,7 +132,6 @@ if __name__ == "__main__":
     )
     luigi.build(
         [FrenchNaiveOpenRelationExtractionTask(task_config=french_task_config)],
-        local_scheduler=True,
-        no_lock=True
+        local_scheduler=True
     )
     # luigi.run(["OpenRelationExtractionTask"])

@@ -1,10 +1,7 @@
+# -*- coding: utf-8 -*-
+
 # ---------------------------------- Meta config ----------------------------------------
 # Finds out which parts of the config are necessary for a specific task
-# Possible tasks (so far) are:
-#   - corpus_reading
-#   - named_entity_recognition
-#   - dependency_parsing
-#   - open_relation_extraction
 CONFIG_DEPENDENCIES = {
     "all": [
         "PIPELINE_DEBUG"
@@ -40,7 +37,8 @@ CONFIG_DEPENDENCIES = {
     "wikipedia_corpus_cleaning": [
         "CORPUS_ENCODING",
         "{language}_WIKIPEDIA_CLEANING_OUTPUT_PATH",
-        "{language}_WIKIPEDIA_CLEANING_INPUT_PATH"
+        "{language}_WIKIPEDIA_CLEANING_INPUT_PATH",
+        "{language}_WIKIPEDIA_REFERENCE_PATTERN"
     ],
     "wikipedia_sentence_splitting": [
         "{language}_WIKIPEDIA_SPLITTING_OUTPUT_PATH"
@@ -75,7 +73,7 @@ FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "nes_fr.txt"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "dependencies_fr.txt"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "relations_fr.txt"
 FRENCH_WIKIPEDIA_CLEANING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_cleaned_fr.txt"
-FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_french.txt"
+FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_fr.txt"
 FRENCH_WIKIPEDIA_SPLITTING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_split_fr.txt"
 FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 
@@ -83,3 +81,6 @@ FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
 FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
+
+# Misc
+FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"
