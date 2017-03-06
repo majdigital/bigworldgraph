@@ -4,7 +4,6 @@ Utilities for the NLP pipeline.
 """
 
 # STD
-from collections import defaultdict
 import pkgutil
 import json
 import luigi
@@ -67,7 +66,7 @@ class TaskRequirementsFromConfigMixin(object):
         return classes
 
 
-def serialize_ne_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
+def serialize_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
     """
     Serialize a sentence tagged with Nnmed entitiy tags s.t. it can be passed between Luigi tasks.
     """
@@ -119,7 +118,7 @@ def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pre
     options = {"ensure_ascii": False}
 
     if pretty:
-        options.update({"indent": 4, "sort_keys": True})
+        options["indent"] = 4
 
     return json.dumps(
         {
@@ -129,9 +128,9 @@ def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pre
                 "verb_phrase": verb,
                 "object_phrase": obj_phrase,
                 "sentence": sentence
-            },
-            **options
-        }
+            }
+        },
+        **options
     )
 
 
@@ -148,7 +147,7 @@ def deserialize_dependency_tree(line):
     Convert dependency node addresses from string to integers.
     """
     sentence_id, raw_tree = deserialize_line(line)
-    final_tree = dict({"root": raw_tree["root"]})
+    final_tree = dict(root=raw_tree["root"])
 
     final_tree["nodes"] = {
             int(address): node

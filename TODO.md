@@ -34,6 +34,7 @@ The versions listed here try to follow [Semantic Versioning](http://semver.or).
 * Adding Dependency Parsing.
 * Adding Named Entity Recognition.
 * Adding Relation extraction.
+* Adding categorization of NE via Wikidata
 
 ### v0.5.0
 
@@ -71,5 +72,4 @@ The versions listed here try to follow [Semantic Versioning](http://semver.or).
 This paragraph lists features that haven't been assigned to specific version
 of the project yet.
 
-* World domination
 * ...

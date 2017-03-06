@@ -24,6 +24,12 @@ CONFIG_DEPENDENCIES = {
         "{language}_STANFORD_NER_MODEL_PATH",
         "{language}_NES_OUTPUT_PATH"
     ],
+    "pos_tagging": [
+        "STANFORD_POSTAGGER_PATH",
+        "{language}_STANFORD_POS_MODEL_PATH",
+        "{language}_STANFORD_MODELS_PATH",
+        "{language}_POS_OUTPUT_PATH"
+    ],
     "dependency_parsing": [
         "DEPENDENCY_TREE_KEEP_FIELDS",
         "STANFORD_CORENLP_MODELS_PATH",
@@ -31,7 +37,7 @@ CONFIG_DEPENDENCIES = {
         "{language}_DEPENDENCY_OUTPUT_PATH"
     ],
     "open_relation_extraction": [
-        "MODERATING_NODE_CTAGS",
+        "VERB_NODE_POS_TAGS",
         "OMITTED_TOKENS_FOR_ALIGNMENT",
         "NER_TAGSET",
         "{language}_ORE_OUTPUT_PATH"
@@ -50,10 +56,11 @@ SUPPORTED_LANGUAGES = ["FRENCH"]
 
 # --------------------------------- General config --------------------------------------
 STANFORD_CORENLP_MODELS_PATH = "../../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
+STANFORD_POSTAGGER_PATH = "../../data/stanford/models/stanford-postagger.jar"
 PRETTY_SERIALIZATION = False
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
 STANFORD_PATH = "../../data/stanford/models/"
-MODERATING_NODE_CTAGS = ["VBP", "VBZ"]
+VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 PIPELINE_DEBUG = True
 CORPUS_ENCODING = "iso-8859-1"
@@ -76,6 +83,7 @@ OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 # TODO (FEATURE): Separate corpora paths from paths for Luigi task results
 FRENCH_LUIGI_DATA_PATH = "../../data/pipeline_french/"
 FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "nes_fr.txt"
+FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "pos_fr.txt"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "dependencies_fr.txt"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "relations_fr.txt"
 FRENCH_WIKIPEDIA_CLEANING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_cleaned_fr.txt"
@@ -85,6 +93,7 @@ FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
+FRENCH_STANFORD_POS_MODEL_PATH = STANFORD_PATH + "french.tagger"
 FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 

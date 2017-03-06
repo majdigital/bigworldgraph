@@ -18,7 +18,8 @@ from bwg.nlp.standard_tasks import (
     IDTaggingTask,
     NERTask,
     DependencyParseTask,
-    NaiveOpenRelationExtractionTask
+    NaiveOpenRelationExtractionTask,
+    PoSTaggingTask
 )
 from bwg.nlp.config_management import build_task_config_for_language
 
@@ -128,6 +129,14 @@ class FrenchNERTask(NERTask):
         return FrenchIDTaggingTask(task_config=self.task_config)
 
 
+class FrenchPoSTaggingTask(PoSTaggingTask):
+    """
+    A luigi task tagging a sentence with PoS tags, but it's tailored to the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchIDTaggingTask(task_config=self.task_config)
+
+
 class FrenchDependencyParseTask(DependencyParseTask):
     """
     A luigi task dependency-parsing a sentence, but it's specific for the french Wikipedia.
@@ -142,7 +151,9 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
     Wikipedia.
     """
     def requires(self):
-        return FrenchNERTask(task_config=self.task_config), FrenchDependencyParseTask(task_config=self.task_config)
+        return FrenchNERTask(task_config=self.task_config),\
+               FrenchDependencyParseTask(task_config=self.task_config),\
+               FrenchPoSTaggingTask(task_config=self.task_config)
 
 
 if __name__ == "__main__":
@@ -153,6 +164,7 @@ if __name__ == "__main__":
             "wikipedia_sentence_splitting",
             "id_tagging",
             "named_entity_recognition",
+            "pos_tagging",
             "dependency_parsing",
             "open_relation_extraction"
         ],
