@@ -6,6 +6,7 @@ Defining standard tasks for the NLP pipeline.
 # STD
 import codecs
 import uuid
+import collections
 
 # EXT
 import luigi
@@ -58,13 +59,14 @@ class NERTask(luigi.Task):
         return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
+        # TODO (BUG): Words with special characters get split?
         # Init necessary resources
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
         stanford_ner_model_path = self.task_config["STANFORD_NER_MODEL_PATH"]
-        tokenizer = StanfordTokenizer(stanford_models_path, encoding=corpus_encoding)
-        ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path, encoding=corpus_encoding)
+        tokenizer = StanfordTokenizer(stanford_models_path)
+        ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path)
 
         # Main work
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
@@ -139,16 +141,54 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
 
                     relations = self.extract_relations(dependency_tree, ne_tagged_line)
                     for subj_phrase, verb, obj_phrase in relations:
+                        # TODO (BUG): No pretty-printing?
                         serialized_relation = serialize_relation(
                             sentence_id_1, subj_phrase, verb, obj_phrase,
                             self._get_sentence(ne_tagged_line),
-                            pretty=pretty_serialization
+                            pretty=True
                         )
                         output_file.write("{}\n".format(serialized_relation))
 
     @staticmethod
     def _get_sentence(ne_tagged_line):
         return " ".join([word for word, tag in ne_tagged_line])
+
+    def _align_ne_tagged_sentence(self, ne_tagged_sentence):
+        omitted_tokens = self.task_config["OMITTED_TOKENS_FOR_ALIGNMENT"]
+
+        return [
+            (word, tag)
+            for word, tag in ne_tagged_sentence
+            if word not in omitted_tokens
+        ]
+
+    @staticmethod
+    def _normalize_node_addresses(dependency_tree):
+        # TODO (Bug): Also normalize references
+        # Delete graph's root node without word
+        if dependency_tree["nodes"][0]["word"] is None:
+            del dependency_tree["nodes"][0]
+
+        normalized_dependency_tree = {"root": dependency_tree["root"], "nodes": {}}
+        sorted_nodes = collections.OrderedDict(sorted(dependency_tree["nodes"].items()))
+        normalizations = {
+            address: normalized_address
+            for address, normalized_address in zip(sorted_nodes, range(len(dependency_tree["nodes"])))
+        }
+
+        for (address, node) in sorted_nodes.items():
+            # Adjust nodes address attribute, dependencies
+            node["address"] = normalizations[address]
+
+            for dependency in node["deps"]:
+                if dependency == "rel":
+                    continue
+
+                node["deps"][dependency] = [normalizations[addr] for addr in node["deps"][dependency]]
+
+            normalized_dependency_tree["nodes"][normalizations[address]] = node
+
+        return normalized_dependency_tree
 
     def _extract_moderating_nodes(self, dependency_tree):
         """
@@ -175,6 +215,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
             if dependency == "rel":
                 continue
 
+            # Ignore noun and object phrases
             if is_verb_node and dependency in ("nsub", "dobj"):
                 continue
 
@@ -187,8 +228,6 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         """
         Check if a word is Named Entity tagged.
         """
-        print("Index: ", word_index)
-        print("Length tagged 2: ", len(ne_tagged_line))
         word, ne_tag = ne_tagged_line[word_index]
         return ne_tag in self.task_config["NER_TAGSET"]
 
@@ -196,12 +235,9 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         """
         Check if a word within an expanded node was assigned a Named Entity tag.
         """
-        print("Expanded: ", expanded_node)
-        print("Tagged line: ", ne_tagged_line)
-        print("Length tagged 1: ", len(ne_tagged_line))
         return any(
             [
-                self._word_is_ne_tagged(address-1, ne_tagged_line)
+                self._word_is_ne_tagged(address, ne_tagged_line)
                 for address, word in expanded_node
             ]
         )
@@ -214,29 +250,42 @@ class NaiveOpenRelationExtractionTask(luigi.Task):
         sorted_expanded_node = sorted(expanded_node, key=lambda x: x[0])
         return " ".join([word for address, word in sorted_expanded_node])
 
+    @staticmethod
+    def _get_subj_and_obj(moderating_node, dependency_tree):
+        subj_node_index = moderating_node["deps"]["nsubj"][0]
+        subj_node = dependency_tree["nodes"][subj_node_index]
+        obj_node_index = moderating_node["deps"]["dobj"][0]
+        obj_node = dependency_tree["nodes"][obj_node_index]
+
+        return subj_node, obj_node
+
     def extract_relations(self, dependency_tree, ne_tagged_line):
         """
         Extract relations involving Named Entities from a sentence, using a dependency graph and named entity tags.
         """
-        moderating_nodes = self._extract_moderating_nodes(dependency_tree)
+        aligned_ne_tagged_line = self._align_ne_tagged_sentence(ne_tagged_line)
+        normalized_dependency_tree = self._normalize_node_addresses(dependency_tree)
+        moderating_nodes = self._extract_moderating_nodes(normalized_dependency_tree)
         extracted_relations = []
 
         for moderating_node in moderating_nodes:
-            subj_node_index = moderating_node["deps"]["nsubj"][0]
-            obj_node_index = moderating_node["deps"]["dobj"][0]
+            subj_node, obj_node = self._get_subj_and_obj(moderating_node, normalized_dependency_tree)
 
-            # TODO (BUG): Words in Dependency parse don't corresppond 1:1 to words in NE tagged sentence
-            expanded_subj_node = self._expand_node(dependency_tree["nodes"][subj_node_index], dependency_tree)
-            expanded_obj_node = self._expand_node(dependency_tree["nodes"][obj_node_index], dependency_tree)
+            expanded_subj_node = self._expand_node(subj_node, normalized_dependency_tree)
+            expanded_obj_node = self._expand_node(obj_node, normalized_dependency_tree)
 
             # TODO (FEATURE): Use extended corpus? (1.)
             # TODO (FEATURE): Extend definition of moderating nodes? (Allow more patterns) (2.)
 
-            if self._expanded_node_is_ne_tagged(expanded_subj_node, ne_tagged_line) or\
-                self._expanded_node_is_ne_tagged(expanded_obj_node, ne_tagged_line):
+            if self._expanded_node_is_ne_tagged(expanded_subj_node, aligned_ne_tagged_line) or\
+                self._expanded_node_is_ne_tagged(expanded_obj_node, aligned_ne_tagged_line):
                     subj_phrase = self._join_expanded_node(expanded_subj_node)
                     obj_phrase = self._join_expanded_node(expanded_obj_node)
-                    expanded_verb_node = self._expand_node(moderating_node, dependency_tree, is_verb_node=True)
+
+                    # TODO (BUG) Verb node is not expanded correctly
+                    expanded_verb_node = self._expand_node(
+                        moderating_node, normalized_dependency_tree, is_verb_node=True
+                    )
                     verb_phrase = self._join_expanded_node(expanded_verb_node)
 
                     extracted_relations.append((subj_phrase, verb_phrase, obj_phrase))

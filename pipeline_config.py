@@ -32,6 +32,7 @@ CONFIG_DEPENDENCIES = {
     ],
     "open_relation_extraction": [
         "MODERATING_NODE_CTAGS",
+        "OMITTED_TOKENS_FOR_ALIGNMENT",
         "NER_TAGSET",
         "{language}_ORE_OUTPUT_PATH"
     ],
@@ -56,6 +57,7 @@ MODERATING_NODE_CTAGS = ["VBP", "VBZ"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 PIPELINE_DEBUG = True
 CORPUS_ENCODING = "iso-8859-1"
+OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 
 # ------------------------------- French configurations ---------------------------------
 # Luigi task dependencies
