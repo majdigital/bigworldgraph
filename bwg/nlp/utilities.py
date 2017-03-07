@@ -6,14 +6,66 @@ Utilities for the NLP pipeline.
 # STD
 import pkgutil
 import json
-import luigi
 import inspect
 import sys
-import uuid
+import abc
+
+# EXT
+import luigi
 
 # PROJECT
 from bwg.misc.helpers import filter_dict
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
+
+
+class TaskWorkflowMixin:
+    """
+    Enable Luigi tasks to process single lines as well as articles or other input types.
+    """
+    @abc.abstractmethod
+    def task_workflow(self, sentence, **workflow_kwargs):
+        """
+        Define the tasks workflow here - it usually includes extracting necessary resources from workflow_kwargs,
+        performing the actual task on the sentence and wrapping all the arguments for the serializing function in a
+        dictionary, returning it in the end.
+        """
+        return {}
+
+    def process_line(self, line, workflow_kwargs, new_state, serializing_function, output_file, pretty=False):
+        """
+        Process line from the input and apply this task's workflow. Serialize the result afterwards and finally write
+        it to the output file.
+        """
+        # TODO (Refactor): Make it possible to a variable number of lines
+        meta, data = deserialize_line(line)
+
+        # Determine if it's just one line or an article, proceed accordingly
+        if meta["type"] == "article":
+            # Apply workflow to every sentence in article
+            sentences = {}
+            sentence_dicts = [
+                serializing_function(
+                    **self.task_workflow(sentence, **workflow_kwargs), new_state=new_state, pretty=pretty
+                )
+                for sentence_id, sentence in data
+            ]
+            for sentence_dict in sentence_dicts:
+                sentences.update(sentence_dict)
+
+            # Preserve article structure
+            output_file.write(
+                serialize_article(
+                    meta["id"], meta["url"], meta["title"], sentences,
+                    from_scratch=False, pretty=pretty, state=new_state
+                )
+            )
+
+        elif meta["type"] == "sentence":
+            serializing_args = workflow(line)
+            output_file.write("{}\n".format(serializing_function(**serializing_args)))
+
+        else:
+            raise TypeError("Unknown input data type '{}'.".format(meta["type"]))
 
 
 class TaskRequirementsFromConfigMixin(object):
@@ -25,8 +77,10 @@ class TaskRequirementsFromConfigMixin(object):
             self._get_task_cls_from_str(required_task)(task_config=self.task_config)
             for required_task in required_tasks
         ]
+
         if len(requirements) == 1:
             return requirements[0]
+
         return requirements
 
     def _get_task_cls_from_str(self, cls_str):
@@ -38,6 +92,7 @@ class TaskRequirementsFromConfigMixin(object):
 
         try:
             return module_classes[cls_str]
+
         except:
             raise KeyError(
                 "No task class called '{}' found in any module of package {}.".format(cls_str, package_name)
@@ -67,7 +122,7 @@ class TaskRequirementsFromConfigMixin(object):
         return classes
 
 
-def serialize_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
+def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=False):
     """
     Serialize a sentence tagged with Nnmed entitiy tags s.t. it can be passed between Luigi tasks.
     """
@@ -78,14 +133,20 @@ def serialize_tagged_sentence(sentence_id, tagged_sentence, pretty=False):
 
     return json.dumps(
         {
-            "sentence_id": sentence_id,
-            "data": tagged_sentence
+            "sentence_id": {
+                "meta": {
+                    "id": sentence_id,
+                    "type": "sentence",
+                    "state": state
+                },
+                "data": tagged_sentence
+            }
         },
         **options
     )
 
 
-def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
+def serialize_dependency_parse_tree(sentence_id, parse_trees, state="raw", pretty=False):
     """
     Serialize a dependency parse tree for a sentence.
     """
@@ -105,14 +166,20 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
 
     return json.dumps(
         {
-            "sentence_id": sentence_id,
-            "data": simplified_tree
+            "sentence_id": {
+                "meta": {
+                    "id": sentence_id,
+                    "state": state,
+                    "type": "sentence"
+                },
+                "data": simplified_tree
+            }
         },
         **options
     )
 
 
-def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pretty=False):
+def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, state="raw", pretty=False):
     """
     Serialize an extracted relation.
     """
@@ -123,36 +190,58 @@ def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pre
 
     return json.dumps(
         {
-            "sentence_id": sentence_id,
-            "data": {
-                "subject_phrase": subj_phrase,
-                "verb_phrase": verb,
-                "object_phrase": obj_phrase,
-                "sentence": sentence
+            sentence_id: {
+                "meta": {
+                    "id": sentence_id,
+                    "state": state,
+                    "type": "sentence"
+                },
+                "data": {
+                    "subject_phrase": subj_phrase,
+                    "verb_phrase": verb,
+                    "object_phrase": obj_phrase,
+                    "sentence": sentence
+                }
             }
         },
         **options
     )
 
 
-def serialize_article(article_id, article_url, article_title, sentences, article_state="raw", pretty=False):
+def serialize_article(article_id, article_url, article_title, sentences, state="raw", from_scratch=True, pretty=False):
+    """
+    Serialize a Wikipedia article.
+    """
     options = {"ensure_ascii": False}
 
     if pretty:
         options["indent"] = 4
 
+    if from_scratch:
+        sentences = {
+            "{}/{}".format(article_id, str(sentence_id).zfill(5)): {
+                "meta": {
+                    "id": "{}/{}".format(article_id, str(sentence_id).zfill(5)),
+                    "type": "sentence",
+                    "state": state
+                },
+                "data": sentence
+            }
+            for sentence, sentence_id in zip(sentences, range(1, len(sentences) + 1))
+        }
+
     return json.dumps(
         {
-            "meta": {
-                "id": article_id,
-                "url": article_url,
-                "title": article_title,
-                "state": article_state
+            article_id: {
+                "meta": {
+                    "id": article_id,
+                    "url": article_url,
+                    "title": article_title,
+                    "type": "article",
+                    "state": state
+                },
+                "data": sentences
             },
-            "data": {
-                "{}/{}".format(article_id, str(sentence_id).zfill(5)): sentence
-                for sentence, sentence_id in zip(sentences, range(1, len(sentences)+1))
-            }
         },
         **options
     )
@@ -160,10 +249,11 @@ def serialize_article(article_id, article_url, article_title, sentences, article
 
 def deserialize_line(line):
     """
-    Transform a line in a file that was created as a result from a Luigi task into a sentence id and sentence data.
+    Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
     """
     json_object = json.loads(line)
-    return json_object["sentence_id"], json_object["data"]
+
+    return json_object[json_object.keys()[0]]
 
 
 def deserialize_dependency_tree(line):
