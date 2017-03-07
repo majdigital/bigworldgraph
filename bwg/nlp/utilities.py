@@ -9,6 +9,7 @@ import json
 import luigi
 import inspect
 import sys
+import uuid
 
 # PROJECT
 from bwg.misc.helpers import filter_dict
@@ -100,7 +101,7 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, pretty=False):
     }
 
     if pretty:
-        options.update({"indent": 4, "sort_keys": True})
+        options["indent"] = 4
 
     return json.dumps(
         {
@@ -128,6 +129,29 @@ def serialize_relation(sentence_id, subj_phrase, verb, obj_phrase, sentence, pre
                 "verb_phrase": verb,
                 "object_phrase": obj_phrase,
                 "sentence": sentence
+            }
+        },
+        **options
+    )
+
+
+def serialize_article(article_id, article_url, article_title, sentences, article_state="raw", pretty=False):
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options["indent"] = 4
+
+    return json.dumps(
+        {
+            "meta": {
+                "id": article_id,
+                "url": article_url,
+                "title": article_title,
+                "state": article_state
+            },
+            "data": {
+                "{}/{}".format(article_id, str(sentence_id).zfill(5)): sentence
+                for sentence, sentence_id in zip(sentences, range(1, len(sentences)+1))
             }
         },
         **options

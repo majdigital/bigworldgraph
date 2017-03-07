@@ -50,6 +50,12 @@ CONFIG_DEPENDENCIES = {
     ],
     "wikipedia_sentence_splitting": [
         "{language}_WIKIPEDIA_SPLITTING_OUTPUT_PATH"
+    ],
+    "wikipedia_reading": [
+        "CORPUS_ENCODING",
+        "{language}_CORPUS_INPATH",
+        "{language}_WIKIPEDIA_ARTICLE_TAG_PATTERN",
+        "{language}_WIKIPEDIA_READING_OUTPUT_PATH"
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -60,10 +66,10 @@ STANFORD_POSTAGGER_PATH = "../../data/stanford/models/stanford-postagger.jar"
 PRETTY_SERIALIZATION = False
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
 STANFORD_PATH = "../../data/stanford/models/"
-VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VSyx"]
+VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 PIPELINE_DEBUG = True
-CORPUS_ENCODING = "iso-8859-1"
+CORPUS_ENCODING = "utf-8"
 OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 
 # ------------------------------- French configurations ---------------------------------
@@ -90,6 +96,8 @@ FRENCH_WIKIPEDIA_CLEANING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_clea
 FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_100_fr.txt"
 FRENCH_WIKIPEDIA_SPLITTING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_split_fr.txt"
 FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
+FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_formatted_fr.txt"
+FRENCH_CORPUS_INPATH = FRENCH_LUIGI_DATA_PATH + "corpus_affairs_french.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
@@ -98,4 +106,5 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
+FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"
