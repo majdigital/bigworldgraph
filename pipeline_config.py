@@ -73,17 +73,6 @@ CORPUS_ENCODING = "utf-8"
 OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 
 # ------------------------------- French configurations ---------------------------------
-# Luigi task dependencies
-# This would be cool if it worked but it doesn't due to weird Luigi scheduler problems.
-# TODO (INQUIRY): Ask this on Stack overflow? / Luigi Github? (Done on 02.03.17 / 03.03.17, waiting for responses)
-# Stackoverflow: http://stackoverflow.com/questions/42563175/how-to-enable-dynamic-requirements-in-luigi
-# Luigi GitHub: https://github.com/spotify/luigi/issues/2052
-#FRENCH_PIPELINE_DEPENDENCIES = {
-#    "ReadCorpusTask": [],
-#    "NERTask": ["ReadCorpusTask"],
-#    "DependencyParseTask": ["ReadCorpusTask"],
-#    "NaiveOpenRelationExtractionTask": ["NERTask", "DependencyParseTask"]
-#}
 
 # Paths for Luigi task outputs
 FRENCH_LUIGI_DATA_PATH = "../../data/pipeline_french/"
@@ -97,7 +86,7 @@ FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_100_fr.t
 FRENCH_WIKIPEDIA_SPLITTING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_split_fr.txt"
 FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"

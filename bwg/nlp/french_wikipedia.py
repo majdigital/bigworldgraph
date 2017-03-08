@@ -42,7 +42,7 @@ class FrenchDependencyParseTask(DependencyParseTask):
 
 class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
     """
-    A luigi task performing a naive version of Open Relation Extraciton on a sentence, but it's specific for the french
+    A luigi task performing a naive version of Open Relation Extraction on a sentence, but it's specific for the french
     Wikipedia.
     """
     def requires(self):
@@ -66,5 +66,5 @@ if __name__ == "__main__":
     )
     luigi.build(
         [FrenchNaiveOpenRelationExtractionTask(task_config=french_task_config)],
-        local_scheduler=True
+        local_scheduler=True, workers=1
     )

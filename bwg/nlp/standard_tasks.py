@@ -4,7 +4,6 @@ Defining standard tasks for the NLP pipeline.
 """
 
 # STD
-import uuid
 import collections
 
 # EXT
@@ -23,25 +22,7 @@ from bwg.nlp.utilities import (
     deserialize_dependency_tree,
     TaskWorkflowMixin
 )
-
-
-class IDTaggingTask(luigi.Task, TaskWorkflowMixin):
-    """
-    Luigi task that reads a corpus and assigns each sentence an ID.
-    """
-    task_config = luigi.DictParameter()
-
-    def output(self):
-        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
-        output_path = self.task_config["ID_TAGGING_OUTPUT_PATH"]
-        return luigi.LocalTarget(output_path, format=text_format)
-
-    def run(self):
-        # Main work
-        with self.input().open("r") as input_file, self.output().open("w") as output_file:
-            for line in input_file.readlines():
-                sentence_id = uuid.uuid4()
-                output_file.write("{}\t{}\n".format(sentence_id, line.strip()))
+from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 
 class NERTask(luigi.Task, TaskWorkflowMixin):
@@ -51,7 +32,7 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
     task_config = luigi.DictParameter()
 
     def requires(self):
-        return IDTaggingTask(task_config=self.task_config)
+        return WikipediaReadingTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
@@ -63,8 +44,9 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
         stanford_ner_model_path = self.task_config["STANFORD_NER_MODEL_PATH"]
-        tokenizer = StanfordTokenizer(stanford_models_path)
-        ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path)
+        corpus_encoding = self.task_config["CORPUS_ENCODING"]
+        tokenizer = StanfordTokenizer(stanford_models_path, encoding=corpus_encoding)
+        ner_tagger = StanfordNERTagger(stanford_ner_model_path, stanford_models_path, encoding=corpus_encoding)
         workflow_kwargs = {
             "tokenizer": tokenizer,
             "ner_tagger": ner_tagger
@@ -74,13 +56,12 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
                 self.process_line(
-                    line, **workflow_kwargs, new_state="ne_tagged", serializing_function=serialize_tagged_sentence,
+                    line, workflow_kwargs, new_state="ne_tagged", serializing_function=serialize_tagged_sentence,
                     output_file=output_file, pretty=pretty_serialization
                 )
 
-    @staticmethod
-    def task_workflow(sentence, **workflow_kwargs):
-        meta, data = sentence["meta"], sentence["data"]
+    def task_workflow(self, target_obj, **workflow_kwargs):
+        meta, data = target_obj["meta"], target_obj["data"]
         tokenizer = workflow_kwargs["tokenizer"]
         ner_tagger = workflow_kwargs["ner_tagger"]
 
@@ -101,7 +82,7 @@ class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
     task_config = luigi.DictParameter()
 
     def requires(self):
-        return IDTaggingTask(task_config=self.task_config)
+        return WikipediaReadingTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
@@ -125,16 +106,16 @@ class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
                 self.process_line(
-                    line, **workflow_kwargs, new_state="dependency_task",
+                    line, workflow_kwargs, new_state="dependency_task",
                     serializing_function=serialize_dependency_parse_tree, output_file=output_file,
                     pretty=pretty_serialization
                 )
 
-    def task_workflow(self, sentence, **workflow_kwargs):
-        meta, data = sentence["meta"], sentence["data"]
+    def task_workflow(self, target_object, **workflow_kwargs):
+        meta, data = target_object["meta"], target_object["data"]
         dependency_parser = workflow_kwargs["dependency_parser"]
 
-        parsed_sentence = dependency_parser.raw_parse(sentence)
+        parsed_sentence = dependency_parser.raw_parse(data)
 
         serializing_arguments = {
             "sentence_id": meta["id"],
@@ -151,7 +132,7 @@ class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
     task_config = luigi.DictParameter()
 
     def requires(self):
-        return IDTaggingTask(task_config=self.task_config)
+        return WikipediaReadingTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
@@ -178,13 +159,12 @@ class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
                 self.process_line(
-                    line, **workflow_kwargs, new_state="pos_tagged", serializing_function=serialize_tagged_sentence,
+                    line, workflow_kwargs, new_state="pos_tagged", serializing_function=serialize_tagged_sentence,
                     output_file=output_file, pretty=pretty_serialization
                 )
 
-    @staticmethod
-    def task_workflow(sentence, **workflow_kwargs):
-        meta, data = sentence["meta"], sentence["data"]
+    def task_workflow(self, target_object, **workflow_kwargs):
+        meta, data = target_object["meta"], target_object["data"]
         tokenizer = workflow_kwargs["tokenizer"]
         pos_tagger = workflow_kwargs["pos_tagger"]
 
