@@ -17,3 +17,5 @@ TODO: How to use it
     * Wikipedia extractor (https://github.com/bwbaugh/wikipedia-extractor)
     * bzcat fr_affaire_pages.xml.bz2 | python WikiExtractor.py -cb 250K -o extracted -
     * find extracted -name '*bz2' -exec bunzip2 -c {} \; > text.xml
+    
+Commenting two lines (219) in nltk/parse/stanford.py when using utf-8 corpus, otherwise dependency parsing breaks.

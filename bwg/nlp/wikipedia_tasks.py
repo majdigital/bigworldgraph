@@ -12,10 +12,10 @@ import luigi
 import luigi.format
 
 # PROJECT
-from bwg.nlp.utilities import serialize_article, TaskWorkflowMixin
+from bwg.nlp.utilities import serialize_article, ArticleProcessingMixin
 
 
-class WikipediaReadingTask(luigi.Task, TaskWorkflowMixin):
+class WikipediaReadingTask(luigi.Task, ArticleProcessingMixin):
     """
     A luigi task that reads an extracted Wikipedia corpus (see README).
     """

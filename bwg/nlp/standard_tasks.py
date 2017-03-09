@@ -18,14 +18,12 @@ from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
     serialize_relation,
-    deserialize_line,
-    deserialize_dependency_tree,
-    TaskWorkflowMixin
+    ArticleProcessingMixin
 )
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 
-class NERTask(luigi.Task, TaskWorkflowMixin):
+class NERTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
     """
@@ -40,6 +38,7 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
         return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
         # Init necessary resources
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
@@ -55,13 +54,14 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
         # Main work
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
-                self.process_line(
+                self.process_articles(
                     line, workflow_kwargs, new_state="ne_tagged", serializing_function=serialize_tagged_sentence,
                     output_file=output_file, pretty=pretty_serialization
                 )
 
-    def task_workflow(self, target_obj, **workflow_kwargs):
-        meta, data = target_obj["meta"], target_obj["data"]
+    def task_workflow(self, metas, dates, **workflow_kwargs):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
+        meta, data = metas[0], dates[0]
         tokenizer = workflow_kwargs["tokenizer"]
         ner_tagger = workflow_kwargs["ner_tagger"]
 
@@ -75,7 +75,7 @@ class NERTask(luigi.Task, TaskWorkflowMixin):
         return serializing_arguments
 
 
-class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
+class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that dependency-parses sentences in a corpus.
     """
@@ -90,11 +90,13 @@ class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
         return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
         # Init necessary resources
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_dependency_model_path = self.task_config["STANFORD_DEPENDENCY_MODEL_PATH"]
         stanford_corenlp_models_path = self.task_config["STANFORD_CORENLP_MODELS_PATH"]
+
         dependency_parser = StanfordDependencyParser(
             stanford_dependency_model_path, stanford_corenlp_models_path, encoding=corpus_encoding
         )
@@ -105,14 +107,15 @@ class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
         # Main work
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
-                self.process_line(
+                self.process_articles(
                     line, workflow_kwargs, new_state="dependency_task",
                     serializing_function=serialize_dependency_parse_tree, output_file=output_file,
                     pretty=pretty_serialization
                 )
 
-    def task_workflow(self, target_object, **workflow_kwargs):
-        meta, data = target_object["meta"], target_object["data"]
+    def task_workflow(self, metas, dates, **workflow_kwargs):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
+        meta, data = metas[0], dates[0]
         dependency_parser = workflow_kwargs["dependency_parser"]
 
         parsed_sentence = dependency_parser.raw_parse(data)
@@ -125,7 +128,7 @@ class DependencyParseTask(luigi.Task, TaskWorkflowMixin):
         return serializing_arguments
 
 
-class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
+class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that PoS tags a sentence in a corpus.
     """
@@ -140,13 +143,14 @@ class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
         return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
         # Init necessary resources
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_postagger_path = self.task_config["STANFORD_POSTAGGER_PATH"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
         stanford_pos_model_path = self.task_config["STANFORD_POS_MODEL_PATH"]
-        tokenizer = StanfordTokenizer(stanford_models_path)
+        tokenizer = StanfordTokenizer(stanford_models_path, encoding=corpus_encoding)
         pos_tagger = StanfordPOSTagger(
             stanford_pos_model_path, path_to_jar=stanford_postagger_path, encoding=corpus_encoding
         )
@@ -158,13 +162,14 @@ class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
         # Main work
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
-                self.process_line(
+                self.process_articles(
                     line, workflow_kwargs, new_state="pos_tagged", serializing_function=serialize_tagged_sentence,
                     output_file=output_file, pretty=pretty_serialization
                 )
 
-    def task_workflow(self, target_object, **workflow_kwargs):
-        meta, data = target_object["meta"], target_object["data"]
+    def task_workflow(self, metas, dates, **workflow_kwargs):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
+        meta, data = metas[0], dates[0]
         tokenizer = workflow_kwargs["tokenizer"]
         pos_tagger = workflow_kwargs["pos_tagger"]
 
@@ -179,7 +184,7 @@ class PoSTaggingTask(luigi.Task, TaskWorkflowMixin):
         return serializing_arguments
 
 
-class NaiveOpenRelationExtractionTask(luigi.Task, TaskWorkflowMixin):
+class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Open Relation extraction on a corpus.
     """
@@ -196,34 +201,38 @@ class NaiveOpenRelationExtractionTask(luigi.Task, TaskWorkflowMixin):
         return luigi.LocalTarget(output_path, format=text_format)
 
     def run(self):
-        # pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
-        relations_sum = 0
-        number_of_lines = 0
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
+        # Init necessary resources
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
 
         with self.input()[0].open("r") as nes_input_file,\
              self.input()[1].open("r") as dependency_input_file,\
              self.input()[2].open("r") as pos_input_file:
             with self.output().open("w") as output_file:
                 for nes_line, dependency_line, pos_line in zip(nes_input_file, dependency_input_file, pos_input_file):
-                    number_of_lines += 1
-                    sentence_id_1, ne_tagged_line = deserialize_line(nes_line)
-                    sentence_id_2, dependency_tree = deserialize_dependency_tree(dependency_line)
-                    sentence_id_3, pos_tagged_line = deserialize_line(pos_line)
-                    assert sentence_id_1 == sentence_id_2 == sentence_id_3
+                    self.process_articles(
+                        (nes_line, dependency_line, pos_line), {}, new_state="extracted_relations",
+                        serializing_function=serialize_relation, output_file=output_file, pretty=pretty_serialization
+                    )
 
-                    # Info for summary
-                    relations = self.extract_relations(dependency_tree, ne_tagged_line, pos_tagged_line)
-                    relations_sum += len(relations)
+    def task_workflow(self, input_objects, **workflow_kwargs):
+        # TODO (Refactor): Adjust to new ArticleProcessingMixin
+        metas_and_dates = [(input_object["meta"], input_object["data"]) for input_object in input_objects]
 
-                    for subj_phrase, verb, obj_phrase in relations:
-                        serialized_relation = serialize_relation(
-                            sentence_id_1, subj_phrase, verb, obj_phrase,
-                            self._get_sentence(ne_tagged_line),
-                            pretty=True
-                        )
-                        output_file.write("{}\n".format(serialized_relation))
+        # Check if all the IDs are equal
+        assert len(set([meta["id"] for meta, data in metas_and_dates])) == 1
 
-        print("{} relations were extracted from {} sentences.".format(relations_sum, number_of_lines))
+        relations = self.extract_relations(*[data for meta, data in metas_and_dates])
+        sentence = self._get_sentence(metas_and_dates[0][1])
+
+        serializing_arguments = {
+            "sentence_id": metas_and_dates[0][0]["id"],
+            "sentence": sentence,
+            "relations": relations,
+            "state": "extracted_relation"
+        }
+
+        return serializing_arguments
 
     @staticmethod
     def _get_sentence(ne_tagged_line):
