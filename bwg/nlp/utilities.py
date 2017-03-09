@@ -6,9 +6,10 @@ Utilities for the NLP pipeline.
 # STD
 import json
 import abc
+import copy
 
 # PROJECT
-from bwg.misc.helpers import filter_dict
+from bwg.misc.helpers import filter_dict, flatten_dictlist
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
@@ -42,22 +43,41 @@ class ArticleProcessingMixin:
             # https://www.youtube.com/watch?v=HL1UzIK-flA
             pass
 
-        # Afterwards, put all the arguments for the corresponding serializing function into a dict and return it.
-        serializing_kwargs = {}
+            # Afterwards, put all the arguments for the corresponding serializing function into a dict and yield it.
+            serializing_kwargs = {}
 
-        return serializing_kwargs
+            yield serializing_kwargs
 
-    def process_articles(self, raw_articles, workflow_kwargs, new_state, serializing_function, output_file,
-                         pretty=False):
+    @property
+    @abc.abstractmethod
+    def workflow_resources(self):
+        """
+        Property that provides resources necessary to complete the task's workflow.
+        """
+        workflow_resources = {}
+
+        return workflow_resources
+
+    def process_articles(self, raw_articles, new_state, serializing_function, output_file, pretty=False):
         """
         Process line from the input and apply this task's workflow. Serialize the result afterwards and finally write
         it to the output file.
         """
         article = self._combine_articles(raw_articles)
+        sentences = []
 
         # Main processing
-        serializing_kwargs = self.task_workflow(article, **workflow_kwargs)
-        serialized_article = serializing_function(**serializing_kwargs, state=new_state, pretty=pretty)
+        for serializing_kwargs in self.task_workflow(article, **self.workflow_resources):
+            serialized_sentence = serializing_function(**serializing_kwargs, state=new_state, dump=False)
+            sentences.append(serialized_sentence)
+
+        sentences = flatten_dictlist(sentences)
+        meta = article["meta"]
+        article_id, article_url, article_title = meta["id"], meta["url"], meta["title"]
+        serialized_article = serialize_article(
+            article_id, article_url, article_title, sentences, state=new_state, from_scratch=False, dump=True,
+            pretty=pretty
+        )
 
         # Output
         output_file.write("{}\n".format(serialized_article))
@@ -145,23 +165,34 @@ class ArticleProcessingMixin:
                 )
 
             # Combine inputs
-            sample_article = article_jsons[0]
+            sample_article = copy.deepcopy(article_jsons[0])
             # Combine meta dates
-            new_articles = dict(meta=list(sample_article["meta"]))
-            new_articles["meta"]["state"] = " | ".join(
+            new_article = dict(meta=sample_article["meta"])
+            new_article["meta"]["state"] = " | ".join(
                 [article_json["meta"]["state"] for article_json in article_jsons]
             )
 
             # Combine dates
-            new_articles["data"] = {
-                sentence_id: {
-                    "data_{}".format(article_json["meta"]["type"]): article_json["data"]["sentence_id"]
-                    for article_json in article_jsons
-                }
-                for sentence_id in sample_article["data"].keys()
-            }
+            new_article["data"] = {}
+            for sentence_id, sentence_json in sample_article["data"].items():
+                sentence_meta = sentence_json["meta"]
+                sentence_meta["state"] = " | ".join(
+                    [article_json["meta"]["state"] for article_json in article_jsons]
+                )
 
-            return new_articles
+                new_article["data"].update(
+                    {
+                        sentence_id: {
+                            "meta": sentence_meta,
+                            "data": {
+                                "data_{}".format(article_json["meta"]["state"]): article_json["data"][sentence_id]
+                                for article_json in article_jsons
+                            }
+                        }
+                    }
+                )
+
+            return new_article
 
 
 def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=False, dump=True):
@@ -174,12 +205,14 @@ def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=
         options.update({"indent": 4, "sort_keys": True})
 
     serialized_tagged_sentence = {
-        "meta": {
-            "id": sentence_id,
-            "type": "sentence",
-            "state": state
-        },
-        "data": tagged_sentence
+        sentence_id: {
+            "meta": {
+                "id": sentence_id,
+                "type": "sentence",
+                "state": state
+            },
+            "data": tagged_sentence
+        }
     }
 
     if dump:
@@ -207,12 +240,14 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, state="raw", prett
         options["indent"] = 4
 
     serialized_dependency_parse_tree = {
-        "meta": {
-            "id": sentence_id,
-            "state": state,
-            "type": "sentence"
-        },
-        "data": simplified_tree
+        sentence_id: {
+            "meta": {
+                "id": sentence_id,
+                "state": state,
+                "type": "sentence"
+            },
+            "data": simplified_tree
+        }
     }
 
     if dump:
@@ -307,18 +342,3 @@ def deserialize_line(line, encoding="utf-8"):
     Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
     """
     return json.loads(line, encoding=encoding)
-
-
-def deserialize_dependency_tree(line):
-    """
-    Convert dependency node addresses from string to integers.
-    """
-    sentence_id, raw_tree = deserialize_line(line)
-    final_tree = dict(root=raw_tree["root"])
-
-    final_tree["nodes"] = {
-            int(address): node
-            for address, node in raw_tree["nodes"].items()
-        }
-
-    return sentence_id, final_tree
