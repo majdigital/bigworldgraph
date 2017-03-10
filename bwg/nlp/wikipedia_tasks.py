@@ -12,7 +12,7 @@ import luigi
 import luigi.format
 
 # PROJECT
-from bwg.misc.helpers import is_collection
+from bwg.misc.helpers import is_collection, time_function
 from bwg.nlp.utilities import serialize_article
 
 
@@ -27,6 +27,7 @@ class WikipediaReadingTask(luigi.Task):
         output_path = self.task_config["WIKIPEDIA_READING_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
+    @time_function(is_classmethod=True)
     def run(self):
         # Init necessary resources
         corpus_inpath = self.task_config["CORPUS_INPATH"]

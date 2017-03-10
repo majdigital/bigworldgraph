@@ -9,7 +9,7 @@ import abc
 import copy
 
 # PROJECT
-from bwg.misc.helpers import filter_dict, flatten_dictlist
+from bwg.misc.helpers import filter_dict, flatten_dictlist, time_function, seconds_to_hms
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
@@ -18,6 +18,7 @@ class ArticleProcessingMixin:
     Enable Luigi tasks to process single lines as well as articles or other input types.
     """
     task_config = None
+    runtimes = []
 
     @abc.abstractmethod
     def task_workflow(self, article, **workflow_kwargs):
@@ -58,6 +59,7 @@ class ArticleProcessingMixin:
 
         return workflow_resources
 
+    @time_function(out=None, return_time=True)
     def process_articles(self, raw_articles, new_state, serializing_function, output_file, pretty=False):
         """
         Process line from the input and apply this task's workflow. Serialize the result afterwards and finally write
@@ -67,9 +69,10 @@ class ArticleProcessingMixin:
         sentences = []
 
         # Main processing
-        print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
+        # TODO (Refactor): Make print statements optional and write to log
+        #print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
         for serializing_kwargs in self.task_workflow(article, **self.workflow_resources):
-            print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
+            #print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
             serialized_sentence = serializing_function(**serializing_kwargs, state=new_state, dump=False)
 
             if self.is_relevant_sentence(serialized_sentence):
@@ -231,6 +234,23 @@ class ArticleProcessingMixin:
         function.
         """
         return True
+
+    @staticmethod
+    def calculate_average_processing_time(runtimes):
+        return sum(runtimes) / len(runtimes)
+
+    @staticmethod
+    def calculate_average_processing_speed(runtimes):
+        return len(runtimes) / sum(runtimes)
+
+    def give_runtime_report(self, runtimes):
+        average_processing_speed = self.calculate_average_processing_speed(runtimes)
+        average_processing_time = self.calculate_average_processing_time(runtimes)
+
+        print("Processing articles in {}:\n\tOn average {:.2f} articles per second.\n\tOn average {:.2f} hour(s), {:.2f}"
+              " minute(s) and {:.2f} second(s) per article.".format(
+            self.__class__.__name__, average_processing_time, *seconds_to_hms(average_processing_speed))
+        )
 
 
 def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=False, dump=True):

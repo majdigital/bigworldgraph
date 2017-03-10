@@ -14,6 +14,7 @@ from nltk.tag.stanford import StanfordNERTagger, StanfordPOSTagger
 from nltk.parse.stanford import StanfordDependencyParser
 
 # PROJECT
+from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
@@ -37,6 +38,7 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["NES_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
+    @time_function(is_classmethod=True, give_report=True)
     def run(self):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
@@ -94,6 +96,7 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["DEPENDENCY_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
+    @time_function(is_classmethod=True, give_report=True)
     def run(self):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
@@ -150,7 +153,9 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["POS_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
+    @time_function(is_classmethod=True, give_report=True)
     def run(self):
+
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
                 self.process_articles(
@@ -213,6 +218,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["ORE_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
+    @time_function(is_classmethod=True, give_report=True)
     def run(self):
         with self.input()[0].open("r") as nes_input_file, self.input()[1].open("r") as dependency_input_file,\
          self.input()[2].open("r") as pos_input_file, self.output().open("w") as output_file:
