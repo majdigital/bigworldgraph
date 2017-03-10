@@ -5,12 +5,12 @@
 CONFIG_DEPENDENCIES = {
     "all": [
         "PIPELINE_DEBUG",
-        "CORPUS_ENCODING",
-        "ONLY_INCLUDE_RELEVANT_SENTENCES",
-        "ONLY_INCLUDE_RELEVANT_ARTICLES"
+        "CORPUS_ENCODING"
     ],
     "optional": [
-        "PRETTY_SERIALIZATION"
+        "PRETTY_SERIALIZATION",
+        "ONLY_INCLUDE_RELEVANT_SENTENCES",
+        "ONLY_INCLUDE_RELEVANT_ARTICLES"
     ],
     "exclude": [
         "DEPENDENCIES",
@@ -54,6 +54,7 @@ CONFIG_DEPENDENCIES = {
         "{language}_WIKIPEDIA_SPLITTING_OUTPUT_PATH"
     ],
     "wikipedia_reading": [
+        "{language}_SENTENCE_TOKENIZER_PATH",
         "CORPUS_ENCODING",
         "{language}_CORPUS_INPATH",
         "{language}_WIKIPEDIA_ARTICLE_TAG_PATTERN",
@@ -99,5 +100,6 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
+FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"

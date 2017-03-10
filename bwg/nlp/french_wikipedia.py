@@ -8,6 +8,7 @@ import luigi.format
 import nltk
 
 # PROJECT
+from bwg.misc.helpers import download_nltk_resource_if_missing
 from bwg.nlp.standard_tasks import (
     NERTask,
     DependencyParseTask,
@@ -21,16 +22,10 @@ from bwg.nlp.config_management import build_task_config_for_language
 class FrenchWikipediaReadingTask(WikipediaReadingTask):
 
     def _additional_formatting(self, line):
-        # TODO (Refactor): Split this into smaller functions
-        french_sentence_tokenizer = "tokenizers/punkt/PY3/french.pickle"
+        french_sentence_tokenizer_path = self.task_config["SENTENCE_TOKENIZER_PATH"]
+        download_nltk_resource_if_missing(french_sentence_tokenizer_path, "punkt")
 
-        # Download resource if necessary
-        try:
-            nltk.data.find(french_sentence_tokenizer)
-        except LookupError:
-            nltk.download("punkt")
-
-        tokenizer = nltk.data.load(french_sentence_tokenizer)
+        tokenizer = nltk.data.load(french_sentence_tokenizer_path)
         sentences = tokenizer.tokenize(line)
         return sentences
 

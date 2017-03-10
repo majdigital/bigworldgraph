@@ -6,6 +6,7 @@ Module for simple helper functions.
 # STD
 import codecs
 import functools
+import nltk
 import sys
 import time
 import types
@@ -56,6 +57,16 @@ def flatten_dictlist(dictlist):
     return new_dict
 
 
+def download_nltk_resource_if_missing(resource_path, resource):
+    """
+    Download a missing resource from the Natural Language Processing Toolkit.
+    """
+    try:
+        nltk.data.find(resource_path)
+    except LookupError:
+        nltk.download(resource)
+
+
 def is_collection(obj):
     """
     Check if a object is iterable.
@@ -64,6 +75,9 @@ def is_collection(obj):
 
 
 def seconds_to_hms(seconds):
+    """
+    Convert seconds to hours, minutes and seconds.
+    """
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
     return h, m, s
@@ -103,6 +117,7 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False, give_
 
             # Add run time to function return value
             if return_time:
+                # In case current function is of a ArticleProcessingMixin subclass
                 if hasattr(args[0], "runtimes") and not give_report:
                     getattr(args[0], "runtimes").append(run_time)
                 else:
@@ -111,6 +126,7 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False, give_
                         "runtime": run_time
                     }
 
+            # In case current function is of a ArticleProcessingMixin subclass
             if give_report:
                 runtimes = getattr(args[0], "runtimes")
                 getattr(args[0], "give_runtime_report")(runtimes)
@@ -120,15 +136,3 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False, give_
         return func_wrapper
 
     return time_decorator
-
-
-def tags(tag_name):
-    def tags_decorator(func):
-        @wraps(func)
-        def func_wrapper(name):
-            return "<{0}>{1}</{0}>".format(tag_name, func(name))
-        return func_wrapper
-    return tags_decorator
-
-
-

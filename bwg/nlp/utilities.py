@@ -65,14 +65,18 @@ class ArticleProcessingMixin:
         Process line from the input and apply this task's workflow. Serialize the result afterwards and finally write
         it to the output file.
         """
+        debug = self.task_config.get("PIPELINE_DEBUG", False)
         article = self._combine_articles(raw_articles)
         sentences = []
 
         # Main processing
-        # TODO (Refactor): Make print statements optional and write to log
-        #print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
+        if debug:
+            print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
+
         for serializing_kwargs in self.task_workflow(article, **self.workflow_resources):
-            #print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
+            if debug:
+                print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
+
             serialized_sentence = serializing_function(**serializing_kwargs, state=new_state, dump=False)
 
             if self.is_relevant_sentence(serialized_sentence):
@@ -82,14 +86,13 @@ class ArticleProcessingMixin:
         meta = article["meta"]
         article_id, article_url, article_title = meta["id"], meta["url"], meta["title"]
         serialized_article = serialize_article(
-            article_id, article_url, article_title, sentences, state=new_state, from_scratch=False, dump=True,
+            article_id, article_url, article_title, sentences, state=new_state, from_scratch=False, dump=False,
             pretty=pretty
         )
 
         # Output
-        # TODO (Refactor): Avoid loading it again
-        if self.is_relevant_article(json.loads(serialized_article)):
-            output_file.write("{}\n".format(serialized_article))
+        if self.is_relevant_article(serialized_article):
+            output_file.write("{}\n".format(just_dump(serialized_article)))
 
     def _combine_articles(self, raw_articles):
         """
@@ -395,6 +398,18 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
         return json.dumps(serialized_article, **options)
 
     return serialized_article
+
+
+def just_dump(json_object, pretty=False):
+    """
+    Self-documenting?
+    """
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options["indent"] = 4
+
+    json.dumps(json_object, **options)
 
 
 def deserialize_line(line, encoding="utf-8"):
