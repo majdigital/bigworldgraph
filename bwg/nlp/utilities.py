@@ -409,7 +409,7 @@ def just_dump(json_object, pretty=False):
     if pretty:
         options["indent"] = 4
 
-    json.dumps(json_object, **options)
+    return json.dumps(json_object, **options)
 
 
 def deserialize_line(line, encoding="utf-8"):
