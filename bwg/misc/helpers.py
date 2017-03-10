@@ -50,3 +50,10 @@ def flatten_dictlist(dictlist):
         new_dict.update(dict_)
 
     return new_dict
+
+
+def is_collection(obj):
+    """
+    Check if a object is iterable.
+    """
+    return hasattr(obj, '__iter__') and not isinstance(obj, str)

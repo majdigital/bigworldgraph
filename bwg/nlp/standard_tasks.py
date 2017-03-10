@@ -242,12 +242,26 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             sentence = self._get_sentence(enriched_sentences[0])
 
             serializing_arguments = {
-                "sentence_id": article_meta["id"],
+                "sentence_id": sentence_id,
                 "sentence": sentence,
                 "relations": relations
             }
 
             yield serializing_arguments
+
+    def _is_relevant_article(self, article):
+        """
+        Override ArticleProcessingMixin's relevance criterion.
+        """
+        return len(article["data"]) > 0
+
+    def _is_relevant_sentence(self, sentence):
+        """
+        Override ArticleProcessingMixin's relevance criterion.
+        """
+        # Separate sentence from sentence ID
+        sentence = list(sentence.values())[0]
+        return len(sentence["data"]["relations"]) > 0
 
     @staticmethod
     def _get_sentence(ne_tagged_line):
@@ -308,6 +322,9 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         """
         verb_node_pos_tags = self.task_config["VERB_NODE_POS_TAGS"]
         verb_nodes = []
+
+        if len(pos_tagged_line) == 0 and len(dependency_tree["nodes"]) == 1:
+            return verb_nodes
 
         for address, node in dependency_tree["nodes"].items():
             if pos_tagged_line[address][1] in verb_node_pos_tags:

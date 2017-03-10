@@ -12,10 +12,11 @@ import luigi
 import luigi.format
 
 # PROJECT
-from bwg.nlp.utilities import serialize_article, ArticleProcessingMixin
+from bwg.misc.helpers import is_collection
+from bwg.nlp.utilities import serialize_article
 
 
-class WikipediaReadingTask(luigi.Task, ArticleProcessingMixin):
+class WikipediaReadingTask(luigi.Task):
     """
     A luigi task that reads an extracted Wikipedia corpus (see README).
     """
@@ -49,6 +50,7 @@ class WikipediaReadingTask(luigi.Task, ArticleProcessingMixin):
                 if re.match(article_tag_pattern, line):
                     current_id, current_url, current_title = self._extract_article_info(line)
                     skip_line = True
+
                 elif line.strip() == "</doc>":
                     article_json = serialize_article(
                         current_id, current_url, current_title, current_sentences, state="parsed",
@@ -56,11 +58,25 @@ class WikipediaReadingTask(luigi.Task, ArticleProcessingMixin):
                     )
                     output_file.write("{}\n".format(article_json))
                     current_title, current_id, current_url, current_sentences = self._reset_vars()
+
                 else:
                     if not line.strip():
                         continue
                     line = re.sub("</?.+?>", "", line)  # Remove other xml markup
-                    current_sentences.append(line.strip())
+                    formatted = self._additional_formatting(line.strip())
+
+                    if is_collection(formatted):
+                        for line_ in formatted:
+                            current_sentences.append(line_)
+
+                    else:
+                        current_sentences.append(line)
+
+    def _additional_formatting(self, line):
+        """
+        Provide additional formatting for a line possible subclasses by overwriting this function.
+        """
+        return line
 
     @staticmethod
     def _reset_vars():

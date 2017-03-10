@@ -67,9 +67,13 @@ class ArticleProcessingMixin:
         sentences = []
 
         # Main processing
+        print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
         for serializing_kwargs in self.task_workflow(article, **self.workflow_resources):
+            print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
             serialized_sentence = serializing_function(**serializing_kwargs, state=new_state, dump=False)
-            sentences.append(serialized_sentence)
+
+            if self.is_relevant_sentence(serialized_sentence):
+                sentences.append(serialized_sentence)
 
         sentences = flatten_dictlist(sentences)
         meta = article["meta"]
@@ -80,7 +84,9 @@ class ArticleProcessingMixin:
         )
 
         # Output
-        output_file.write("{}\n".format(serialized_article))
+        # TODO (Refactor): Avoid loading it again
+        if self.is_relevant_article(json.loads(serialized_article)):
+            output_file.write("{}\n".format(serialized_article))
 
     def _combine_articles(self, raw_articles):
         """
@@ -194,6 +200,38 @@ class ArticleProcessingMixin:
 
             return new_article
 
+    def is_relevant_article(self, article):
+        """
+        Filter articles in the output by a relevance criterion that subclasses can define in this function.
+
+        All articles are relevant if the flag is not set; only relevant ones are relevant if the flag is set (duh).
+        """
+        relevance_flag_set = self.task_config.get("ONLY_INCLUDE_RELEVANT_ARTICLES", False)
+        return not relevance_flag_set or self._is_relevant_article(article)
+
+    def is_relevant_sentence(self, sentence):
+        """
+        Filter sentences of an article in the output by a relevance criterion that subclasses can define in this
+        function.
+
+        All sentences are relevant if the flag is not set; only relevant ones are relevant if the flag is set (duh).
+        """
+        relevance_flag_set = self.task_config.get("ONLY_INCLUDE_RELEVANT_SENTENCES", False)
+        return not relevance_flag_set or self._is_relevant_sentence(sentence)
+
+    def _is_relevant_article(self, article):
+        """
+        Filter articles in the output by a relevance criterion that subclasses can define in this function.
+        """
+        return True
+
+    def _is_relevant_sentence(self, sentence):
+        """
+        Filter sentences of an article in the output by a relevance criterion that subclasses can define in this
+        function.
+        """
+        return True
+
 
 def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=False, dump=True):
     """
@@ -266,27 +304,29 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", pretty=Fal
         options["indent"] = 4
 
     serialized_relation = {
-        "meta": {
-            "id": sentence_id,
-            "state": state,
-            "type": "sentence"
-        },
-        "data": {
-            "sentence": sentence,
-            "relations": {
-                "{}/{}".format(sentence_id, str(relation_id).zfill(5)): {
-                    "meta": {
-                        "id": "{}/{}".format(sentence_id, str(relation_id).zfill(5)),
-                        "state": state,
-                        "type": "sentence"
-                    },
-                    "data": {
-                        "subject_phrase": subj_phrase,
-                        "verb": verb,
-                        "object_phrase": obj_phrase
+        sentence_id: {
+            "meta": {
+                "id": sentence_id,
+                "state": state,
+                "type": "sentence"
+            },
+            "data": {
+                "sentence": sentence,
+                "relations": {
+                    "{}/{}".format(sentence_id, str(relation_id).zfill(5)): {
+                        "meta": {
+                            "id": "{}/{}".format(sentence_id, str(relation_id).zfill(5)),
+                            "state": state,
+                            "type": "sentence"
+                        },
+                        "data": {
+                            "subject_phrase": subj_phrase,
+                            "verb": verb,
+                            "object_phrase": obj_phrase
+                        }
                     }
+                    for (subj_phrase, verb, obj_phrase), relation_id in zip(relations, range(1, len(relations) + 1))
                 }
-                for (subj_phrase, verb, obj_phrase), relation_id in zip(relations, range(1, len(relations) + 1))
             }
         }
     }

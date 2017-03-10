@@ -3,7 +3,9 @@
 NLP Pipeline tasks for french texts.
 """
 
+# EXT
 import luigi.format
+import nltk
 
 # PROJECT
 from bwg.nlp.standard_tasks import (
@@ -16,12 +18,29 @@ from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 from bwg.nlp.config_management import build_task_config_for_language
 
 
+class FrenchWikipediaReadingTask(WikipediaReadingTask):
+
+    def _additional_formatting(self, line):
+        # TODO (Refactor): Split this into smaller functions
+        french_sentence_tokenizer = "tokenizers/punkt/PY3/french.pickle"
+
+        # Download resource if necessary
+        try:
+            nltk.data.find(french_sentence_tokenizer)
+        except LookupError:
+            nltk.download("punkt")
+
+        tokenizer = nltk.data.load(french_sentence_tokenizer)
+        sentences = tokenizer.tokenize(line)
+        return sentences
+
+
 class FrenchNERTask(NERTask):
     """
     A luigi task tagging Named Entities in a sentence, but it's specific for the french Wikipedia.
     """
     def requires(self):
-        return WikipediaReadingTask(task_config=self.task_config)
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
 
 
 class FrenchPoSTaggingTask(PoSTaggingTask):
@@ -29,7 +48,7 @@ class FrenchPoSTaggingTask(PoSTaggingTask):
     A luigi task tagging a sentence with PoS tags, but it's tailored to the french Wikipedia.
     """
     def requires(self):
-        return WikipediaReadingTask(task_config=self.task_config)
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
 
 
 class FrenchDependencyParseTask(DependencyParseTask):
@@ -37,7 +56,7 @@ class FrenchDependencyParseTask(DependencyParseTask):
     A luigi task dependency-parsing a sentence, but it's specific for the french Wikipedia.
     """
     def requires(self):
-        return WikipediaReadingTask(task_config=self.task_config)
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
 
 
 class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
@@ -66,5 +85,5 @@ if __name__ == "__main__":
     )
     luigi.build(
         [FrenchNaiveOpenRelationExtractionTask(task_config=french_task_config)],
-        local_scheduler=True, workers=1
+        local_scheduler=True, workers=2, log_level="INFO"
     )
