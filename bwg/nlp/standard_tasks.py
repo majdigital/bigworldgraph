@@ -18,9 +18,9 @@ from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
-    serialize_relation,
-    ArticleProcessingMixin
+    serialize_relation
 )
+from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 

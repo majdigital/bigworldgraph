@@ -15,9 +15,17 @@ from bwg.nlp.standard_tasks import (
     NaiveOpenRelationExtractionTask,
     PoSTaggingTask
 )
+from bwg.nlp.corenlp_server_tasks import (
+    ServerNERTask,
+    ServerDependencyParseTask,
+    ServerPoSTaggingTask,
+    ServerNaiveOpenRelationExtractionTask
+)
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 from bwg.nlp.config_management import build_task_config_for_language
 
+
+# ---------------------------- Default tasks for french ---------------------------------
 
 class FrenchWikipediaReadingTask(WikipediaReadingTask):
 
@@ -40,7 +48,7 @@ class FrenchNERTask(NERTask):
 
 class FrenchPoSTaggingTask(PoSTaggingTask):
     """
-    A luigi task tagging a sentence with PoS tags, but it's tailored to the french Wikipedia.
+    A luigi task tagging a sentence with PoS tags, but it's specific to the french Wikipedia.
     """
     def requires(self):
         return FrenchWikipediaReadingTask(task_config=self.task_config)
@@ -64,6 +72,46 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
                FrenchDependencyParseTask(task_config=self.task_config),\
                FrenchPoSTaggingTask(task_config=self.task_config)
 
+# -------------------- Tasks for french using Stanford CoreNLP server --------------------
+
+
+class FrenchServerNERTask(ServerNERTask):
+    """
+    A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it's specific for the
+    french Wikipedia.
+    """
+    # TODO (Feature): Implement
+    pass
+
+
+class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
+    """
+    A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it's specific to the french
+    Wikipedia.
+    """
+    # TODO (Feature): Implement
+    pass
+
+
+class FrenchServerDependencyTask(ServerDependencyParseTask):
+    """
+    A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it's specific for the french
+    Wikipedia.
+    """
+    # TODO (Feature): Implement
+    pass
+
+
+class FrenchServerNaiveOPenRelationExtractionTask(ServerNaiveOpenRelationExtractionTask):
+    """
+    A luigi task performing a naive version of Open Relation Extraction on a sentence using a Stanford CoreNLP server,
+    but it's specific for the french Wikipedia.
+    """
+    # TODO (Feature): Implement
+    pass
+
+
+# --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
     # TODO (FEATURE): Use remote scheduler for server deployment

@@ -5,7 +5,9 @@
 CONFIG_DEPENDENCIES = {
     "all": [
         "PIPELINE_DEBUG",
-        "CORPUS_ENCODING"
+        "CORPUS_ENCODING",
+        "STANFORD_CORENLP_SERVER_ADDRESS",
+        "{language}_LANGUAGE_ABBREVIATION"
     ],
     "optional": [
         "PRETTY_SERIALIZATION",
@@ -65,6 +67,7 @@ SUPPORTED_LANGUAGES = ["FRENCH"]
 
 # --------------------------------- General config --------------------------------------
 STANFORD_CORENLP_MODELS_PATH = "../../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
+STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
 STANFORD_POSTAGGER_PATH = "../../data/stanford/models/stanford-postagger.jar"
 PRETTY_SERIALIZATION = False
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
@@ -100,6 +103,7 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
+FRENCH_LANGUAGE_ABBREVATION = "fr"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"
