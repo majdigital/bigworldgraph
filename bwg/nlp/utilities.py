@@ -8,6 +8,9 @@ import json
 import abc
 import copy
 
+# EXT
+import luigi
+
 # PROJECT
 from bwg.misc.helpers import filter_dict, flatten_dictlist, time_function, seconds_to_hms
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
@@ -17,11 +20,11 @@ class ArticleProcessingMixin:
     """
     Enable Luigi tasks to process single lines as well as articles or other input types.
     """
-    task_config = None
+    task_config = luigi.DictParameter()
     runtimes = []
 
     @abc.abstractmethod
-    def task_workflow(self, article, **workflow_kwargs):
+    def task_workflow(self, article, bulk=False, **workflow_kwargs):
         """
         Define the tasks workflow here - it usually includes extracting necessary resources from workflow_kwargs,
         performing the actual task on the sentence and wrapping all the arguments for the serializing function in a
