@@ -1,0 +1,46 @@
+# corpus_affairs_french_sample.xml
+
+# Default
+
+Function 'run' of 'FrenchPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 33.38 second(s) to complete.
+Processing articles in FrenchPoSTaggingTask:
+	On average 33.38 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 0.03 second(s) per article.
+
+Function 'run' of 'FrenchDependencyParseTask' took 0.00 hour(s), 1.00 minute(s) and 46.02 second(s) to complete.
+Processing articles in FrenchDependencyParseTask:
+	On average 106.02 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 0.01 second(s) per article.
+
+Function 'run' of 'FrenchNERTask' took 0.00 hour(s), 1.00 minute(s) and 54.67 second(s) to complete.
+Processing articles in FrenchNERTask:
+	On average 114.66 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 0.01 second(s) per article.
+
+Function 'run' of 'FrenchNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.06 second(s) to complete.
+Processing articles in FrenchNaiveOpenRelationExtractionTask:
+	On average 0.04 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 27.73 second(s) per article.
+
+# corpus_affairs_french_sample2.xml
+
+# Default
+
+Function 'run' of 'FrenchWikipediaReadingTask' took 0.00 hour(s), 0.00 minute(s) and 0.14 second(s) to complete.
+
+Function 'run' of 'FrenchWikipediaReadingTask' took 0.00 hour(s), 0.00 minute(s) and 0.14 second(s) to complete.
+Function 'run' of 'FrenchDependencyParseTask' took 0.00 hour(s), 37.00 minute(s) and 28.07 second(s) to complete.
+Processing articles in FrenchDependencyParseTask:
+	On average 562.02 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 0.00 second(s) per article.
+Function 'run' of 'FrenchNERTask' took 0.00 hour(s), 45.00 minute(s) and 48.97 second(s) to complete.
+Processing articles in FrenchNERTask:
+	On average 687.24 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 0.00 second(s) per article.
+Function 'run' of 'FrenchPoSTaggingTask' took 0.00 hour(s), 11.00 minute(s) and 45.30 second(s) to complete.
+Processing articles in FrenchPoSTaggingTask:
+Function 'run' of 'FrenchNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.31 second(s) to complete.
+Processing articles in FrenchNaiveOpenRelationExtractionTask:
+	On average 0.07 articles per second.
+	On average 0.00 hour(s), 0.00 minute(s) and 13.37 second(s) per article.
+

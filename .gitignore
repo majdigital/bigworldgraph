@@ -6,3 +6,4 @@ data/stanford/*
 data/pipeline_*/*
 python_sudo.sh
 __pycache__
+data/corpora_*/*
