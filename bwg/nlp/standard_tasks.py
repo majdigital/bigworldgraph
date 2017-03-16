@@ -18,9 +18,9 @@ from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
-    serialize_relation,
-    ArticleProcessingMixin
+    serialize_relation
 )
+from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 
@@ -28,8 +28,6 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
     """
-    task_config = luigi.DictParameter()
-
     def requires(self):
         return WikipediaReadingTask(task_config=self.task_config)
 
@@ -64,15 +62,12 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
 
         return workflow_resources
 
-    def task_workflow(self, article, **workflow_kwargs):
+    def task_workflow(self, article, **workflow_resources):
         article_data = article["data"]
-        tokenizer = workflow_kwargs["tokenizer"]
-        ner_tagger = workflow_kwargs["ner_tagger"]
 
         for sentence_id, sentence_json in article_data.items():
             sentence_data = sentence_json["data"]
-            tokenized_sentence = tokenizer.tokenize(sentence_data)
-            ner_tagged_sentence = ner_tagger.tag(tokenized_sentence)
+            ner_tagged_sentence = self._ner_tag(sentence_data, **workflow_resources)
 
             serializing_arguments = {
                 "sentence_id": sentence_id,
@@ -81,13 +76,23 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
 
             yield serializing_arguments
 
+    def _ner_tag(self, sentence_data, **workflow_resources):
+        """
+        Tag a single sentence with named entities.
+        """
+        tokenizer = workflow_resources["tokenizer"]
+        ner_tagger = workflow_resources["ner_tagger"]
+
+        tokenized_sentence = tokenizer.tokenize(sentence_data)
+        ner_tagged_sentence = ner_tagger.tag(tokenized_sentence)
+
+        return ner_tagged_sentence
+
 
 class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that dependency-parses sentences in a corpus.
     """
-    task_config = luigi.DictParameter()
-
     def requires(self):
         return WikipediaReadingTask(task_config=self.task_config)
 
@@ -123,13 +128,12 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
 
         return workflow_resources
 
-    def task_workflow(self, article, **workflow_kwargs):
+    def task_workflow(self, article, **workflow_resources):
         article_data = article["data"]
-        dependency_parser = workflow_kwargs["dependency_parser"]
 
         for sentence_id, sentence_json in article_data.items():
             sentence_data = sentence_json["data"]
-            parsed_sentence = dependency_parser.raw_parse(sentence_data)
+            parsed_sentence = self._dependency_parse(sentence_data, **workflow_resources)
 
             serializing_arguments = {
                 "sentence_id": sentence_id,
@@ -138,13 +142,21 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
 
             yield serializing_arguments
 
+    def _dependency_parse(self, sentence_data, **workflow_resources):
+        """
+        Dependency parse a sentence.
+        """
+        dependency_parser = workflow_resources["dependency_parser"]
+
+        parsed_sentence = dependency_parser.raw_parse(sentence_data)
+
+        return parsed_sentence
+
 
 class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that PoS tags a sentence in a corpus.
     """
-    task_config = luigi.DictParameter()
-
     def requires(self):
         return WikipediaReadingTask(task_config=self.task_config)
 
@@ -184,15 +196,12 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
 
         return workflow_resources
 
-    def task_workflow(self, article, **workflow_kwargs):
+    def task_workflow(self, article, **workflow_resources):
         article_data = article["data"]
-        tokenizer = workflow_kwargs["tokenizer"]
-        pos_tagger = workflow_kwargs["pos_tagger"]
 
         for sentence_id, sentence_json in article_data.items():
             sentence_data = sentence_json["data"]
-            tokenized_sentence = tokenizer.tokenize(sentence_data)
-            pos_tagged_sentence = pos_tagger.tag(tokenized_sentence)
+            pos_tagged_sentence = self._pos_tag(sentence_data, **workflow_resources)
 
             serializing_arguments = {
                 "sentence_id": sentence_id,
@@ -201,13 +210,23 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
 
             yield serializing_arguments
 
+    def _pos_tag(self, sentence_data, **workflow_resources):
+        """
+        Tag a single sentence with Part-of-Speech tags.
+        """
+        tokenizer = workflow_resources["tokenizer"]
+        pos_tagger = workflow_resources["pos_tagger"]
+
+        tokenized_sentence = tokenizer.tokenize(sentence_data)
+        pos_tagged_sentence = pos_tagger.tag(tokenized_sentence)
+
+        return pos_tagged_sentence
+
 
 class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Open Relation extraction on a corpus.
     """
-    task_config = luigi.DictParameter()
-
     def requires(self):
         return NERTask(task_config=self.task_config),\
                DependencyParseTask(task_config=self.task_config),\
@@ -225,7 +244,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             for nes_line, dependency_line, pos_line in zip(nes_input_file, dependency_input_file, pos_input_file):
                 self.process_articles(
                     (nes_line, dependency_line, pos_line), new_state="extracted_relations",
-                    serializing_function=serialize_relation, output_file=output_file, pretty=True
+                    serializing_function=serialize_relation, output_file=output_file
                 )
 
     @property
@@ -238,14 +257,12 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
 
         return workflow_resources
 
-    def task_workflow(self, article, **workflow_kwargs):
+    def task_workflow(self, article, **workflow_resources):
         article_meta, article_data = article["meta"], article["data"]
 
         for sentence_id, sentence_json in article_data.items():
             sentence_dates = sentence_json["data"]
-            enriched_sentences = [sentence_date["data"] for sentence_date in sentence_dates.values()]
-            relations = self.extract_relations(*enriched_sentences)
-            sentence = self._get_sentence(enriched_sentences[0])
+            relations, sentence = self._extract_relations_from_sentence(sentence_dates, **workflow_resources)
 
             serializing_arguments = {
                 "sentence_id": sentence_id,
@@ -254,6 +271,13 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             }
 
             yield serializing_arguments
+
+    def _extract_relations_from_sentence(self, sentence_dates, **workflow_resources):
+        enriched_sentences = [sentence_date["data"] for sentence_date in sentence_dates.values()]
+        relations = self.extract_relations(*enriched_sentences)
+        sentence = self._get_sentence(enriched_sentences[0])
+
+        return relations, sentence
 
     def _is_relevant_article(self, article):
         """
@@ -296,8 +320,12 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         with the words of a NE tagged sentence.
         """
         # Delete graph's root node without word
-        if dependency_tree["nodes"]["0"]["word"] is None:
-            del dependency_tree["nodes"]["0"]
+        if "0" in dependency_tree["nodes"]:
+            if dependency_tree["nodes"]["0"]["word"] in (None, "ROOT"):
+                del dependency_tree["nodes"]["0"]
+        else:
+            # Empty tree
+            return dependency_tree
 
         dependency_tree["nodes"] = {int(address): node for address, node in dependency_tree["nodes"].items()}
         normalized_dependency_tree = {"root": dependency_tree["root"], "nodes": {}}

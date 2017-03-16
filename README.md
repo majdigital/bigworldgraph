@@ -19,3 +19,8 @@ TODO: How to use it
     * find extracted -name '*bz2' -exec bunzip2 -c {} \; > text.xml
     
 Commenting two lines (219) in nltk/parse/stanford.py when using utf-8 corpus, otherwise dependency parsing breaks.
+
+* Starting CoreNLP Server:
+    * java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -serverProperties StanfordCoreNLP-french.properties 
+    
+Only 1 Worker on MacOS with Python > 3.4
