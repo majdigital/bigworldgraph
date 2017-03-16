@@ -244,7 +244,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             for nes_line, dependency_line, pos_line in zip(nes_input_file, dependency_input_file, pos_input_file):
                 self.process_articles(
                     (nes_line, dependency_line, pos_line), new_state="extracted_relations",
-                    serializing_function=serialize_relation, output_file=output_file, pretty=True
+                    serializing_function=serialize_relation, output_file=output_file
                 )
 
     @property
@@ -320,8 +320,12 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         with the words of a NE tagged sentence.
         """
         # Delete graph's root node without word
-        if dependency_tree["nodes"]["0"]["word"] is None:
-            del dependency_tree["nodes"]["0"]
+        if "0" in dependency_tree["nodes"]:
+            if dependency_tree["nodes"]["0"]["word"] in (None, "ROOT"):
+                del dependency_tree["nodes"]["0"]
+        else:
+            # Empty tree
+            return dependency_tree
 
         dependency_tree["nodes"] = {int(address): node for address, node in dependency_tree["nodes"].items()}
         normalized_dependency_tree = {"root": dependency_tree["root"], "nodes": {}}

@@ -37,8 +37,6 @@ class CoreNLPServerMixin:
         }
         properties.update(self._corenlp_server_overriding_properties)
 
-        # TODO (Bug): This causes the following error:
-        # "INFO: Task FrenchServerDependencyParseTask___PIPELINE_DEBUG_ba61f8749e died unexpectedly with exit code -11"
         result_json = server.annotate(
             sentence_data,
             properties=properties
@@ -51,7 +49,6 @@ class CoreNLPServerMixin:
     @property
     def workflow_resources(self):
         pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
-        # TODO (Refactor?): Are the models still loaded everytime or just once?
         corenlp_server = pycorenlp.StanfordCoreNLP(self.task_config["STANFORD_CORENLP_SERVER_ADDRESS"])
 
         workflow_resources = {
@@ -74,7 +71,6 @@ class ArticleProcessingMixin:
     Enable Luigi tasks to process single lines as well as articles or other input types.
     """
     task_config = luigi.DictParameter()
-    runtimes = []
 
     @abc.abstractmethod
     def task_workflow(self, article, bulk=False, **workflow_kwargs):
@@ -133,7 +129,7 @@ class ArticleProcessingMixin:
             if debug:
                 print("{} finished sentence #{}.".format(self.__class__.__name__, serializing_kwargs["sentence_id"]))
 
-            serialized_sentence = serializing_function(**serializing_kwargs, state=new_state, dump=False)
+            serialized_sentence = serializing_function(state=new_state, dump=False, **serializing_kwargs)
 
             if self.is_relevant_sentence(serialized_sentence):
                 sentences.append(serialized_sentence)
@@ -148,7 +144,7 @@ class ArticleProcessingMixin:
 
         # Output
         if self.is_relevant_article(serialized_article):
-            output_file.write("{}\n".format(just_dump(serialized_article)))
+            output_file.write("{}\n".format(just_dump(serialized_article, pretty=pretty)))
 
     def _combine_articles(self, raw_articles):
         """
@@ -293,20 +289,3 @@ class ArticleProcessingMixin:
         function.
         """
         return True
-
-    @staticmethod
-    def calculate_average_processing_time(runtimes):
-        return sum(runtimes) / len(runtimes)
-
-    @staticmethod
-    def calculate_average_processing_speed(runtimes):
-        return len(runtimes) / sum(runtimes)
-
-    def give_runtime_report(self, runtimes):
-        average_processing_speed = self.calculate_average_processing_speed(runtimes)
-        average_processing_time = self.calculate_average_processing_time(runtimes)
-
-        print("Processing articles in {}:\n\tOn average {:.2f} articles per second.\n\tOn average {:.2f} hour(s), {:.2f}"
-              " minute(s) and {:.2f} second(s) per article.".format(
-            self.__class__.__name__, average_processing_time, *seconds_to_hms(average_processing_speed))
-        )

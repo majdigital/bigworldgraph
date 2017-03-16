@@ -83,7 +83,7 @@ class FrenchServerNERTask(ServerNERTask):
     @property
     def _corenlp_server_overriding_properties(self):
         return {
-            "ner.model": self.task_config["STANFORD_NER_MODEL_PATH"],
+            "ner.model": self.task_config["CORENLP_STANFORD_NER_MODEL_PATH"],
             "pos.model": "edu/stanford/nlp/models/pos-tagger/french/french.tagger"
         }
 
@@ -139,5 +139,5 @@ if __name__ == "__main__":
     )
     luigi.build(
         [FrenchServerNaiveOpenRelationExtractionTask(task_config=french_task_config)],
-        local_scheduler=True, workers=2, log_level="INFO"
+        local_scheduler=True, workers=1, log_level="INFO"
     )

@@ -117,19 +117,10 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False, give_
 
             # Add run time to function return value
             if return_time:
-                # In case current function is of a ArticleProcessingMixin subclass
-                if hasattr(args[0], "runtimes") and not give_report:
-                    getattr(args[0], "runtimes").append(run_time)
-                else:
-                    return {
-                        "return": function_result,
-                        "runtime": run_time
-                    }
-
-            # In case current function is of a ArticleProcessingMixin subclass
-            if give_report:
-                runtimes = getattr(args[0], "runtimes")
-                getattr(args[0], "give_runtime_report")(runtimes)
+                return {
+                    "return": function_result,
+                    "runtime": run_time
+                }
 
             return function_result
 

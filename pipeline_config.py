@@ -20,13 +20,11 @@ CONFIG_DEPENDENCIES = {
         "{language}_LUIGI_DATA_PATH",
         "STANFORD_PATH"
     ],
-    "id_tagging": [
-        "{language}_ID_TAGGING_OUTPUT_PATH"
-    ],
     "named_entity_recognition": [
         "{language}_STANFORD_MODELS_PATH",
         "{language}_STANFORD_NER_MODEL_PATH",
-        "{language}_NES_OUTPUT_PATH"
+        "{language}_NES_OUTPUT_PATH",
+        "{language}_CORENLP_STANFORD_NER_MODEL_PATH",
     ],
     "pos_tagging": [
         "STANFORD_POSTAGGER_PATH",
@@ -46,15 +44,6 @@ CONFIG_DEPENDENCIES = {
         "NER_TAGSET",
         "{language}_ORE_OUTPUT_PATH"
     ],
-    "wikipedia_corpus_cleaning": [
-        "CORPUS_ENCODING",
-        "{language}_WIKIPEDIA_CLEANING_OUTPUT_PATH",
-        "{language}_WIKIPEDIA_CLEANING_INPUT_PATH",
-        "{language}_WIKIPEDIA_REFERENCE_PATTERN"
-    ],
-    "wikipedia_sentence_splitting": [
-        "{language}_WIKIPEDIA_SPLITTING_OUTPUT_PATH"
-    ],
     "wikipedia_reading": [
         "{language}_SENTENCE_TOKENIZER_PATH",
         "CORPUS_ENCODING",
@@ -67,7 +56,7 @@ SUPPORTED_LANGUAGES = ["FRENCH"]
 
 # --------------------------------- General config --------------------------------------
 STANFORD_CORENLP_MODELS_PATH = "../../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
-STANFORD_CORENLP_SERVER_ADDRESS = "0:0:0:0:0:0:0:0:9000"
+STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
 STANFORD_POSTAGGER_PATH = "../../data/stanford/models/stanford-postagger.jar"
 PRETTY_SERIALIZATION = False
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
@@ -76,7 +65,8 @@ VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 PIPELINE_DEBUG = True
 CORPUS_ENCODING = "utf-8"
-OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
+OMITTED_TOKENS_FOR_ALIGNMENT = []
+# OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 ONLY_INCLUDE_RELEVANT_SENTENCES = True
 ONLY_INCLUDE_RELEVANT_ARTICLES = True
 
@@ -89,15 +79,12 @@ FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_nes.json"
 FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_pos.json"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_dependencies.json"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_relations.json"
-FRENCH_WIKIPEDIA_CLEANING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_cleaned_fr.txt"
-FRENCH_WIKIPEDIA_CLEANING_INPUT_PATH = FRENCH_LUIGI_DATA_PATH + "corpus_100_fr.txt"
-FRENCH_WIKIPEDIA_SPLITTING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "wikipedia_split_fr.txt"
-FRENCH_ID_TAGGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "id_tagged_fr.txt"
 FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample2.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
+FRENCH_CORENLP_STANFORD_NER_MODEL_PATH = "./" + "ner-model-french.ser.gz"
 FRENCH_STANFORD_POS_MODEL_PATH = STANFORD_PATH + "french.tagger"
 FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"

@@ -42,7 +42,30 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, state="raw", prett
     """
     options = {"ensure_ascii": False}
 
-    parse_tree = vars([tree for tree in parse_trees][0])
+    if type(parse_trees) != dict:
+        if len(parse_trees) == 0:
+            empty_tree = {
+                sentence_id: {
+                    "meta": {
+                        "id": sentence_id,
+                        "state": state,
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "root": None,
+                        "nodes": {}
+                    }
+                }
+            }
+
+            if dump:
+                return json.dumps(empty_tree, **options)
+            return empty_tree
+
+        parse_tree = vars([tree for tree in parse_trees][0])
+    else:
+        parse_tree = parse_trees
+
     simplified_tree = {
         "root": parse_tree["root"]["address"],
         "nodes": {

@@ -10,6 +10,9 @@ Also, this approach comes with some other merits as well:
     * Avoiding using bulk operations like "parse_sents()" which complicate the current architecture of the pipeline
 """
 
+# STD
+import collections
+
 # PROJECT
 from bwg.nlp.mixins import CoreNLPServerMixin
 from bwg.nlp.standard_tasks import (
@@ -35,8 +38,10 @@ class ServerNERTask(CoreNLPServerMixin, NERTask):
             postprocessing_func=self._postprocess_ner_tagged,
         )
 
-    @staticmethod
-    def _postprocess_ner_tagged(result_json):
+    def _postprocess_ner_tagged(self, result_json):
+        if len(result_json["sentences"]) == 0:
+            return []
+
         token_dicts = result_json["sentences"][0]["tokens"]
         return [
             (token_dict["word"], token_dict["ner"])
@@ -59,9 +64,51 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
             postprocessing_func=self._postprocess_dependency_parsed,
         )
 
+    def _postprocess_dependency_parsed(self, result_json):
+        if len(result_json["sentences"]) == 0:
+            return []
+
+        edges = result_json["sentences"][0]["basicDependencies"]
+        return self.edges_to_nodes(edges)
+
+    def edges_to_nodes(self, edges):
+        nodes = {}
+
+        for edge in edges:
+            # Create not if they don't exist
+            governing_address = edge["governor"]
+            if governing_address not in nodes:
+                nodes[governing_address] = self._create_node(governing_address, edge["governorGloss"], None)
+
+            dependent_address = edge["dependent"]
+            if dependent_address not in nodes:
+                nodes[dependent_address] = self._create_node(dependent_address, edge["dependentGloss"], edge["dep"])
+
+            elif nodes[dependent_address]["rel"] is None:
+                nodes[dependent_address]["rel"] = edge["dep"]
+
+            # Create connections if they don't exist
+            if dependent_address not in nodes[governing_address]["deps"]:
+                if edge["dep"] in nodes[governing_address]["deps"]:
+                    nodes[governing_address]["deps"][edge["dep"]].append(dependent_address)
+                else:
+                    nodes[governing_address]["deps"][edge["dep"]] = [dependent_address]
+
+        root = [node for node_address, node in nodes.items() if node["rel"] == "ROOT"][0]
+
+        return {
+            "nodes": nodes,
+            "root": root
+        }
+
     @staticmethod
-    def _postprocess_dependency_parsed(result_json):
-        return result_json["sentences"][0]["basicDependencies"]
+    def _create_node(node_address, node_gloss, node_rel):
+        return {
+            "address": node_address,
+            "word": node_gloss,
+            "rel": node_rel,
+            "deps": {}
+        }
 
 
 class ServerPoSTaggingTask(CoreNLPServerMixin, PoSTaggingTask):
@@ -79,8 +126,10 @@ class ServerPoSTaggingTask(CoreNLPServerMixin, PoSTaggingTask):
             postprocessing_func=self._postprocess_pos_tagged,
         )
 
-    @staticmethod
-    def _postprocess_pos_tagged(result_json):
+    def _postprocess_pos_tagged(self, result_json):
+        if len(result_json["sentences"]) == 0:
+            return []
+
         token_dicts = result_json["sentences"][0]["tokens"]
         return [
             (token_dict["word"], token_dict["pos"])
