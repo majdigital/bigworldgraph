@@ -80,8 +80,12 @@ class FrenchServerNERTask(ServerNERTask):
     A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it's specific for the
     french Wikipedia.
     """
-    # TODO (Feature): Implement
-    pass
+    @property
+    def _corenlp_server_overriding_properties(self):
+        return {
+            "ner.model": self.task_config["STANFORD_NER_MODEL_PATH"],
+            "pos.model": "edu/stanford/nlp/models/pos-tagger/french/french.tagger"
+        }
 
 
 class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
@@ -89,26 +93,33 @@ class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
     A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it's specific to the french
     Wikipedia.
     """
-    # TODO (Feature): Implement
-    pass
+    @property
+    def _corenlp_server_overriding_properties(self):
+        return {"pos.model": "edu/stanford/nlp/models/pos-tagger/french/french.tagger"}
 
 
-class FrenchServerDependencyTask(ServerDependencyParseTask):
+class FrenchServerDependencyParseTask(ServerDependencyParseTask):
     """
     A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it's specific for the french
     Wikipedia.
     """
-    # TODO (Feature): Implement
-    pass
+    @property
+    def _corenlp_server_overriding_properties(self):
+        return {
+            "parse.model": "edu/stanford/nlp/models/lexparser/frenchFactored.ser.gz",
+            "pos.model": "edu/stanford/nlp/models/pos-tagger/french/french.tagger"
+        }
 
 
-class FrenchServerNaiveOPenRelationExtractionTask(ServerNaiveOpenRelationExtractionTask):
+class FrenchServerNaiveOpenRelationExtractionTask(ServerNaiveOpenRelationExtractionTask):
     """
     A luigi task performing a naive version of Open Relation Extraction on a sentence using a Stanford CoreNLP server,
     but it's specific for the french Wikipedia.
     """
-    # TODO (Feature): Implement
-    pass
+    def requires(self):
+        return FrenchServerNERTask(task_config=self.task_config),\
+               FrenchServerDependencyParseTask(task_config=self.task_config),\
+               FrenchServerPoSTaggingTask(task_config=self.task_config)
 
 
 # --------------------------- Pipeline composition & starting ----------------------------
@@ -127,6 +138,6 @@ if __name__ == "__main__":
         config_file_path="../../pipeline_config.py"
     )
     luigi.build(
-        [FrenchNaiveOpenRelationExtractionTask(task_config=french_task_config)],
+        [FrenchServerNaiveOpenRelationExtractionTask(task_config=french_task_config)],
         local_scheduler=True, workers=2, log_level="INFO"
     )

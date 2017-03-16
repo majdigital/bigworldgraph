@@ -27,15 +27,18 @@ class CoreNLPServerMixin:
         """
         Annotate a sentence using a CoreNLP server.
         """
-        language_abbreviations = self.task_config["LANGUAGE_ABBREVIATION"]
+        language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         properties = {
             "annotators": action,
             "outputFormat": "json",
-            "tokenize.language": language_abbreviations,
-            "pipelineLanguage": language_abbreviations,
+            "tokenize.language": language_abbreviation,
+            "lemma.language": language_abbreviation,
+            "pipelineLanguage": language_abbreviation,
         }
         properties.update(self._corenlp_server_overriding_properties)
 
+        # TODO (Bug): This causes the following error:
+        # "INFO: Task FrenchServerDependencyParseTask___PIPELINE_DEBUG_ba61f8749e died unexpectedly with exit code -11"
         result_json = server.annotate(
             sentence_data,
             properties=properties

@@ -20,7 +20,7 @@ from bwg.nlp.standard_tasks import (
 )
 
 
-class ServerNERTask(NERTask, CoreNLPServerMixin):
+class ServerNERTask(CoreNLPServerMixin, NERTask):
     """
     Luigi task that performs Named Entity Recognition on a corpus, but using a Stanford CoreNLP server.
     """
@@ -44,7 +44,7 @@ class ServerNERTask(NERTask, CoreNLPServerMixin):
         ]
 
 
-class ServerDependencyParseTask(DependencyParseTask, CoreNLPServerMixin):
+class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
     """
     Luigi task that dependency-parses sentences in a corpus, but using a Stanford CoreNLP server.
     """
@@ -64,7 +64,7 @@ class ServerDependencyParseTask(DependencyParseTask, CoreNLPServerMixin):
         return result_json["sentences"][0]["basicDependencies"]
 
 
-class ServerPoSTaggingTask(PoSTaggingTask, CoreNLPServerMixin):
+class ServerPoSTaggingTask(CoreNLPServerMixin, PoSTaggingTask):
     """
     Luigi task that PoS tags a sentence in a corpus, but using a Stanford CoreNLP server.
     """
