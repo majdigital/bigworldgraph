@@ -126,21 +126,40 @@ class EvaluationSetCreator:
         """
         Write articles into the evaluation set file.
         """
+        named_entities_path = self.evaluation_set_outpath.replace(".xml", "_nes.xml")
+        raw_relations_path = self.evaluation_set_outpath.replace(".xml", "_relations_raw.xml")
+
         with codecs.open(self.evaluation_set_outpath, "wb", self.corpus_encoding) as outfile:
-            for article in articles:
-                # Write header
-                outfile.write(
-                    '<doc id="{id}" url="{url}" title="{title}">\n'.format(
+            with codecs.open(named_entities_path, "wb", self.corpus_encoding) as nes_file:
+                nes_file.write(
+                    "<!--\nIn this version of the evaluation corpus, annotate named entities in the following way:\n'"
+                    "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and"
+                    " also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron.'\n(The tags can vary "
+                    "depending on the tagset used by the pipelines named entity tagger.)\n-->\n\n")
+
+                for article in articles:
+                    # Write header
+                    header = '<doc id="{id}" url="{url}" title="{title}">\n'.format(
                         id=article.id, url=article.url, title=article.title
                     )
-                )
+                    outfile.write(header)
+                    nes_file.write(header)
 
-                # Write sentences
-                for sentence in article.sentences:
-                    outfile.write(sentence)
+                    # Write sentences
+                    for sentence in article.sentences:
+                        outfile.write(sentence)
+                        nes_file.write(sentence)
 
-                # Write footer
-                outfile.write('</doc>\n')
+                    # Write footer
+                    outfile.write('</doc>\n')
+                    nes_file.write('</doc>\n')
+
+        with codecs.open(raw_relations_path, "wb", self.corpus_encoding) as raw_relations_file:
+            # TODO (Feature): Find good easy format for humans to enter relations
+            raw_relations_file.write(
+                "<!--\nAdd the relations that are expected to be found by the NLP pipeline here in the following form:"
+                "\n-->\n\n"
+            )
 
     def _sample_articles(self, articles):
         if self.keep_number is None:
