@@ -29,11 +29,8 @@ class WikipediaReadingTask(luigi.Task):
 
     @time_function(is_classmethod=True)
     def run(self):
-        # Init necessary resources
-        corpus_inpath = self.task_config["CORPUS_INPATH"]
-        corpus_encoding = self.task_config["CORPUS_ENCODING"]
-        article_tag_pattern = self.task_config["WIKIPEDIA_ARTICLE_TAG_PATTERN"]
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+        corpus_inpath = self.workflow_resources["corpus_inpath"]
+        corpus_encoding = self.workflow_resources["corpus_encoding"]
 
         # Init "parsing" variables
         current_title = ""
@@ -48,16 +45,15 @@ class WikipediaReadingTask(luigi.Task):
                     skip_line = False
                     continue
 
-                if re.match(article_tag_pattern, line):
+                if re.match(self.workflow_resources["article_tag_pattern"], line):
                     current_id, current_url, current_title = self._extract_article_info(line)
                     skip_line = True
 
                 elif line.strip() == "</doc>":
-                    article_json = serialize_article(
-                        current_id, current_url, current_title, current_sentences, state="parsed",
-                        pretty=pretty_serialization
+                    self._output_article(
+                        current_id, current_url, current_title, current_sentences, output_file, state="parsed",
+                        pretty=self.workflow_resources["pretty_serialization"]
                     )
-                    output_file.write("{}\n".format(article_json))
                     current_title, current_id, current_url, current_sentences = self._reset_vars()
 
                 else:
@@ -72,6 +68,29 @@ class WikipediaReadingTask(luigi.Task):
 
                     else:
                         current_sentences.append(line)
+
+    @property
+    def workflow_resources(self):
+        corpus_inpath = self.task_config["CORPUS_INPATH"]
+        corpus_encoding = self.task_config["CORPUS_ENCODING"]
+        article_tag_pattern = self.task_config["WIKIPEDIA_ARTICLE_TAG_PATTERN"]
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+
+        workflow_resources = {
+            "corpus_inpath": corpus_inpath,
+            "corpus_encoding": corpus_encoding,
+            "article_tag_pattern": article_tag_pattern,
+            "pretty_serialization": pretty_serialization
+        }
+
+        return workflow_resources
+
+    def _output_article(self, id_, url, title, sentences, output_file, **additional):
+        article_json = serialize_article(
+            id_, url, title, sentences, state=additional["state"],
+            pretty=additional["pretty"]
+        )
+        output_file.write("{}\n".format(article_json))
 
     def _additional_formatting(self, line):
         """
