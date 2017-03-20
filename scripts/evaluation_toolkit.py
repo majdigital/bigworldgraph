@@ -6,7 +6,8 @@ Toolkit for script used for this project.
 # STD
 import argparse
 import codecs
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
+import json
 import random
 import re
 import sys
@@ -14,8 +15,12 @@ import sys
 # EXT
 import nltk
 
+# CONST
+ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
+
 # TYPES
 Article = namedtuple("Article", ["id", "title", "url", "sentences"])
+ConfusionMatrix = namedtuple("ConfusionMatrix", ["tp", "tn", "fp", "fn"])
 
 
 def main():
@@ -26,10 +31,20 @@ def main():
 
 
 def _start_evalset_creator():
+    """
+    Parse arguments for the EvaluationSetCreator and run it.
+    """
     argument_parser = _init_evalset_argument_parser()
     args = argument_parser.parse_args()
     eval_set_creator = EvaluationSetCreator(**vars(args))
     eval_set_creator.create_test_set()
+
+
+def _start_ne_eval():
+    argument_parser = _init_ne_eval_argument_parser()
+    args = argument_parser.parse_args()
+    ne_evaluator = NamedEntityEvaluator(**vars(args))
+    ne_evaluator.evaluate_named_entities()
 
 
 # --------------------------------------- Create an evaluation set -----------------------------------------------------
@@ -50,7 +65,6 @@ class EvaluationSetCreator:
     ...
     """
     languages = ["french", "english"]
-    article_tag_pattern = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 
     def __init__(self, **creation_kwargs):
         self.corpus_inpath = creation_kwargs["corpus_inpath"]
@@ -74,53 +88,18 @@ class EvaluationSetCreator:
         Start a modified version of the WikipediaReadingTask to create an evaluation set from an already existing
         corpus.
         """
-        articles = self._read_articles()
+        language_formatting = {
+            "french": self._additional_formatting_french,
+            "english": self._additional_formatting_english
+        }
+
+        articles = read_articles(
+            self.corpus_inpath,
+            self.corpus_encoding,
+            formatting_function=language_formatting[self.current_language]
+        )
         sampled_articles = self._sample_articles(articles)
         self._write_articles(sampled_articles)
-
-    def _read_articles(self):
-        """
-        Read articles from corpus.
-        """
-        articles = set()
-
-        # Init "parsing" variables
-        current_title = ""
-        current_id = ""
-        current_url = ""
-        current_sentences = []
-        skip_line = False
-
-        with codecs.open(self.corpus_inpath, "rb", self.corpus_encoding) as input_file:
-            for line in input_file.readlines():
-                if skip_line:
-                    skip_line = False
-                    continue
-
-                if re.match(self.article_tag_pattern, line):
-                    current_id, current_url, current_title = self._extract_article_info(line)
-                    skip_line = True
-
-                elif line.strip() == "</doc>":
-                    articles.add(
-                        Article(id=current_id, title=current_title, url=current_url, sentences=tuple(current_sentences))
-                    )
-                    current_title, current_id, current_url, current_sentences = self._reset_vars()
-
-                else:
-                    if not line.strip():
-                        continue
-                    line = re.sub("</?.+?>", "", line)  # Remove other xml markup
-                    formatted = getattr(self, "_additional_formatting_" + self.current_language)(line.strip())
-
-                    if self.is_collection(formatted):
-                        for line_ in formatted:
-                            current_sentences.append(line_)
-
-                    else:
-                        current_sentences.append(line)
-
-        return articles
 
     def _write_articles(self, articles):
         """
@@ -135,7 +114,9 @@ class EvaluationSetCreator:
                     "<!--\nIn this version of the evaluation corpus, annotate named entities in the following way:\n'"
                     "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and"
                     " also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron.'\n(The tags can vary "
-                    "depending on the tagset used by the pipelines named entity tagger.)\n-->\n\n")
+                    "depending on the tagset used by the pipelines named entity tagger.)\nPlease maintain line breaks."
+                    "\n-->\n\n"
+                )
 
                 for article in articles:
                     # Write header
@@ -147,8 +128,8 @@ class EvaluationSetCreator:
 
                     # Write sentences
                     for sentence in article.sentences:
-                        outfile.write(sentence)
-                        nes_file.write(sentence)
+                        outfile.write("{}\n".format(sentence))
+                        nes_file.write("{}\n".format(sentence))
 
                     # Write footer
                     outfile.write('</doc>\n')
@@ -166,18 +147,6 @@ class EvaluationSetCreator:
             return random.sample(articles, int(len(articles) * self.keep_percentage))
         elif self.keep_percentage is None:
             return random.sample(articles, self.keep_number)
-
-    @staticmethod
-    def _reset_vars():
-        return "", "", "", []
-
-    def _extract_article_info(self, line):
-        """
-        Extract relevant dates from articles.
-        """
-        article_tag_pattern = self.article_tag_pattern
-        groups = re.match(article_tag_pattern, line).groups()
-        return groups
 
     def _additional_formatting_french(self, line):
         french_sentence_tokenizer_path = "tokenizers/punkt/PY3/french.pickle"
@@ -200,12 +169,239 @@ class EvaluationSetCreator:
         except LookupError:
             nltk.download(resource)
 
+
+# -------------------------------------- Evaluate named entities -------------------------------------------------------
+
+
+class NamedEntityEvaluator:
+    """
+    Tool that evaluates found named entities. To work, please provide two files: A *_nes.xml file, where named entities
+    are manually enclosed in .xml-tags like this: 'Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>
+    North Korea’s</ne> defiance and also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron.'
+
+    The other file necessary is the one produced by the NLP pipeline, specifically from nlp.standard_tasks.NERTask. It's
+     a JSON file. Please make sure that the articles in the evaluation set are included in the original corpus that was
+    processed by the NERTask.
+    """
+    ne_tag_pattern = "<ne type=[\\'\"].+?[\\'\"]>.+?<\/ne>"
+
+    def __init__(self, **creation_kwargs):
+        self.eval_inpath = creation_kwargs["eval_inpath"]
+        self.ne_inpath = creation_kwargs["ne_inpath"]
+        self.output_path = creation_kwargs["output_path"]
+        self.corpus_encoding = creation_kwargs["corpus_encoding"]
+
+    def evaluate_named_entities(self):
+        manually_annotated, ne_tagged = self._prepare_eval_data()
+
+        for (manually_id, manually_article), (tagged_id, tagged_article) \
+            in zip(manually_annotated.items(), ne_tagged.items()):
+            assert manually_id == tagged_id  # Assure data sets are aligned
+
+            # Get sentences from articles
+            manually_sentences = manually_article.sentences
+            tagged_sentences = [sentence_json["data"] for sentence_id, sentence_json in tagged_article["data"].items()]
+            assert len(manually_sentences) == len(tagged_sentences)
+
+            for manually_sentence, tagged_sentence in zip(manually_sentences, tagged_sentences):
+                mannually_sentence = self.convert_manually_tagged_sentence(manually_sentence)
+
+                # TODO (Feature): Create confusion matrix
+
+    def _prepare_eval_data(self):
+        """
+        Read, filter and convert evaluation data into an appropriate data structure.
+        """
+        articles = self._read_manually_annotated_file()
+        tagged_articles = self._read_ne_tagged_file()
+        filtered_tagged_articles = self._filter_tagged_articles(articles, tagged_articles)
+        del tagged_articles  # Big data structure
+
+        # Convert data structures
+        articles_dict = id_collection_to_dict(articles, lambda item: getattr(item, "id"))
+        tagged_articles_dict = id_collection_to_dict(filtered_tagged_articles, lambda item: item["meta"]["id"])
+        sorted_articles_dict = OrderedDict(sorted(articles_dict.items()))
+        sorted_tagged_articles_dict = OrderedDict(sorted(tagged_articles_dict.items()))
+
+        return sorted_articles_dict, sorted_tagged_articles_dict
+
+    def _read_ne_tagged_file(self):
+        """
+        Read named entity tagged file from NLP pipeline.
+        """
+        tagged_articles = []
+
+        with codecs.open(self.ne_inpath, "rb", self.corpus_encoding) as ne_file:
+            for line in ne_file.readlines():
+                deserialized_line = self.deserialize_line(line)
+                tagged_articles.append(deserialized_line)
+
+        return tagged_articles
+
+    def _read_manually_annotated_file(self):
+        """
+        Read file with manually annotated name entities.
+        """
+        return read_articles(self.eval_inpath, self.corpus_encoding)
+
+    def convert_manually_tagged_sentence(self, manually_tagged_sentence, default_tag='O'):
+        """
+        Convert a manually tagged sentence into a data structure that fits the output of the Stanford Named Entity
+        Tagger.
+
+        Example:
+
+        "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and also took
+        aim at <ne type='I-ORG'>China</ne>, the North’s main patron."
+
+        == is converted to ==>
+
+        [('Hours', 'O'), ('later', 'O'), ('Trump', 'I-Pers'), ('decried', 'O'), ('North', 'I-ORG'), ('Korea', 'I-ORG'),
+        ('’s', 'I-ORG'), ('defiance', 'O'), ('and', 'O'), ('also', 'O'), ('took', 'O'), ('aim', 'O'), ('at', 'O'),
+        ('China', 'I-ORG'), ('the', 'O'), ('North', 'O'), ('’s', 'O'), ('main', 'O'), ('patron', 'O'), ('.', 'O')]
+        """
+        tokens_string = str(manually_tagged_sentence)
+
+        for match in re.findall(self.ne_tag_pattern, manually_tagged_sentence):
+            ne_tag = re.findall("type=[\\'\"](.+?)[\\'\"]", match)[0]
+            tokens = re.findall("<ne .+?>(.+?)<\/ne>", match)[0].split(" ")
+            tokens_string = re.sub(
+                match,
+                " ".join(["{}|{}".format(token, ne_tag) for token in tokens]),
+                tokens_string
+            )
+
+        ne_tagged_tokens = [
+            tuple(token.split("|"))
+            if "|" in token else (token, default_tag)
+            for token in tokens_string.split(" ")
+        ]
+
+        return ne_tagged_tokens
+
+
     @staticmethod
-    def is_collection(obj):
+    def _filter_tagged_articles(articles, tagged_articles):
         """
-        Check if a object is iterable.
+        Filter out those named entity tagged articles from the NLP pipeline which also appear in the evaluation set.
         """
-        return hasattr(obj, '__iter__') and not isinstance(obj, str)
+        article_ids = set([article.id for article in articles])
+
+        return [
+            tagged_article
+            for tagged_article in tagged_articles
+            if tagged_article["meta"]["id"] in article_ids
+        ]
+
+    def deserialize_line(self, line):
+        """
+        Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
+        """
+        return json.loads(line, encoding=self.corpus_encoding)
+
+
+# ------------------------------------------ Helper functions ----------------------------------------------------------
+
+
+def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=None):
+    """
+    Read articles from corpus.
+    """
+    global ARTICLE_TAG_PATTERN
+    articles = set()
+
+    # Init "parsing" variables
+    current_title = ""
+    current_id = ""
+    current_url = ""
+    current_sentences = []
+    skip_line = False
+    comment = False
+
+    with codecs.open(corpus_inpath, "rb", corpus_encoding) as input_file:
+        for line in input_file.readlines():
+            line = line.strip()
+
+            # Skip lines that should be ignored (article headers withing the article, xml comments, etc.)
+            if skip_line:
+                if not comment or "-->" in line:
+                    comment = False
+                    skip_line = False
+                continue
+
+            if line == current_title:
+                continue
+
+            # Identify xml/html comments
+            if "<!--" in line:
+                if "-->" not in line:
+                    skip_line = True
+                    comment = True
+                continue
+
+            # Identify beginning of new article
+            if re.match(ARTICLE_TAG_PATTERN, line):
+                current_id, current_url, current_title = _extract_article_info(line)
+
+            # Identify end of article
+            elif line.strip() == "</doc>":
+                articles.add(
+                    Article(id=current_id, title=current_title, url=current_url, sentences=tuple(current_sentences))
+                )
+                current_title, current_id, current_url, current_sentences = _reset_vars()
+
+            # Just add a new line to ongoing article
+            else:
+                if not line.strip():
+                    continue
+
+                formatted = None
+                if formatting_function is not None:
+                    formatted = formatting_function(line)
+
+                if formatted is not None:
+                    if is_collection(formatted):
+                        for line_ in formatted:
+                            current_sentences.append(line_)
+                    else:
+                        current_sentences.append(formatted)
+                else:
+                    current_sentences.append(line)
+
+    return articles
+
+
+def _reset_vars():
+    return "", "", "", []
+
+
+def _extract_article_info(line):
+    """
+    Extract relevant dates from articles.
+    """
+    global ARTICLE_TAG_PATTERN
+    groups = re.match(ARTICLE_TAG_PATTERN, line).groups()
+    return groups
+
+
+def is_collection(obj):
+    """
+    Check if a object is iterable.
+    """
+    return hasattr(obj, '__iter__') and not isinstance(obj, str)
+
+
+def id_collection_to_dict(collection, id_getter):
+    """
+    Convert a collection of items that possess an id attribute to a dictionary which the same id as their key.
+    """
+    id_dict = {}
+
+    for item in collection:
+        item_id = id_getter(item)
+        id_dict[item_id] = item
+
+    return id_dict
 
 
 # ------------------------------------------ Argument parsing ----------------------------------------------------------
@@ -226,7 +422,7 @@ def _init_evalset_argument_parser():
         "-i", "--corpus-inpath",
         type=str,
         required=True,
-        help="Input path of corpus file (comprised of articles)."
+        help="Input path to corpus file (comprised of articles)."
     )
     argument_parser.add_argument(
         "-enc", "--corpus-encoding",
@@ -266,10 +462,51 @@ def _init_evalset_argument_parser():
     return argument_parser
 
 
+def _init_ne_eval_argument_parser():
+    """
+    Initialize the argument parser for the named entity evaluator.
+    """
+    argument_parser = argparse.ArgumentParser()
+
+    argument_parser.add_argument(
+        "-ene", "--eval-nes",
+        required=True,
+        action='store_true',
+        help="Flag that will evaluate named entities found by the NLP pipeline with a manually annotated file."
+    )
+    argument_parser.add_argument(
+        "-ei", "--eval-inpath",
+        type=str,
+        required=True,
+        help="Input path to manually annotated evaluation set (xml)."
+    )
+    argument_parser.add_argument(
+        "-ni", "--ne-inpath",
+        type=str,
+        required=True,
+        help="Input path to named entity tagged file from NLP-Pipeline (json)."
+    )
+    argument_parser.add_argument(
+        "-o", "--output-path",
+        type=str,
+        help="When flag is set, output of this script will also be written to an output file."
+    )
+    argument_parser.add_argument(
+        "-enc", "--corpus-encoding",
+        type=str,
+        default="utf-8",
+        help="Encoding of input corpus."
+    )
+
+    return argument_parser
+
+
 def parse_and_start():
     flags_to_parser = {
         "-ce": _start_evalset_creator,
-        "--create-evalset": _start_evalset_creator
+        "--create-evalset": _start_evalset_creator,
+        "-ene": _start_ne_eval,
+        "--eval-nes": _start_ne_eval
     }
 
     for arg in sys.argv:

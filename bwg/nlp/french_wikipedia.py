@@ -74,8 +74,8 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
                FrenchDependencyParseTask(task_config=self.task_config),\
                FrenchPoSTaggingTask(task_config=self.task_config)
 
-# -------------------- Tasks for french using Stanford CoreNLP server --------------------
 
+# -------------------- Tasks for french using Stanford CoreNLP server --------------------
 
 class FrenchServerNERTask(ServerNERTask):
     """
