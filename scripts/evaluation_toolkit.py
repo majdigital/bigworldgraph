@@ -12,6 +12,8 @@ import random
 import re
 import sys
 
+# EXT
+
 # CONST
 ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 
@@ -89,13 +91,11 @@ class EvaluationSetCreator:
         """
         sys.stdout.write("Reading articles...")
         articles = read_ne_tagged_file(self.ne_inpath, self.corpus_encoding)
-        sys.stdout.flush()
-        sys.stdout.write("\rReading articles... Done!\n")
+        print("\rReading articles... Done!", flush=True)
 
-        sys.stdout.write("Sampling articles...")
         sampled_articles = self._sample_articles(articles)
         sys.stdout.flush()
-        sys.stdout.write("\rSampling articles... Done!\n")
+        print("\rSampling articles... Done!", flush=True)
         self._write_articles(sampled_articles)
 
     def _write_articles(self, articles):
@@ -109,10 +109,10 @@ class EvaluationSetCreator:
             with codecs.open(named_entities_path, "wb", self.corpus_encoding) as nes_file:
                 nes_file.write(
                     "<!--\nIn this version of the evaluation corpus, annotate named entities in the following way:\n'"
-                    "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and"
-                    " also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron.'\n(The tags can vary "
-                    "depending on the tag set used by the pipelines named entity tagger.)\nPlease maintain line breaks."
-                    "\n-->\n\n"
+                    "Hours later , <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea ’s</ne> defiance "
+                    "and also took aim at <ne type='I-ORG'>China</ne> , the North 's main patron . '\n(The tags can "
+                    "vary depending on the tag set used by the pipelines named entity tagger.)\nPlease maintain line "
+                    "breaks. Also be careful not to add or remove whitespaces by accident.\n-->\n\n"
                 )
 
                 i = 0
@@ -133,7 +133,7 @@ class EvaluationSetCreator:
                     nes_file.write(header)
 
                     # Write sentences
-                    for sentence_id, sentence_json in article["data"].items():
+                    for sentence_id, sentence_json in get_sorted_dict_items(article["data"]):
                         outfile.write("{}\n".format(self._get_sentence(sentence_json)))
                         nes_file.write("{}\n".format(self._get_sentence(sentence_json)))
 
@@ -142,8 +142,7 @@ class EvaluationSetCreator:
                     nes_file.write('</doc>\n')
                     sys.stdout.flush()
 
-            sys.stdout.flush()
-            sys.stdout.write("\rWriting articles... Done!")
+            print("\rWriting articles... Done!", flush=True)
 
         with codecs.open(raw_relations_path, "wb", self.corpus_encoding) as raw_relations_file:
             # TODO (Feature): Find good easy format for humans to enter relations
@@ -197,7 +196,7 @@ class NamedEntityEvaluator:
             manually_sentences = manually_article.sentences
             tagged_sentences = [
                 sentence_json["data"]
-                for sentence_id, sentence_json in OrderedDict(sorted(tagged_article["data"].items())).items()
+                for sentence_id, sentence_json in get_sorted_dict_items(tagged_article["data"])
             ]
             assert len(manually_sentences) == len(tagged_sentences)
 
@@ -213,28 +212,30 @@ class NamedEntityEvaluator:
                     # True Positive
                     # Named entity was rightfully tagged
                     if ne_tag == gold_ne_tag and ne_tag != self.default_tag:
-                        confusion_matrices["total"].increment_cell("tp")
+                        confusion_matrices["all"].increment_cell("tp")
                         confusion_matrices[gold_ne_tag].increment_cell("tp")
 
                     # True Negative
                     # A normal token was rightfully _not_ tagged
                     elif ne_tag == gold_ne_tag and ne_tag == self.default_tag:
-                        confusion_matrices["total"].increment_cell("tn")
+                        confusion_matrices["all"].increment_cell("tn")
                         confusion_matrices[gold_ne_tag].increment_cell("tn")
 
                     # False Positive
                     # A normal token was wrongfully tagged as a named entity or got assigned the wrong named entity tag
                     elif ne_tag != gold_ne_tag and ne_tag != self.default_tag:
-                        confusion_matrices["total"].increment_cell("fp")
+                        confusion_matrices["all"].increment_cell("fp")
                         confusion_matrices[gold_ne_tag].increment_cell("fp")
 
                     # False Negative
                     # A named entity was not identified and therefore wrongfully not tagged as one
                     elif ne_tag != gold_ne_tag and ne_tag == self.default_tag:
-                        confusion_matrices["total"].increment_cell("fn")
+                        confusion_matrices["all"].increment_cell("fn")
                         confusion_matrices[gold_ne_tag].increment_cell("fn")
 
-        bla = 3
+        print("")
+        for tag, confusion_matrix in confusion_matrices.items():
+            confusion_matrix.prettyprint("Confusion matrix for " + tag)
 
     def _prepare_eval_data(self):
         """
@@ -321,6 +322,7 @@ class ConfusionMatrix:
         self.tn = 0  # True negatives
         self.fp = 0  # False positives
         self.fn = 0  # False negatives
+        self.epsilon = 1e-20 # Add to avoid division by zero
 
     def increment_cell(self, cell, incrementation=1):
         """
@@ -335,28 +337,50 @@ class ConfusionMatrix:
         """
         What's the proportion of correctly classified results (both positive and negative)?
         """
-        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn + self.epsilon)
 
     @property
     def precision(self):
         """
         How many of the selected items are relevant?
         """
-        return self.tp / (self.tp + self.fp)
+        return self.tp / (self.tp + self.fp + self.epsilon)
 
     @property
     def recall(self):
         """
         How many relevant items are selected?
         """
-        return self.tp / (self.tp + self.fn)
+        return self.tp / (self.tp + self.fn + self.epsilon)
 
     @property
     def f1_score(self):
         """
         Harmonic mean of precision and recall.
         """
-        return (2 * self.tp) / (2 * self.tp + self.fp + self.fn)
+        return (2 * self.tp) / (2 * self.tp + self.fp + self.fn + self.epsilon)
+
+    def prettyprint(self, header=""):
+        row_format = "{:>7}" * 4
+        metric_format = "{:>22}: {:.2f}"
+
+        if header:
+            print("{:>28}".format(header))
+            print("{:>28}\n".format(len(header)*"-"))
+
+        # Print table
+        print("{:>28}\n".format("Gold standard"))
+        print(row_format.format("", "", "True", "False"))
+        print(row_format.format("Tagger", "True", self.tp, self.fp))
+        print(row_format.format("", "False", self.fn, self.tn))
+        print("")
+
+        # Print metrics
+        print(metric_format.format("Accuracy", self.accuracy))
+        print(metric_format.format("Precision", self.precision))
+        print(metric_format.format("Recall", self.recall))
+        print(metric_format.format("F1-Score", self.f1_score))
+        print("")
 
 
 def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=None):
@@ -481,6 +505,10 @@ def deserialize_line(line, encoding="utf-8"):
     Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
     """
     return json.loads(line, encoding=encoding)
+
+
+def get_sorted_dict_items(dictionary):
+    return OrderedDict(sorted(dictionary.items())).items()
 
 
 # ------------------------------------------ Argument parsing ----------------------------------------------------------
