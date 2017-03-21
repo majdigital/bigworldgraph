@@ -6,7 +6,7 @@ Toolkit for script used for this project.
 # STD
 import argparse
 import codecs
-from collections import namedtuple, OrderedDict
+from collections import namedtuple, OrderedDict, defaultdict
 import json
 import random
 import re
@@ -20,7 +20,7 @@ ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 
 # TYPES
 Article = namedtuple("Article", ["id", "title", "url", "sentences"])
-ConfusionMatrix = namedtuple("ConfusionMatrix", ["tp", "tn", "fp", "fn"])
+Evaluation = namedtuple("Evaluation", ["precision", "accuracy", "recall", "f_score", "info"])
 
 
 def main():
@@ -41,6 +41,9 @@ def _start_evalset_creator():
 
 
 def _start_ne_eval():
+    """
+    Parse arguments for the NamedEntityEvaluator and run it.
+    """
     argument_parser = _init_ne_eval_argument_parser()
     args = argument_parser.parse_args()
     ne_evaluator = NamedEntityEvaluator(**vars(args))
@@ -72,6 +75,9 @@ class EvaluationSetCreator:
         self.corpus_encoding = creation_kwargs["corpus_encoding"]
         self.keep_percentage = creation_kwargs["keep_percentage"]
         self.keep_number = creation_kwargs["keep_number"]
+        self.tokenizer = nltk.stanford.StanfordTokenizer(
+            creation_kwargs["stanford_models_path"], encoding=self.corpus_encoding
+        )
 
         if self.keep_percentage is None and self.keep_number is None:
             self.keep_number = 10
@@ -93,12 +99,19 @@ class EvaluationSetCreator:
             "english": self._additional_formatting_english
         }
 
+        sys.stdout.write("Reading articles...")
         articles = read_articles(
             self.corpus_inpath,
             self.corpus_encoding,
             formatting_function=language_formatting[self.current_language]
         )
+        sys.stdout.flush()
+        sys.stdout.write("\rReading articles... Done!\n")
+
+        sys.stdout.write("Sampling articles...")
         sampled_articles = self._sample_articles(articles)
+        sys.stdout.flush()
+        sys.stdout.write("\rSampling articles... Done!\n")
         self._write_articles(sampled_articles)
 
     def _write_articles(self, articles):
@@ -114,11 +127,20 @@ class EvaluationSetCreator:
                     "<!--\nIn this version of the evaluation corpus, annotate named entities in the following way:\n'"
                     "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and"
                     " also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron.'\n(The tags can vary "
-                    "depending on the tagset used by the pipelines named entity tagger.)\nPlease maintain line breaks."
+                    "depending on the tag set used by the pipelines named entity tagger.)\nPlease maintain line breaks."
                     "\n-->\n\n"
                 )
 
+                i = 0
+                print("Starting writing articles (tokenizing might take a while)")
                 for article in articles:
+                    i += 1
+                    sys.stdout.write(
+                        "\rWriting article {} of {}... ({:.2f} % complete)".format(
+                            i, len(articles), (i-1) / len(articles) * 100.0
+                        )
+                    )
+
                     # Write header
                     header = '<doc id="{id}" url="{url}" title="{title}">\n'.format(
                         id=article.id, url=article.url, title=article.title
@@ -127,13 +149,18 @@ class EvaluationSetCreator:
                     nes_file.write(header)
 
                     # Write sentences
-                    for sentence in article.sentences:
+
+                    for sentence in self._tokenize_sentences(article.sentences):
                         outfile.write("{}\n".format(sentence))
                         nes_file.write("{}\n".format(sentence))
 
                     # Write footer
                     outfile.write('</doc>\n')
                     nes_file.write('</doc>\n')
+                    sys.stdout.flush()
+
+            sys.stdout.flush()
+            sys.stdout.write("\rWriting articles... Done!")
 
         with codecs.open(raw_relations_path, "wb", self.corpus_encoding) as raw_relations_file:
             # TODO (Feature): Find good easy format for humans to enter relations
@@ -141,6 +168,13 @@ class EvaluationSetCreator:
                 "<!--\nAdd the relations that are expected to be found by the NLP pipeline here in the following form:"
                 "\n-->\n\n"
             )
+
+    def _tokenize_sentences(self, sentences):
+        tokenized_sentences = self.tokenizer.tokenize_sents(sentences)
+        return [
+            " ".join(tokenized_sentence)
+            for tokenized_sentence in tokenized_sentences
+        ]
 
     def _sample_articles(self, articles):
         if self.keep_number is None:
@@ -190,9 +224,11 @@ class NamedEntityEvaluator:
         self.ne_inpath = creation_kwargs["ne_inpath"]
         self.output_path = creation_kwargs["output_path"]
         self.corpus_encoding = creation_kwargs["corpus_encoding"]
+        self.default_tag = 'O'
 
     def evaluate_named_entities(self):
         manually_annotated, ne_tagged = self._prepare_eval_data()
+        confusion_matrices = defaultdict(lambda: ConfusionMatrix())
 
         for (manually_id, manually_article), (tagged_id, tagged_article) \
             in zip(manually_annotated.items(), ne_tagged.items()):
@@ -200,13 +236,46 @@ class NamedEntityEvaluator:
 
             # Get sentences from articles
             manually_sentences = manually_article.sentences
-            tagged_sentences = [sentence_json["data"] for sentence_id, sentence_json in tagged_article["data"].items()]
+            tagged_sentences = [
+                sentence_json["data"]
+                for sentence_id, sentence_json in OrderedDict(sorted(tagged_article["data"].items())).items()
+            ]
             assert len(manually_sentences) == len(tagged_sentences)
 
             for manually_sentence, tagged_sentence in zip(manually_sentences, tagged_sentences):
-                mannually_sentence = self.convert_manually_tagged_sentence(manually_sentence)
+                manually_sentence = self.convert_manually_tagged_sentence(manually_sentence)
 
-                # TODO (Feature): Create confusion matrix
+                for ne_tuple1, ne_tuple2 in zip(manually_sentence, tagged_sentence):
+                    token1, gold_ne_tag = ne_tuple1
+                    token2, ne_tag = ne_tuple2
+                    assert token1 == token2
+
+                    # Fill confusion matrices
+                    # True Positive
+                    # Named entity was rightfully tagged
+                    if ne_tag == gold_ne_tag and ne_tag != self.default_tag:
+                        confusion_matrices["total"].increment_cell("tp")
+                        confusion_matrices[gold_ne_tag].increment_cell("tp")
+
+                    # True Negative
+                    # A normal token was rightfully _not_ tagged
+                    elif ne_tag == gold_ne_tag and ne_tag == self.default_tag:
+                        confusion_matrices["total"].increment_cell("tn")
+                        confusion_matrices[gold_ne_tag].increment_cell("tn")
+
+                    # False Positive
+                    # A normal token was wrongfully tagged as a named entity
+                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag:
+                        confusion_matrices["total"].increment_cell("fp")
+                        confusion_matrices[gold_ne_tag].increment_cell("fp")
+
+                    # False Negative
+                    # A named entity was not identified and therefore wrongfully not tagged as one
+                    elif ne_tag != gold_ne_tag and ne_tag == self.default_tag:
+                        confusion_matrices["total"].increment_cell("fn")
+                        confusion_matrices[gold_ne_tag].increment_cell("fn")
+
+        bla = 3
 
     def _prepare_eval_data(self):
         """
@@ -263,8 +332,9 @@ class NamedEntityEvaluator:
         tokens_string = str(manually_tagged_sentence)
 
         for match in re.findall(self.ne_tag_pattern, manually_tagged_sentence):
-            ne_tag = re.findall("type=[\\'\"](.+?)[\\'\"]", match)[0]
-            tokens = re.findall("<ne .+?>(.+?)<\/ne>", match)[0].split(" ")
+            ne_tag = re.findall("type=[\\'\"](.+?)[\\'\"]", match)[0]  # Extract NE tag
+            tokens = re.findall("<ne .+?>(.+?)<\/ne>", match)[0].split(" ")  # Get tokens enclosed by NE tag
+            # Map NE tags onto every token within the tag
             tokens_string = re.sub(
                 match,
                 " ".join(["{}|{}".format(token, ne_tag) for token in tokens]),
@@ -272,13 +342,12 @@ class NamedEntityEvaluator:
             )
 
         ne_tagged_tokens = [
-            tuple(token.split("|"))
-            if "|" in token else (token, default_tag)
+            token.split("|")
+            if "|" in token else [token, default_tag]
             for token in tokens_string.split(" ")
         ]
 
         return ne_tagged_tokens
-
 
     @staticmethod
     def _filter_tagged_articles(articles, tagged_articles):
@@ -300,7 +369,26 @@ class NamedEntityEvaluator:
         return json.loads(line, encoding=self.corpus_encoding)
 
 
-# ------------------------------------------ Helper functions ----------------------------------------------------------
+# --------------------------------------- Helper functions / classes ---------------------------------------------------
+
+
+class ConfusionMatrix:
+    """
+    Simple class for a confusion matrix.
+    """
+    def __init__(self):
+        self.tp = 0
+        self.tn = 0
+        self.fp = 0
+        self.fn = 0
+
+    def increment_cell(self, cell, incrementation=1):
+        """
+        Increment a cell in the confusion matrix.
+        """
+        observations = getattr(self, cell)
+        observations += incrementation
+        setattr(self, cell, observations)
 
 
 def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=None):
@@ -355,10 +443,12 @@ def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=No
                 if not line.strip():
                     continue
 
+                # Apply additional formatting to line if an appropriate function is given
                 formatted = None
                 if formatting_function is not None:
                     formatted = formatting_function(line)
 
+                # Add line
                 if formatted is not None:
                     if is_collection(formatted):
                         for line_ in formatted:
@@ -445,6 +535,12 @@ def _init_evalset_argument_parser():
         "-kn", "--keep-number",
         type=int,
         help="Exact number of articles from the original corpus that make it into the evaluation set."
+    )
+    argument_parser.add_argument(
+        "-stf", "--stanford-models-path",
+        type=str,
+        required=True,
+        help="Path to .jar with language-specific Stanford Models (used for tokenizing)."
     )
 
     # Additional language support

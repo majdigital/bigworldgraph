@@ -39,6 +39,7 @@ class WikipediaReadingTask(luigi.Task):
         current_sentences = []
         skip_line = False
 
+        # TODO (Documentation): Add documentation like in scripts.evaluation_toolkit.py
         with codecs.open(corpus_inpath, "r", corpus_encoding) as input_file, self.output().open("w") as output_file:
             for line in input_file.readlines():
                 if skip_line:
