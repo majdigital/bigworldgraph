@@ -39,16 +39,20 @@ class WikipediaReadingTask(luigi.Task):
         current_sentences = []
         skip_line = False
 
-        # TODO (Documentation): Add documentation like in scripts.evaluation_toolkit.py
+        # TODO (Documentation): Add documentation like in scripts.evaluation_toolkit.pys
         with codecs.open(corpus_inpath, "r", corpus_encoding) as input_file, self.output().open("w") as output_file:
             for line in input_file.readlines():
+                line = line.strip()
+
                 if skip_line:
                     skip_line = False
                     continue
 
+                if line == current_title:
+                    continue
+
                 if re.match(self.workflow_resources["article_tag_pattern"], line):
                     current_id, current_url, current_title = self._extract_article_info(line)
-                    skip_line = True
 
                 elif line.strip() == "</doc>":
                     self._output_article(

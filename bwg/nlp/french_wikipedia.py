@@ -82,6 +82,9 @@ class FrenchServerNERTask(ServerNERTask):
     A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it's specific for the
     french Wikipedia.
     """
+    def requires(self):
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
+
     @property
     def _corenlp_server_overriding_properties(self):
         return {
@@ -95,6 +98,9 @@ class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
     A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it's specific to the french
     Wikipedia.
     """
+    def requires(self):
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
+
     @property
     def _corenlp_server_overriding_properties(self):
         return {"pos.model": "edu/stanford/nlp/models/pos-tagger/french/french.tagger"}
@@ -105,6 +111,9 @@ class FrenchServerDependencyParseTask(ServerDependencyParseTask):
     A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it's specific for the french
     Wikipedia.
     """
+    def requires(self):
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
+
     @property
     def _corenlp_server_overriding_properties(self):
         return {

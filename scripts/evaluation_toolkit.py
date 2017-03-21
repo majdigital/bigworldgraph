@@ -12,15 +12,11 @@ import random
 import re
 import sys
 
-# EXT
-import nltk
-
 # CONST
 ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 
 # TYPES
 Article = namedtuple("Article", ["id", "title", "url", "sentences"])
-Evaluation = namedtuple("Evaluation", ["precision", "accuracy", "recall", "f_score", "info"])
 
 
 def main():
@@ -70,14 +66,11 @@ class EvaluationSetCreator:
     languages = ["french", "english"]
 
     def __init__(self, **creation_kwargs):
-        self.corpus_inpath = creation_kwargs["corpus_inpath"]
+        self.ne_inpath = creation_kwargs["ne_inpath"]
         self.evaluation_set_outpath = creation_kwargs["evalset_outpath"]
         self.corpus_encoding = creation_kwargs["corpus_encoding"]
         self.keep_percentage = creation_kwargs["keep_percentage"]
         self.keep_number = creation_kwargs["keep_number"]
-        self.tokenizer = nltk.stanford.StanfordTokenizer(
-            creation_kwargs["stanford_models_path"], encoding=self.corpus_encoding
-        )
 
         if self.keep_percentage is None and self.keep_number is None:
             self.keep_number = 10
@@ -94,17 +87,8 @@ class EvaluationSetCreator:
         Start a modified version of the WikipediaReadingTask to create an evaluation set from an already existing
         corpus.
         """
-        language_formatting = {
-            "french": self._additional_formatting_french,
-            "english": self._additional_formatting_english
-        }
-
         sys.stdout.write("Reading articles...")
-        articles = read_articles(
-            self.corpus_inpath,
-            self.corpus_encoding,
-            formatting_function=language_formatting[self.current_language]
-        )
+        articles = read_ne_tagged_file(self.ne_inpath, self.corpus_encoding)
         sys.stdout.flush()
         sys.stdout.write("\rReading articles... Done!\n")
 
@@ -132,7 +116,6 @@ class EvaluationSetCreator:
                 )
 
                 i = 0
-                print("Starting writing articles (tokenizing might take a while)")
                 for article in articles:
                     i += 1
                     sys.stdout.write(
@@ -142,17 +125,17 @@ class EvaluationSetCreator:
                     )
 
                     # Write header
+                    meta = article["meta"]
                     header = '<doc id="{id}" url="{url}" title="{title}">\n'.format(
-                        id=article.id, url=article.url, title=article.title
+                        id=meta["id"], url=meta["url"], title=meta["title"]
                     )
                     outfile.write(header)
                     nes_file.write(header)
 
                     # Write sentences
-
-                    for sentence in self._tokenize_sentences(article.sentences):
-                        outfile.write("{}\n".format(sentence))
-                        nes_file.write("{}\n".format(sentence))
+                    for sentence_id, sentence_json in article["data"].items():
+                        outfile.write("{}\n".format(self._get_sentence(sentence_json)))
+                        nes_file.write("{}\n".format(self._get_sentence(sentence_json)))
 
                     # Write footer
                     outfile.write('</doc>\n')
@@ -169,40 +152,15 @@ class EvaluationSetCreator:
                 "\n-->\n\n"
             )
 
-    def _tokenize_sentences(self, sentences):
-        tokenized_sentences = self.tokenizer.tokenize_sents(sentences)
-        return [
-            " ".join(tokenized_sentence)
-            for tokenized_sentence in tokenized_sentences
-        ]
+    @staticmethod
+    def _get_sentence(sentence_json):
+        return " ".join([token for token, ne_tag in sentence_json["data"]])
 
     def _sample_articles(self, articles):
         if self.keep_number is None:
             return random.sample(articles, int(len(articles) * self.keep_percentage))
         elif self.keep_percentage is None:
             return random.sample(articles, self.keep_number)
-
-    def _additional_formatting_french(self, line):
-        french_sentence_tokenizer_path = "tokenizers/punkt/PY3/french.pickle"
-        self.download_nltk_resource_if_missing(french_sentence_tokenizer_path, "punkt")
-
-        tokenizer = nltk.data.load(french_sentence_tokenizer_path)
-        sentences = tokenizer.tokenize(line)
-        return sentences
-
-    def _additional_formatting_english(self, line):
-        return line
-
-    @staticmethod
-    def download_nltk_resource_if_missing(resource_path, resource):
-        """
-        Download a missing resource from the Natural Language Processing Toolkit.
-        """
-        try:
-            nltk.data.find(resource_path)
-        except LookupError:
-            nltk.download(resource)
-
 
 # -------------------------------------- Evaluate named entities -------------------------------------------------------
 
@@ -227,6 +185,7 @@ class NamedEntityEvaluator:
         self.default_tag = 'O'
 
     def evaluate_named_entities(self):
+        # TODO (Feature): Add terminal output
         manually_annotated, ne_tagged = self._prepare_eval_data()
         confusion_matrices = defaultdict(lambda: ConfusionMatrix())
 
@@ -264,7 +223,7 @@ class NamedEntityEvaluator:
                         confusion_matrices[gold_ne_tag].increment_cell("tn")
 
                     # False Positive
-                    # A normal token was wrongfully tagged as a named entity
+                    # A normal token was wrongfully tagged as a named entity or got assigned the wrong named entity tag
                     elif ne_tag != gold_ne_tag and ne_tag != self.default_tag:
                         confusion_matrices["total"].increment_cell("fp")
                         confusion_matrices[gold_ne_tag].increment_cell("fp")
@@ -282,7 +241,7 @@ class NamedEntityEvaluator:
         Read, filter and convert evaluation data into an appropriate data structure.
         """
         articles = self._read_manually_annotated_file()
-        tagged_articles = self._read_ne_tagged_file()
+        tagged_articles = read_ne_tagged_file(self.ne_inpath, self.corpus_encoding)
         filtered_tagged_articles = self._filter_tagged_articles(articles, tagged_articles)
         del tagged_articles  # Big data structure
 
@@ -293,19 +252,6 @@ class NamedEntityEvaluator:
         sorted_tagged_articles_dict = OrderedDict(sorted(tagged_articles_dict.items()))
 
         return sorted_articles_dict, sorted_tagged_articles_dict
-
-    def _read_ne_tagged_file(self):
-        """
-        Read named entity tagged file from NLP pipeline.
-        """
-        tagged_articles = []
-
-        with codecs.open(self.ne_inpath, "rb", self.corpus_encoding) as ne_file:
-            for line in ne_file.readlines():
-                deserialized_line = self.deserialize_line(line)
-                tagged_articles.append(deserialized_line)
-
-        return tagged_articles
 
     def _read_manually_annotated_file(self):
         """
@@ -362,12 +308,6 @@ class NamedEntityEvaluator:
             if tagged_article["meta"]["id"] in article_ids
         ]
 
-    def deserialize_line(self, line):
-        """
-        Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
-        """
-        return json.loads(line, encoding=self.corpus_encoding)
-
 
 # --------------------------------------- Helper functions / classes ---------------------------------------------------
 
@@ -377,10 +317,10 @@ class ConfusionMatrix:
     Simple class for a confusion matrix.
     """
     def __init__(self):
-        self.tp = 0
-        self.tn = 0
-        self.fp = 0
-        self.fn = 0
+        self.tp = 0  # True positives
+        self.tn = 0  # True negatives
+        self.fp = 0  # False positives
+        self.fn = 0  # False negatives
 
     def increment_cell(self, cell, incrementation=1):
         """
@@ -389,6 +329,34 @@ class ConfusionMatrix:
         observations = getattr(self, cell)
         observations += incrementation
         setattr(self, cell, observations)
+
+    @property
+    def accuracy(self):
+        """
+        What's the proportion of correctly classified results (both positive and negative)?
+        """
+        return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn)
+
+    @property
+    def precision(self):
+        """
+        How many of the selected items are relevant?
+        """
+        return self.tp / (self.tp + self.fp)
+
+    @property
+    def recall(self):
+        """
+        How many relevant items are selected?
+        """
+        return self.tp / (self.tp + self.fn)
+
+    @property
+    def f1_score(self):
+        """
+        Harmonic mean of precision and recall.
+        """
+        return (2 * self.tp) / (2 * self.tp + self.fp + self.fn)
 
 
 def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=None):
@@ -494,6 +462,27 @@ def id_collection_to_dict(collection, id_getter):
     return id_dict
 
 
+def read_ne_tagged_file(ne_inpath, corpus_encoding):
+    """
+    Read named entity tagged file from NLP pipeline.
+    """
+    tagged_articles = []
+
+    with codecs.open(ne_inpath, "rb", corpus_encoding) as ne_file:
+        for line in ne_file.readlines():
+            deserialized_line = deserialize_line(line, corpus_encoding)
+            tagged_articles.append(deserialized_line)
+
+    return tagged_articles
+
+
+def deserialize_line(line, encoding="utf-8"):
+    """
+    Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
+    """
+    return json.loads(line, encoding=encoding)
+
+
 # ------------------------------------------ Argument parsing ----------------------------------------------------------
 
 def _init_evalset_argument_parser():
@@ -509,10 +498,10 @@ def _init_evalset_argument_parser():
         help="Flag that will create an evaluation set from an existing corpus (comprised of articles)."
     )
     argument_parser.add_argument(
-        "-i", "--corpus-inpath",
+        "-ni", "--ne-inpath",
         type=str,
         required=True,
-        help="Input path to corpus file (comprised of articles)."
+        help="Input path to named entity tagged file from NLP-Pipeline (json)."
     )
     argument_parser.add_argument(
         "-enc", "--corpus-encoding",
@@ -536,12 +525,6 @@ def _init_evalset_argument_parser():
         type=int,
         help="Exact number of articles from the original corpus that make it into the evaluation set."
     )
-    argument_parser.add_argument(
-        "-stf", "--stanford-models-path",
-        type=str,
-        required=True,
-        help="Path to .jar with language-specific Stanford Models (used for tokenizing)."
-    )
 
     # Additional language support
     argument_parser.add_argument(
@@ -562,6 +545,7 @@ def _init_ne_eval_argument_parser():
     """
     Initialize the argument parser for the named entity evaluator.
     """
+    # TODO (Feature): Create optional flag to write evaluation result into file
     argument_parser = argparse.ArgumentParser()
 
     argument_parser.add_argument(
