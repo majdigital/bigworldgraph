@@ -184,12 +184,22 @@ class NamedEntityEvaluator:
         self.default_tag = 'O'
 
     def evaluate_named_entities(self):
-        # TODO (Feature): Add terminal output
+        print("Reading in data...")
         manually_annotated, ne_tagged = self._prepare_eval_data()
+        print("\rReading in data... Done!", flush=True)
         confusion_matrices = defaultdict(lambda: ConfusionMatrix())
 
+        print("Starting evaluating...")
+        i = 0
         for (manually_id, manually_article), (tagged_id, tagged_article) \
             in zip(manually_annotated.items(), ne_tagged.items()):
+            i += 1
+            print(
+                "\rEvaluating article {} of {}... ({:.2f} % complete))".format(
+                    i, len(manually_annotated), (i-1) / len(manually_annotated) * 100
+                ),
+                flush=True
+            )
             assert manually_id == tagged_id  # Assure data sets are aligned
 
             # Get sentences from articles
@@ -222,17 +232,22 @@ class NamedEntityEvaluator:
                         confusion_matrices[gold_ne_tag].increment_cell("tn")
 
                     # False Positive
-                    # A normal token was wrongfully tagged as a named entity or got assigned the wrong named entity tag
-                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag:
+                    # A normal token was wrongfully tagged as a named entity
+                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag == self.default_tag:
                         confusion_matrices["all"].increment_cell("fp")
                         confusion_matrices[gold_ne_tag].increment_cell("fp")
 
                     # False Negative
                     # A named entity was not identified and therefore wrongfully not tagged as one
-                    elif ne_tag != gold_ne_tag and ne_tag == self.default_tag:
+                    elif ne_tag != gold_ne_tag and ne_tag == self.default_tag and gold_ne_tag != self.default_tag:
                         confusion_matrices["all"].increment_cell("fn")
                         confusion_matrices[gold_ne_tag].increment_cell("fn")
 
+                    # Special case: There was named entity tag assigned, but it was the wrong one
+                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag != self.default_tag:
+                        confusion_matrices[gold_ne_tag].increment_cell("fn")
+
+        print("\rEvaluating articles... Done!", flush=True)
         print("")
         for tag, confusion_matrix in confusion_matrices.items():
             confusion_matrix.prettyprint("Confusion matrix for " + tag)
@@ -361,18 +376,21 @@ class ConfusionMatrix:
         return (2 * self.tp) / (2 * self.tp + self.fp + self.fn + self.epsilon)
 
     def prettyprint(self, header=""):
-        row_format = "{:>7}" * 4
-        metric_format = "{:>22}: {:.2f}"
+        """
+        Print all information in a confusion matrix to the terminal (including the value of various evaluation metrics).
+        """
+        row_format = "{:>10}" * 4
+        metric_format = "{:>34}: {:.2f}"
 
         if header:
-            print("{:>28}".format(header))
-            print("{:>28}\n".format(len(header)*"-"))
+            print("{:>40}".format(header))
+            print("{:>40}\n".format(len(header)*"-"))
 
         # Print table
-        print("{:>28}\n".format("Gold standard"))
-        print(row_format.format("", "", "True", "False"))
-        print(row_format.format("Tagger", "True", self.tp, self.fp))
-        print(row_format.format("", "False", self.fn, self.tn))
+        print("{:>40}\n".format("Gold standard"))
+        print(row_format.format("", "", "Positive", "Negative"))
+        print(row_format.format("System", "True", self.tp, self.tn))
+        print(row_format.format("", "False", self.fp, self.fn))
         print("")
 
         # Print metrics
@@ -573,7 +591,6 @@ def _init_ne_eval_argument_parser():
     """
     Initialize the argument parser for the named entity evaluator.
     """
-    # TODO (Feature): Create optional flag to write evaluation result into file
     argument_parser = argparse.ArgumentParser()
 
     argument_parser.add_argument(
