@@ -38,22 +38,35 @@ class WikipediaReadingTask(luigi.Task):
         current_url = ""
         current_sentences = []
         skip_line = False
+        comment = False
 
-        # TODO (Documentation): Add documentation like in scripts.evaluation_toolkit.pys
         with codecs.open(corpus_inpath, "r", corpus_encoding) as input_file, self.output().open("w") as output_file:
             for line in input_file.readlines():
                 line = line.strip()
 
+                # Skip lines that should be ignored (article headers withing the article, xml comments, etc.)
                 if skip_line:
-                    skip_line = False
+                    if not comment or "-->" in line:
+                        comment = False
+                        skip_line = False
                     continue
 
+                # Skip line if line is the title (title is already given in the <doc> tag)
                 if line == current_title:
                     continue
 
+                # Identify xml/html comments
+                if "<!--" in line:
+                    if "-->" not in line:
+                        skip_line = True
+                        comment = True
+                    continue
+
+                # Identify beginning of new article
                 if re.match(self.workflow_resources["article_tag_pattern"], line):
                     current_id, current_url, current_title = self._extract_article_info(line)
 
+                # Identify end of article
                 elif line.strip() == "</doc>":
                     self._output_article(
                         current_id, current_url, current_title, current_sentences, output_file, state="parsed",
@@ -61,12 +74,16 @@ class WikipediaReadingTask(luigi.Task):
                     )
                     current_title, current_id, current_url, current_sentences = self._reset_vars()
 
+                # Just add a new line to ongoing article
                 else:
                     if not line.strip():
                         continue
+
+                    # Apply additional formatting to line if an appropriate function is given
                     line = re.sub("</?.+?>", "", line)  # Remove other xml markup
                     formatted = self._additional_formatting(line.strip())
 
+                    # Add line
                     if is_collection(formatted):
                         for line_ in formatted:
                             current_sentences.append(line_)

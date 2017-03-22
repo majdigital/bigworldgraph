@@ -12,8 +12,6 @@ import random
 import re
 import sys
 
-# EXT
-
 # CONST
 ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 
@@ -46,6 +44,16 @@ def _start_ne_eval():
     args = argument_parser.parse_args()
     ne_evaluator = NamedEntityEvaluator(**vars(args))
     ne_evaluator.evaluate_named_entities()
+
+
+def _start_relations_eval():
+    """
+    Parse arguments for the RelationsEvaluator and run it.
+    """
+    argument_parser = _init_relations_eval_argument_parser()
+    args = argument_parser.parse_args()
+    relations_evaluator = RelationsEvaluator(**vars(args))
+    # TODO (Feature): Evaluate
 
 
 # --------------------------------------- Create an evaluation set -----------------------------------------------------
@@ -103,53 +111,92 @@ class EvaluationSetCreator:
         Write articles into the evaluation set file.
         """
         named_entities_path = self.evaluation_set_outpath.replace(".xml", "_nes.xml")
-        raw_relations_path = self.evaluation_set_outpath.replace(".xml", "_relations_raw.xml")
+        raw_relations_path = self.evaluation_set_outpath.replace(".xml", "_relations.xml")
 
         with codecs.open(self.evaluation_set_outpath, "wb", self.corpus_encoding) as outfile:
             with codecs.open(named_entities_path, "wb", self.corpus_encoding) as nes_file:
-                nes_file.write(
-                    "<!--\nIn this version of the evaluation corpus, annotate named entities in the following way:\n'"
-                    "Hours later , <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea ’s</ne> defiance "
-                    "and also took aim at <ne type='I-ORG'>China</ne> , the North 's main patron . '\n(The tags can "
-                    "vary depending on the tag set used by the pipelines named entity tagger.)\nPlease maintain line "
-                    "breaks. Also be careful not to add or remove whitespaces by accident.\n-->\n\n"
-                )
+                with codecs.open(raw_relations_path, "wb", self.corpus_encoding) as relations_file:
+                    # Write comments to help user
+                    nes_file.write(
+                        "<!--\nIn this version of the evaluation corpus, annotate named entities in the following "
+                        "way:\n'"
+                        "Hours later , <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea ’s</ne> "
+                        "defiance "
+                        "and also took aim at <ne type='I-ORG'>China</ne> , the North 's main patron . '\n(The tags "
+                        "can "
+                        "vary depending on the tag set used by the pipelines named entity tagger.)\nPlease maintain "
+                        "line "
+                        "breaks. Also be careful not to add or remove whitespaces by accident.\n-->\n\n"
+                    )
+                    relations_file.write(
+                        "<!--\nAdd the relations that are expected to be found by the NLP pipeline here.\n\nTry to "
+                        "follow these"
+                        " two steps:\n\t1. Add all Named Entities within the article to a relation that is called "
+                        "'participated"
+                        " in' and has the title of the\n\t   article as its object.\n\t2. Add all 'normal' relation "
+                        "within the"
+                        " text as subject - verb - object divided by tabs. Follow your intuition to\n\t   define the "
+                        "scope of "
+                        "subject and object (phrase).\n\t3. Delete the original article (everything inside the <doc> "
+                        "tag)\n\t"
+                        "4. Delete this comment (optional)\n\nExample:\n\n<doc id='12345' url='www.great-news.com' "
+                        "title="
+                        "'North Korea missile crisis'>\nHours later, Trump decried North Korea’s defiance and also "
+                        "took aim at "
+                        "China, the North's main patron.\n</doc>\n<relations id='12345' title='North Korea missile "
+                        "crisis'>\n"
+                        "Trump\tparticipated in\tNorth Korea missile crisis\nNorth Korea\tparticipated in\tNorth "
+                        "Korea missile "
+                        " crisis\nChina\tparticipated in\tNorth Korea missile crisis\nTrump\tdecried\tNorth Korea’s "
+                        "defiance\n"
+                        "Trump\ttook aim at\tChina\nChina\tmain patron\tthe North's\n</relations>\n\n(Don't include "
+                        "headers "
+                        " like 'Example'here. Just a plain file with all the relations, enclosed by a "
+                        "<relations>\ntag"
+                        " for all relations of a specific article. If you're handling multiple articles, "
+                        "just use different "
+                        "<relations>\nblocks, each for one article.)\n-->\n\n"
+                    )
 
-                i = 0
-                for article in articles:
-                    i += 1
-                    sys.stdout.write(
-                        "\rWriting article {} of {}... ({:.2f} % complete)".format(
-                            i, len(articles), (i-1) / len(articles) * 100.0
+                    i = 0
+                    for article in articles:
+                        i += 1
+                        sys.stdout.write(
+                            "\rWriting article {} of {}... ({:.2f} % complete)".format(
+                                i, len(articles), (i-1) / len(articles) * 100.0
+                            )
                         )
-                    )
 
-                    # Write header
-                    meta = article["meta"]
-                    header = '<doc id="{id}" url="{url}" title="{title}">\n'.format(
-                        id=meta["id"], url=meta["url"], title=meta["title"]
-                    )
-                    outfile.write(header)
-                    nes_file.write(header)
+                        # Write header
+                        meta = article["meta"]
+                        header = '<doc id="{id}" url="{url}" title="{title}">\n'.format(
+                            id=meta["id"], url=meta["url"], title=meta["title"]
+                        )
+                        outfile.write(header)
+                        nes_file.write(header)
+                        relations_file.write(header)
 
-                    # Write sentences
-                    for sentence_id, sentence_json in get_sorted_dict_items(article["data"]):
-                        outfile.write("{}\n".format(self._get_sentence(sentence_json)))
-                        nes_file.write("{}\n".format(self._get_sentence(sentence_json)))
+                        # Write sentences
+                        for sentence_id, sentence_json in get_sorted_dict_items(article["data"]):
+                            sentence = self._get_sentence(sentence_json)
+                            outfile.write("{}\n".format(sentence))
+                            nes_file.write("{}\n".format(sentence))
+                            relations_file.write("{}\n".format(sentence))
 
-                    # Write footer
-                    outfile.write('</doc>\n')
-                    nes_file.write('</doc>\n')
-                    sys.stdout.flush()
+                        # Write footer
+                        outfile.write('</doc>\n')
+                        nes_file.write('</doc>\n')
+                        relations_file.write('</doc>\n')
 
-            print("\rWriting articles... Done!", flush=True)
+                        # Write relations tag
+                        relations_file.write(
+                            '<relations id="{id}" title="{title}">\n</relations>\n'.format(
+                                id=meta["id"], title=meta["title"]
+                            )
+                        )
+                        sys.stdout.flush()
 
-        with codecs.open(raw_relations_path, "wb", self.corpus_encoding) as raw_relations_file:
-            # TODO (Feature): Find good easy format for humans to enter relations
-            raw_relations_file.write(
-                "<!--\nAdd the relations that are expected to be found by the NLP pipeline here in the following form:"
-                "\n-->\n\n"
-            )
+                print("\rWriting articles... Done!", flush=True)
 
     @staticmethod
     def _get_sentence(sentence_json):
@@ -245,6 +292,7 @@ class NamedEntityEvaluator:
 
                     # Special case: There was named entity tag assigned, but it was the wrong one
                     elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag != self.default_tag:
+                        # Cannot be added to the global matrix -> is not possible to visualize in a binary one
                         confusion_matrices[gold_ne_tag].increment_cell("fn")
 
         print("\rEvaluating articles... Done!", flush=True)
@@ -324,6 +372,24 @@ class NamedEntityEvaluator:
             if tagged_article["meta"]["id"] in article_ids
         ]
 
+# ----------------------------------------- Evaluate relations ---------------------------------------------------------
+
+
+class RelationsEvaluator:
+    """
+    Tool that evaluates found named entities. To work, please provide two files: A *_relations.xml file, where named
+    entities are manually extracted from a text and enclosed in in a <relations> tag (for more details, see the actual
+    *_relations.xml file).
+
+    The other file necessary is the one produced by the NLP pipeline, specifically from
+    nlp.standard_tasks.OpenRelationExtractionTask. It's a JSON file. Please make sure that the articles in the
+    evaluation set are included in the original corpus that was processed by the NERTask.
+    """
+    def __init__(self, **creation_kwargs):
+        self.eval_inpath = creation_kwargs["eval_inpath"]
+        self.relations_inpath = creation_kwargs["relations_inpath"]
+        self.corpus_encoding = creation_kwargs["corpus_encoding"]
+
 
 # --------------------------------------- Helper functions / classes ---------------------------------------------------
 
@@ -337,7 +403,7 @@ class ConfusionMatrix:
         self.tn = 0  # True negatives
         self.fp = 0  # False positives
         self.fn = 0  # False negatives
-        self.epsilon = 1e-20 # Add to avoid division by zero
+        self.epsilon = 1e-20  # Add to avoid division by zero
 
     def increment_cell(self, cell, incrementation=1):
         """
@@ -427,6 +493,7 @@ def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=No
                     skip_line = False
                 continue
 
+            # Skip line if line is the title (title is already given in the <doc> tag)
             if line == current_title:
                 continue
 
@@ -626,12 +693,48 @@ def _init_ne_eval_argument_parser():
     return argument_parser
 
 
+def _init_relations_eval_argument_parser():
+    """
+    Initialize the argument parser for the relation evaluator.
+    """
+    argument_parser = argparse.ArgumentParser()
+
+    argument_parser.add_argument(
+        "-erl", "--eval-relations",
+        required=True,
+        action='store_true',
+        help="Flag that will evaluate named entities found by the NLP pipeline with a manually annotated file."
+    )
+    argument_parser.add_argument(
+        "-ei", "--eval-inpath",
+        type=str,
+        required=True,
+        help="Input path to manually annotated evaluation set (xml)."
+    )
+    argument_parser.add_argument(
+        "-ri", "--relations-inpath",
+        type=str,
+        required=True,
+        help="Input path to relations file from NLP-Pipeline (json)."
+    )
+    argument_parser.add_argument(
+        "-enc", "--corpus-encoding",
+        type=str,
+        default="utf-8",
+        help="Encoding of input corpus."
+    )
+
+    return argument_parser
+
+
 def parse_and_start():
     flags_to_parser = {
         "-ce": _start_evalset_creator,
         "--create-evalset": _start_evalset_creator,
         "-ene": _start_ne_eval,
-        "--eval-nes": _start_ne_eval
+        "--eval-nes": _start_ne_eval,
+        "-erl": _start_relations_eval,
+        "--eval-relations": _start_relations_eval
     }
 
     for arg in sys.argv:
