@@ -7,3 +7,4 @@ data/pipeline_*/*
 python_sudo.sh
 __pycache__
 data/corpora_*/*
+data/evaluation/*

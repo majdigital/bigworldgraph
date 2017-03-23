@@ -67,8 +67,8 @@ PIPELINE_DEBUG = True
 CORPUS_ENCODING = "utf-8"
 OMITTED_TOKENS_FOR_ALIGNMENT = []
 # OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
-ONLY_INCLUDE_RELEVANT_SENTENCES = True
-ONLY_INCLUDE_RELEVANT_ARTICLES = True
+ONLY_INCLUDE_RELEVANT_SENTENCES = False
+ONLY_INCLUDE_RELEVANT_ARTICLES = False
 
 # ------------------------------- French configurations ---------------------------------
 
@@ -80,7 +80,7 @@ FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_pos.json"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_dependencies.json"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_relations.json"
 FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample2.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
