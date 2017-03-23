@@ -452,3 +452,69 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
                     extracted_relations.append((subj_phrase, verb_node["word"], obj_phrase))
 
         return extracted_relations
+
+
+class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Luigi task that performs Open Relation extraction on a corpus.
+    """
+    def requires(self):
+        return NERTask(task_config=self.task_config)
+
+    def output(self):
+        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
+        output_path = self.task_config["PE_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path, format=text_format)
+
+    @time_function(is_classmethod=True, give_report=True)
+    def run(self):
+        # TODO (Refactor)
+        with self.input()[0].open("r") as nes_input_file, self.input()[1].open("r") as dependency_input_file, \
+                self.input()[2].open("r") as pos_input_file, self.output().open("w") as output_file:
+            for nes_line, dependency_line, pos_line in zip(nes_input_file, dependency_input_file, pos_input_file):
+                self.process_articles(
+                    (nes_line, dependency_line, pos_line), new_state="extracted_relations",
+                    serializing_function=serialize_relation, output_file=output_file
+                )
+
+    @property
+    def workflow_resources(self):
+        # TODO (Refactor)
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+
+        workflow_resources = {
+            "pretty": pretty_serialization
+        }
+
+        return workflow_resources
+
+    def task_workflow(self, article, **workflow_resources):
+        # TODO (Refactor)
+        article_meta, article_data = article["meta"], article["data"]
+
+        for sentence_id, sentence_json in article_data.items():
+            pass
+
+
+class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Merge relations gained from OpenRelationExtractionTask and ParticipationExtractionTask.
+    """
+    # TODO (Implement)
+    pass
+
+
+class CategorieCompletionTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Add categories from Wikidata to Named Entities.
+    """
+    # TODO (Implement)
+    pass
+
+
+class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Writes information extracted from text by means of the NLP pipeline into a database.
+    """
+    # TODO (Implement)
+    pass
