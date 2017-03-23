@@ -13,10 +13,14 @@ import re
 import sys
 
 # CONST
-ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
+ARTICLE_OPENING_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
+ARTICLE_CLOSING_TAG = '</doc>'
+RELATIONS_OPENING_TAG_PATTERN = '<relations id="(\d+)" title="(.+?)">'
+RELATIONS_CLOSING_TAG = '</relations>'
 
 # TYPES
-Article = namedtuple("Article", ["id", "title", "url", "sentences"])
+Article = namedtuple("Article", ["id", "title", "url", "contents"])
+Relations = namedtuple("Relations", ["id", "title", "contents"])
 
 
 def main():
@@ -53,7 +57,7 @@ def _start_relations_eval():
     argument_parser = _init_relations_eval_argument_parser()
     args = argument_parser.parse_args()
     relations_evaluator = RelationsEvaluator(**vars(args))
-    # TODO (Feature): Evaluate
+    relations_evaluator.evaluate_relations()
 
 
 # --------------------------------------- Create an evaluation set -----------------------------------------------------
@@ -98,7 +102,7 @@ class EvaluationSetCreator:
         corpus.
         """
         sys.stdout.write("Reading articles...")
-        articles = read_ne_tagged_file(self.ne_inpath, self.corpus_encoding)
+        articles = read_articles_file(self.ne_inpath, self.corpus_encoding)
         print("\rReading articles... Done!", flush=True)
 
         sampled_articles = self._sample_articles(articles)
@@ -250,11 +254,8 @@ class NamedEntityEvaluator:
             assert manually_id == tagged_id  # Assure data sets are aligned
 
             # Get sentences from articles
-            manually_sentences = manually_article.sentences
-            tagged_sentences = [
-                sentence_json["data"]
-                for sentence_id, sentence_json in get_sorted_dict_items(tagged_article["data"])
-            ]
+            manually_sentences = manually_article.contents
+            tagged_sentences = self._get_sentences_from_article_json(tagged_article)
             assert len(manually_sentences) == len(tagged_sentences)
 
             for manually_sentence, tagged_sentence in zip(manually_sentences, tagged_sentences):
@@ -265,48 +266,65 @@ class NamedEntityEvaluator:
                     token2, ne_tag = ne_tuple2
                     assert token1 == token2
 
-                    # Fill confusion matrices
-                    # True Positive
-                    # Named entity was rightfully tagged
-                    if ne_tag == gold_ne_tag and ne_tag != self.default_tag:
-                        confusion_matrices["all"].increment_cell("tp")
-                        confusion_matrices[gold_ne_tag].increment_cell("tp")
-
-                    # True Negative
-                    # A normal token was rightfully _not_ tagged
-                    elif ne_tag == gold_ne_tag and ne_tag == self.default_tag:
-                        confusion_matrices["all"].increment_cell("tn")
-                        confusion_matrices[gold_ne_tag].increment_cell("tn")
-
-                    # False Positive
-                    # A normal token was wrongfully tagged as a named entity
-                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag == self.default_tag:
-                        confusion_matrices["all"].increment_cell("fp")
-                        confusion_matrices[gold_ne_tag].increment_cell("fp")
-
-                    # False Negative
-                    # A named entity was not identified and therefore wrongfully not tagged as one
-                    elif ne_tag != gold_ne_tag and ne_tag == self.default_tag and gold_ne_tag != self.default_tag:
-                        confusion_matrices["all"].increment_cell("fn")
-                        confusion_matrices[gold_ne_tag].increment_cell("fn")
-
-                    # Special case: There was named entity tag assigned, but it was the wrong one
-                    elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag != self.default_tag:
-                        # Cannot be added to the global matrix -> is not possible to visualize in a binary one
-                        confusion_matrices[gold_ne_tag].increment_cell("fn")
+                    confusion_matrices = self._fill_confusion_matrix(ne_tag, gold_ne_tag, confusion_matrices)
 
         print("\rEvaluating articles... Done!", flush=True)
         print("")
         for tag, confusion_matrix in confusion_matrices.items():
             confusion_matrix.prettyprint("Confusion matrix for " + tag)
 
+    def _fill_confusion_matrix(self, ne_tag, gold_ne_tag, confusion_matrices):
+        """
+        Fill the corresponding confusion matrix based on the current tag and gold tag.
+        """
+        # True Positive
+        # Named entity was rightfully tagged
+        if ne_tag == gold_ne_tag and ne_tag != self.default_tag:
+            confusion_matrices["all"].increment_cell("tp")
+            confusion_matrices[gold_ne_tag].increment_cell("tp")
+
+        # True Negative
+        # A normal token was rightfully _not_ tagged
+        elif ne_tag == gold_ne_tag and ne_tag == self.default_tag:
+            confusion_matrices["all"].increment_cell("tn")
+            confusion_matrices[gold_ne_tag].increment_cell("tn")
+
+        # False Positive
+        # A normal token was wrongfully tagged as a named entity
+        elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag == self.default_tag:
+            confusion_matrices["all"].increment_cell("fp")
+            confusion_matrices[gold_ne_tag].increment_cell("fp")
+
+        # False Negative
+        # A named entity was not identified and therefore wrongfully not tagged as one
+        elif ne_tag != gold_ne_tag and ne_tag == self.default_tag and gold_ne_tag != self.default_tag:
+            confusion_matrices["all"].increment_cell("fn")
+            confusion_matrices[gold_ne_tag].increment_cell("fn")
+
+        # Special case: There was named entity tag assigned, but it was the wrong one
+        elif ne_tag != gold_ne_tag and ne_tag != self.default_tag and gold_ne_tag != self.default_tag:
+            # Cannot be added to the global matrix -> is not possible to visualize in a binary one
+            confusion_matrices[gold_ne_tag].increment_cell("fn")
+
+        return confusion_matrices
+
+    @staticmethod
+    def _get_sentences_from_article_json(article_json):
+        """
+        Get sentence data from all sentences from an article json object.
+        """
+        return [
+            sentence_json["data"]
+            for sentence_id, sentence_json in get_sorted_dict_items(article_json["data"])
+        ]
+
     def _prepare_eval_data(self):
         """
         Read, filter and convert evaluation data into an appropriate data structure.
         """
         articles = self._read_manually_annotated_file()
-        tagged_articles = read_ne_tagged_file(self.ne_inpath, self.corpus_encoding)
-        filtered_tagged_articles = self._filter_tagged_articles(articles, tagged_articles)
+        tagged_articles = read_articles_file(self.ne_inpath, self.corpus_encoding)
+        filtered_tagged_articles = filter_tagged_articles(articles, tagged_articles)
         del tagged_articles  # Big data structure
 
         # Convert data structures
@@ -321,7 +339,18 @@ class NamedEntityEvaluator:
         """
         Read file with manually annotated name entities.
         """
-        return read_articles(self.eval_inpath, self.corpus_encoding)
+        global ARTICLE_OPENING_TAG_PATTERN, ARTICLE_CLOSING_TAG
+        target_variables = {
+            "id": "",
+            "url": "",
+            "title": "",
+        }
+
+        return read_targets(
+            self.eval_inpath, ARTICLE_OPENING_TAG_PATTERN, ARTICLE_CLOSING_TAG, target_class=Article,
+            target_variables=target_variables, extraction_function=_extract_article_info,
+            corpus_encoding=self.corpus_encoding
+        )
 
     def convert_manually_tagged_sentence(self, manually_tagged_sentence, default_tag='O'):
         """
@@ -359,19 +388,6 @@ class NamedEntityEvaluator:
 
         return ne_tagged_tokens
 
-    @staticmethod
-    def _filter_tagged_articles(articles, tagged_articles):
-        """
-        Filter out those named entity tagged articles from the NLP pipeline which also appear in the evaluation set.
-        """
-        article_ids = set([article.id for article in articles])
-
-        return [
-            tagged_article
-            for tagged_article in tagged_articles
-            if tagged_article["meta"]["id"] in article_ids
-        ]
-
 # ----------------------------------------- Evaluate relations ---------------------------------------------------------
 
 
@@ -390,6 +406,99 @@ class RelationsEvaluator:
         self.relations_inpath = creation_kwargs["relations_inpath"]
         self.corpus_encoding = creation_kwargs["corpus_encoding"]
 
+    def evaluate_relations(self):
+        confusion_matrix = RelationExtractionConfusionMatrix()
+
+        sorted_relations_dict, sorted_extracted_relations_dict = self._prepare_eval_data()
+
+        for (manually_id, manually_article), (extracted_id, extracted_article) in \
+                zip(sorted_relations_dict.items(), sorted_extracted_relations_dict.items()):
+
+            manual_relations = self._convert_manual_relations(manually_article.contents)
+            extracted_relations = self._convert_extracted_relations(extracted_article)
+            confusion_matrix.extractions += len(extracted_relations)
+
+            correct_extractions = 0
+            for manuel_relation in manual_relations:
+                for extracted_relation in extracted_relations:
+                    if manuel_relation == extracted_relation:
+                        correct_extractions += 1
+                        confusion_matrix.increment_cell("correct")
+                        break
+
+            # Number of relations is number of extracted relations + gold relations - intersection
+            confusion_matrix.relations += (len(manual_relations) + len(extracted_relations) - 2 * correct_extractions)
+
+        confusion_matrix.prettyprint()
+
+    def _read_manually_annotated_file(self):
+        """
+        Read file with manually extracted relations.
+        """
+        global RELATIONS_OPENING_TAG_PATTERN, RELATIONS_CLOSING_TAG
+        target_variables = {
+            "id": "",
+            "title": ""
+        }
+
+        targets = read_targets(
+            self.eval_inpath, RELATIONS_OPENING_TAG_PATTERN, RELATIONS_CLOSING_TAG, target_class=Relations,
+            target_variables=target_variables, extraction_function=self._extract_relations_info,
+            corpus_encoding=self.corpus_encoding
+        )
+        return targets
+
+    @staticmethod
+    def _convert_manual_relations(manual_relations):
+        return [
+            Relation(*manual_relation_string.split("\t"))
+            for manual_relation_string in manual_relations
+        ]
+
+    @staticmethod
+    def _convert_extracted_relations(extracted_article):
+        relations = []
+
+        for sentence_id, sentence in extracted_article["data"].items():
+            relations.extend(
+                [
+                    Relation(**extracted_relation["data"])
+                    for extracted_relation_id, extracted_relation in sentence["data"]["relations"]
+                ]
+            )
+
+        return relations
+
+    def _prepare_eval_data(self):
+        """
+        Read, filter and convert evaluation data into an appropriate data structure.
+        """
+        manual_relations = self._read_manually_annotated_file()
+        extracted_relations = read_articles_file(self.relations_inpath, self.corpus_encoding)
+        filtered_extracted_relations = filter_tagged_articles(manual_relations, extracted_relations)
+        del extracted_relations  # Big data structure
+
+        # Convert data structures
+        relations_dict = id_collection_to_dict(manual_relations, lambda item: getattr(item, "id"))
+        filtered_extracted_relations_dict = id_collection_to_dict(
+            filtered_extracted_relations, lambda item: item["meta"]["id"]
+        )
+        sorted_relations_dict = OrderedDict(sorted(relations_dict.items()))
+        sorted_extracted_relations_dict = OrderedDict(sorted(filtered_extracted_relations_dict.items()))
+
+        return sorted_relations_dict, sorted_extracted_relations_dict
+
+    @staticmethod
+    def _extract_relations_info(line, target_opening_tag_pattern):
+        """
+        Extract relevant dates from articles.
+        """
+        groups = re.match(target_opening_tag_pattern, line).groups()
+        return {
+            "id": groups[0],
+            "title": groups[1]
+        }
+
 
 # --------------------------------------- Helper functions / classes ---------------------------------------------------
 
@@ -404,6 +513,8 @@ class ConfusionMatrix:
         self.fp = 0  # False positives
         self.fn = 0  # False negatives
         self.epsilon = 1e-20  # Add to avoid division by zero
+
+        self.defined_metrics = {"accuracy", "precision", "recall", "f1_score"}
 
     def increment_cell(self, cell, incrementation=1):
         """
@@ -439,18 +550,28 @@ class ConfusionMatrix:
         """
         Harmonic mean of precision and recall.
         """
-        return (2 * self.tp) / (2 * self.tp + self.fp + self.fn + self.epsilon)
+        return (2 * self.precision * self.recall) / (self.precision + self.recall + self.epsilon)
 
     def prettyprint(self, header=""):
         """
         Print all information in a confusion matrix to the terminal (including the value of various evaluation metrics).
         """
-        row_format = "{:>10}" * 4
-        metric_format = "{:>34}: {:.2f}"
-
         if header:
             print("{:>40}".format(header))
             print("{:>40}\n".format(len(header)*"-"))
+
+        self._print_confusion_matrix()
+        self._print_metrics()
+
+    def _print_metrics(self):
+        metric_format = "{:>34}: {:.2f}"
+
+        for metric in self.defined_metrics:
+            print(metric_format.format(metric.title(), getattr(self, metric)))
+        print("")
+
+    def _print_confusion_matrix(self):
+        row_format = "{:>10}" * 4
 
         # Print table
         print("{:>40}\n".format("Gold standard"))
@@ -459,26 +580,137 @@ class ConfusionMatrix:
         print(row_format.format("", "False", self.fp, self.fn))
         print("")
 
-        # Print metrics
-        print(metric_format.format("Accuracy", self.accuracy))
-        print(metric_format.format("Precision", self.precision))
-        print(metric_format.format("Recall", self.recall))
-        print(metric_format.format("F1-Score", self.f1_score))
+
+class RelationExtractionConfusionMatrix(ConfusionMatrix):
+    """
+    Confusion matrix for relations extraction. It's hard to follow the TP / TN / FP / FN procedure here, so some of the
+    evaluation metrics will be redefined.
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.correct = 0
+        self.extractions = 0
+        self.relations = 0
+        self.defined_metrics.remove("accuracy")  # TN are not defined for this task (you can't count non-relations)
+
+    @property
+    def precision(self):
+        return self.correct / (self.extractions + self.epsilon)
+
+    @property
+    def recall(self):
+        return self.correct / (self.relations + self.epsilon)
+
+    def _print_confusion_matrix(self):
+        row_format = "{:>20}" * 2
+
+        # Print table
+        print(row_format.format("", "Relations"))
+        print(row_format.format("Correct", self.correct))
+        print(row_format.format("Extracted", self.extractions))
+        print(row_format.format("Relations", self.relations))
         print("")
 
 
-def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=None):
+class Relation:
+    """
+    Relation classed used in RelationsEvaluator. Useful to compare relations and check for equality.
+    """
+    subject = None
+    verb = None
+    object = None
+    equality = "strict"
+    possible_equalities = {
+        "strict",  # All parts of the relation have to match exactly
+        "disjunctive",  # At least one of the parts has to match exactly
+        "strict_substring",  # All of the of the parts have to be at least substrings
+        "substring_disjunctive"  # At least of the parts has to be a substring
+    }
+
+    def __init__(self, *args, **kwargs):
+        if "equality" in kwargs:
+            custom_equality = kwargs["equality"]
+            if custom_equality not in self.possible_equalities:
+                raise NotImplementedError(
+                    "'{}' isn't a defined equality for this class. Did you maybe mean {}?".format(
+                        custom_equality, " / ".join(list(self.possible_equalities))
+                    )
+                )
+
+            self.equality = custom_equality
+
+        if len(args) == 3:
+            self.subject = args[0]
+            self.verb = args[1]
+            self.object = args[2]
+
+        elif "subject_phrase" in kwargs and "verb" in kwargs and "object_phrase" in kwargs:
+            self.subject = kwargs["subject_phrase"]
+            self.verb = kwargs["verb"]
+            self.object = kwargs["object_phrase"]
+
+        else:
+            raise AssertionError("Initialization for Relation class failed")
+
+    def __eq__(self, other):
+        equality_functions = {
+            "strict": self._strict,
+            "disjunctive": self._disjunctive,
+            "strict_substring": self._strict_substring,
+            "substring_disjunctive": self._substring_disjunctive
+        }
+
+        if not isinstance(other, Relation):
+            raise AssertionError("You can only compare a Relation to another Relation.")
+
+        return equality_functions[self.equality](self, other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    @staticmethod
+    def _strict(relation1, relation2):
+        return (
+            relation1.subject == relation1.subject and
+            relation1.verb == relation2.verb and
+            relation1.object == relation2.object
+        )
+
+    @staticmethod
+    def _disjunctive(relation1, relation2):
+        return (
+            relation1.subject == relation2.subject or
+            relation1.verb == relation2.verb or
+            relation1.object == relation2.object
+        )
+
+    @staticmethod
+    def _strict_substring(relation1, relation2):
+        return (
+            (relation1.subject in relation2.subject or relation2.subject in relation1.subject) and
+            (relation1.verb in relation2.verb or relation2.verb in relation1.verb) and
+            (relation1.object in relation2.object or relation2.object in relation1.object)
+        )
+
+    @staticmethod
+    def _substring_disjunctive(relation1, relation2):
+        return (
+            (relation1.subject in relation2.subject or relation2.subject in relation1.subject) or
+            (relation1.verb in relation2.verb or relation2.verb in relation1.verb) or
+            (relation1.object in relation2.object or relation2.object in relation1.object)
+        )
+
+
+def read_targets(corpus_inpath, target_opening_tag_pattern, target_closing_tag, target_class, target_variables,
+                 extraction_function, corpus_encoding="utf-8", formatting_function=None):
     """
     Read articles from corpus.
     """
-    global ARTICLE_TAG_PATTERN
-    articles = set()
+    targets = set()
 
     # Init "parsing" variables
-    current_title = ""
-    current_id = ""
-    current_url = ""
-    current_sentences = []
+    contents = []
     skip_line = False
     comment = False
 
@@ -494,8 +726,9 @@ def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=No
                 continue
 
             # Skip line if line is the title (title is already given in the <doc> tag)
-            if line == current_title:
-                continue
+            if "title" in target_variables:
+                if line == target_variables["title"]:
+                    continue
 
             # Identify xml/html comments
             if "<!--" in line:
@@ -505,15 +738,13 @@ def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=No
                 continue
 
             # Identify beginning of new article
-            if re.match(ARTICLE_TAG_PATTERN, line):
-                current_id, current_url, current_title = _extract_article_info(line)
+            if re.match(target_opening_tag_pattern, line):
+                target_variables = extraction_function(line, target_opening_tag_pattern)
 
             # Identify end of article
-            elif line.strip() == "</doc>":
-                articles.add(
-                    Article(id=current_id, title=current_title, url=current_url, sentences=tuple(current_sentences))
-                )
-                current_title, current_id, current_url, current_sentences = _reset_vars()
+            elif line.strip() == target_closing_tag:
+                targets.add(target_class(**target_variables, contents=tuple(contents)))
+                target_variables, contents = _reset_vars(target_variables)
 
             # Just add a new line to ongoing article
             else:
@@ -529,26 +760,44 @@ def read_articles(corpus_inpath, corpus_encoding="utf-8", formatting_function=No
                 if formatted is not None:
                     if is_collection(formatted):
                         for line_ in formatted:
-                            current_sentences.append(line_)
+                            contents.append(line_)
                     else:
-                        current_sentences.append(formatted)
+                        contents.append(formatted)
                 else:
-                    current_sentences.append(line)
+                    contents.append(line)
 
-    return articles
-
-
-def _reset_vars():
-    return "", "", "", []
+    return targets
 
 
-def _extract_article_info(line):
+def _reset_vars(target_variables):
+    """
+    Reset variables for a new target.
+    """
+    reset_types = {
+        str: "",
+        list: [],
+        dict: {},
+        int: 0,
+        float: 0.0,
+        set: set()
+    }
+
+    return {
+        key: reset_types[type(value)]
+        for key, value in target_variables.items()
+    }, []
+
+
+def _extract_article_info(line, target_opening_tag_pattern):
     """
     Extract relevant dates from articles.
     """
-    global ARTICLE_TAG_PATTERN
-    groups = re.match(ARTICLE_TAG_PATTERN, line).groups()
-    return groups
+    groups = re.match(target_opening_tag_pattern, line).groups()
+    return {
+        "id": groups[0],
+        "url": groups[1],
+        "title": groups[2]
+    }
 
 
 def is_collection(obj):
@@ -571,18 +820,31 @@ def id_collection_to_dict(collection, id_getter):
     return id_dict
 
 
-def read_ne_tagged_file(ne_inpath, corpus_encoding):
+def read_articles_file(articles_inpath, corpus_encoding):
     """
-    Read named entity tagged file from NLP pipeline.
+    Read an article file from NLP pipeline.
     """
     tagged_articles = []
 
-    with codecs.open(ne_inpath, "rb", corpus_encoding) as ne_file:
+    with codecs.open(articles_inpath, "rb", corpus_encoding) as ne_file:
         for line in ne_file.readlines():
             deserialized_line = deserialize_line(line, corpus_encoding)
             tagged_articles.append(deserialized_line)
 
     return tagged_articles
+
+
+def filter_tagged_articles(articles, tagged_articles):
+    """
+    Filter out those named entity tagged articles from the NLP pipeline which also appear in the evaluation set.
+    """
+    article_ids = set([article.id for article in articles])
+
+    return [
+        tagged_article
+        for tagged_article in tagged_articles
+        if tagged_article["meta"]["id"] in article_ids
+    ]
 
 
 def deserialize_line(line, encoding="utf-8"):
@@ -602,7 +864,7 @@ def _init_evalset_argument_parser():
     """
     Initialize the argument parser for the evaluation set creator.
     """
-    argument_parser = argparse.ArgumentParser()
+    argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     argument_parser.add_argument(
         "-ce", "--create-evalset",
@@ -658,7 +920,7 @@ def _init_ne_eval_argument_parser():
     """
     Initialize the argument parser for the named entity evaluator.
     """
-    argument_parser = argparse.ArgumentParser()
+    argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     argument_parser.add_argument(
         "-ene", "--eval-nes",
@@ -697,7 +959,7 @@ def _init_relations_eval_argument_parser():
     """
     Initialize the argument parser for the relation evaluator.
     """
-    argument_parser = argparse.ArgumentParser()
+    argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
     argument_parser.add_argument(
         "-erl", "--eval-relations",
@@ -723,6 +985,17 @@ def _init_relations_eval_argument_parser():
         default="utf-8",
         help="Encoding of input corpus."
     )
+    argument_parser.add_argument(
+        "-eq", "--equality",
+        type=str,
+        default="strict",
+        choices=["strict", "disjunctive", "strict_substring", "substring_disjunctive"],
+        help="Define the circumstances under which two relations are equal:\n\t"
+        "strict: All parts of the relation have to match exactly\n\t"
+        "disjunctive: At least one of the parts has to match exactly\n\t"
+        "strict_substring: All of the of the parts have to be at least substrings\n\t"
+        "substring_disjunctive: At least of the parts has to be a substring"
+    )
 
     return argument_parser
 
@@ -742,7 +1015,8 @@ def parse_and_start():
             return flags_to_parser[arg]()
 
     raise Exception(
-        "No suitable command line arguments found for this script. Maybe you meant {}?".format(
+        "No suitable command line arguments found for this script. Maybe you meant {}? (Use one of these plus -h flag "
+        "for more help).".format(
             " / ".join(list(flags_to_parser.keys()))
         )
     )
