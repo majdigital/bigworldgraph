@@ -50,6 +50,10 @@ CONFIG_DEPENDENCIES = {
         "{language}_CORPUS_INPATH",
         "{language}_WIKIPEDIA_ARTICLE_TAG_PATTERN",
         "{language}_WIKIPEDIA_READING_OUTPUT_PATH"
+    ],
+    "participation_extraction": [
+        "{language}_PARTICIPATION_PHRASE",
+        "{language}_PE_OUTPUT_PATH"
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -80,6 +84,7 @@ FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_pos.json"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_dependencies.json"
 FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_relations.json"
 FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.json"
+FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.json"
 FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french.xml"
 
 # Paths for french Stanford models
@@ -90,6 +95,7 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
+FRENCH_PARTICIPATION_PHRASE = "participé à"
 FRENCH_LANGUAGE_ABBREVIATION = "fr"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'

@@ -94,7 +94,7 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, state="raw", prett
     return serialized_dependency_parse_tree
 
 
-def serialize_relation(sentence_id, sentence, relations, state="raw", pretty=False, dump=True):
+def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", pretty=False, dump=True):
     """
     Serialize an extracted relation.
     """
@@ -113,9 +113,9 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", pretty=Fal
             "data": {
                 "sentence": sentence,
                 "relations": {
-                    "{}/{}".format(sentence_id, str(relation_id).zfill(5)): {
+                    "{}/{}{}".format(sentence_id, infix, str(relation_id).zfill(5)): {
                         "meta": {
-                            "id": "{}/{}".format(sentence_id, str(relation_id).zfill(5)),
+                            "id": "{}/{}{}".format(sentence_id, infix, str(relation_id).zfill(5)),
                             "state": state,
                             "type": "sentence"
                         },

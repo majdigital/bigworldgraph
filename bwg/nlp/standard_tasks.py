@@ -167,7 +167,6 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
 
     @time_function(is_classmethod=True, give_report=True)
     def run(self):
-
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
                 self.process_articles(
@@ -267,7 +266,8 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             serializing_arguments = {
                 "sentence_id": sentence_id,
                 "sentence": sentence,
-                "relations": relations
+                "relations": relations,
+                "infix": "ORE"
             }
 
             yield serializing_arguments
@@ -452,3 +452,125 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
                     extracted_relations.append((subj_phrase, verb_node["word"], obj_phrase))
 
         return extracted_relations
+
+
+class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Luigi task that extracts all Named Entity participating in an issue or topic.
+    """
+    default_ne_tag = "O"  # TODO (Refactor): Make this a config parameters?
+
+    def requires(self):
+        return NERTask(task_config=self.task_config)
+
+    def output(self):
+        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
+        output_path = self.task_config["PE_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path, format=text_format)
+
+    @time_function(is_classmethod=True, give_report=True)
+    def run(self):
+        with self.input().open("r") as nes_input_file, self.output().open("w") as output_file:
+            for nes_line in nes_input_file:
+                self.process_articles(
+                    nes_line, new_state="extracted_participations",
+                    serializing_function=serialize_relation, output_file=output_file
+                )
+
+    @property
+    def workflow_resources(self):
+        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
+        participation_phrase = self.task_config["PARTICIPATION_PHRASE"]
+
+        workflow_resources = {
+            "pretty": pretty_serialization,
+            "participation_phrase": participation_phrase
+        }
+
+        return workflow_resources
+
+    def task_workflow(self, article, **workflow_resources):
+        article_meta, article_data = article["meta"], article["data"]
+        article_title = article_meta["title"]
+        participation_phrase = workflow_resources["participation_phrase"]
+
+        for sentence_id, sentence_json in article_data.items():
+            nes = self.get_nes_from_sentence(sentence_json["data"])
+            relations = self._build_participation_relations(nes, article_title, participation_phrase)
+            sentence = self._get_sentence(sentence_json["data"])
+
+            serializing_arguments = {
+                "sentence_id": sentence_id,
+                "sentence": sentence,
+                "relations": relations,
+                "infix": "PE"
+            }
+
+            yield serializing_arguments
+
+    @staticmethod
+    def _build_participation_relations(nes, title, participation_phrase):
+        return [
+            (ne, participation_phrase, title) for ne in nes
+        ]
+
+    @staticmethod
+    def _get_sentence(sentence_data):
+        return " ".join([word for word, ne_tag in sentence_data])
+
+    def get_nes_from_sentence(self, sentence_data):
+        """
+        Extract all named entities from a named entity tagged sentence.
+        """
+        nes = []
+        current_ne = []
+        current_ne_tag = ""
+
+        for word, ne_tag in sentence_data:
+            # Start of named entity
+            if ne_tag != self.default_ne_tag and not current_ne:
+                current_ne.append(word)
+                current_ne_tag = ne_tag
+
+            # End of named entity
+            elif ne_tag == self.default_ne_tag and current_ne:
+                nes.append(" ".join(current_ne))
+                current_ne = []
+                current_ne_tag = ""
+
+            # Decide if named entity is ongoing or not
+            elif ne_tag != self.default_ne_tag and current_ne:
+                # New named entity
+                if current_ne_tag == ne_tag:
+                    current_ne.append(word)
+                # New named entity
+                else:
+                    nes.append(" ".join(current_ne))
+                    current_ne = [word]
+                    current_ne_tag = ne_tag
+
+        return nes
+
+
+class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Merge relations gained from OpenRelationExtractionTask and ParticipationExtractionTask.
+    """
+    # TODO (Implement)
+    pass
+
+
+class CategorieCompletionTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Add categories from Wikidata to Named Entities.
+    """
+    # TODO (Implement)
+    pass
+
+
+class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
+    """
+    Writes information extracted from text by means of the NLP pipeline into a database.
+    """
+    # TODO (Implement)
+    pass

@@ -13,7 +13,8 @@ from bwg.nlp.standard_tasks import (
     NERTask,
     DependencyParseTask,
     NaiveOpenRelationExtractionTask,
-    PoSTaggingTask
+    PoSTaggingTask,
+    ParticipationExtractionTask
 )
 from bwg.nlp.corenlp_server_tasks import (
     ServerNERTask,
@@ -75,6 +76,14 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
                FrenchPoSTaggingTask(task_config=self.task_config)
 
 
+class FrenchParticipationExtractionTask(ParticipationExtractionTask):
+    """
+    A luigi Task performing participation extraction, but it's specific for the Wikipedia.
+    """
+    def requires(self):
+        return FrenchNERTask(task_config=self.task_config)
+
+
 # -------------------- Tasks for french using Stanford CoreNLP server --------------------
 
 class FrenchServerNERTask(ServerNERTask):
@@ -133,6 +142,14 @@ class FrenchServerNaiveOpenRelationExtractionTask(ServerNaiveOpenRelationExtract
                FrenchServerPoSTaggingTask(task_config=self.task_config)
 
 
+class FrenchServerParticipationExtractionTask(FrenchParticipationExtractionTask):
+    """
+    A luigi Task performing participation extraction, but it's specific for the Wikipedia.
+    """
+    def requires(self):
+        return FrenchServerNERTask(task_config=self.task_config)
+
+
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
@@ -143,7 +160,8 @@ if __name__ == "__main__":
             "named_entity_recognition",
             "pos_tagging",
             "dependency_parsing",
-            "open_relation_extraction"
+            "open_relation_extraction",
+            "participation_extraction"
         ],
         language="french",
         config_file_path="../../pipeline_config.py"
