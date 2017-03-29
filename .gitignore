@@ -8,3 +8,6 @@ python_sudo.sh
 __pycache__
 data/corpora_*/*
 data/evaluation/*
+*.ctrl
+*.ipynb
+*/apicache/*

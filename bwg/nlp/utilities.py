@@ -137,6 +137,14 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", 
     return serialized_relation
 
 
+def serialize_wikidata_entity(wikidata_entity):
+    """
+    Serialize relevant information of a Wikidata entity.
+    """
+    # TODO (Feature): Implement
+    pass
+
+
 def serialize_article(article_id, article_url, article_title, sentences, state="raw", from_scratch=True, pretty=False,
                       dump=True):
     """
@@ -175,6 +183,40 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
         return json.dumps(serialized_article, **options)
 
     return serialized_article
+
+
+def get_nes_from_sentence(sentence_data, default_ne_tag):
+    """
+    Extract all named entities from a named entity tagged sentence.
+    """
+    nes = []
+    current_ne = []
+    current_ne_tag = ""
+
+    for word, ne_tag in sentence_data:
+        # Start of named entity
+        if ne_tag != default_ne_tag and not current_ne:
+            current_ne.append(word)
+            current_ne_tag = ne_tag
+
+        # End of named entity
+        elif ne_tag == default_ne_tag and current_ne:
+            nes.append(" ".join(current_ne))
+            current_ne = []
+            current_ne_tag = ""
+
+        # Decide if named entity is ongoing or not
+        elif ne_tag != default_ne_tag and current_ne:
+            # New named entity
+            if current_ne_tag == ne_tag:
+                current_ne.append(word)
+            # New named entity
+            else:
+                nes.append(" ".join(current_ne))
+                current_ne = [word]
+                current_ne_tag = ne_tag
+
+    return nes
 
 
 def just_dump(json_object, pretty=False):

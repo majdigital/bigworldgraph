@@ -18,7 +18,8 @@ from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
-    serialize_relation
+    serialize_relation,
+    get_nes_from_sentence
 )
 from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
@@ -46,7 +47,6 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
 
     @property
     def workflow_resources(self):
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
         stanford_ner_model_path = self.task_config["STANFORD_NER_MODEL_PATH"]
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
@@ -56,8 +56,7 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
 
         workflow_resources = {
             "tokenizer": tokenizer,
-            "ner_tagger": ner_tagger,
-            "pretty": pretty_serialization
+            "ner_tagger": ner_tagger
         }
 
         return workflow_resources
@@ -113,7 +112,6 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
     @property
     def workflow_resources(self):
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_dependency_model_path = self.task_config["STANFORD_DEPENDENCY_MODEL_PATH"]
         stanford_corenlp_models_path = self.task_config["STANFORD_CORENLP_MODELS_PATH"]
 
@@ -122,8 +120,7 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
         )
 
         workflow_resources = {
-            "dependency_parser": dependency_parser,
-            "pretty": pretty_serialization
+            "dependency_parser": dependency_parser
         }
 
         return workflow_resources
@@ -177,7 +174,6 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
     @property
     def workflow_resources(self):
         corpus_encoding = self.task_config["CORPUS_ENCODING"]
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         stanford_postagger_path = self.task_config["STANFORD_POSTAGGER_PATH"]
         stanford_models_path = self.task_config["STANFORD_MODELS_PATH"]
         stanford_pos_model_path = self.task_config["STANFORD_POS_MODEL_PATH"]
@@ -189,8 +185,7 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
 
         workflow_resources = {
             "tokenizer": tokenizer,
-            "pos_tagger": pos_tagger,
-            "pretty": pretty_serialization
+            "pos_tagger": pos_tagger
         }
 
         return workflow_resources
@@ -246,16 +241,6 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
                     serializing_function=serialize_relation, output_file=output_file
                 )
 
-    @property
-    def workflow_resources(self):
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
-
-        workflow_resources = {
-            "pretty": pretty_serialization
-        }
-
-        return workflow_resources
-
     def task_workflow(self, article, **workflow_resources):
         article_meta, article_data = article["meta"], article["data"]
 
@@ -278,20 +263,6 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         sentence = self._get_sentence(enriched_sentences[0])
 
         return relations, sentence
-
-    def _is_relevant_article(self, article):
-        """
-        Override ArticleProcessingMixin's relevance criterion.
-        """
-        return len(article["data"]) > 0
-
-    def _is_relevant_sentence(self, sentence):
-        """
-        Override ArticleProcessingMixin's relevance criterion.
-        """
-        # Separate sentence from sentence ID
-        sentence = list(sentence.values())[0]
-        return len(sentence["data"]["relations"]) > 0
 
     @staticmethod
     def _get_sentence(ne_tagged_line):
@@ -479,11 +450,9 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
 
     @property
     def workflow_resources(self):
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         participation_phrase = self.task_config["PARTICIPATION_PHRASE"]
 
         workflow_resources = {
-            "pretty": pretty_serialization,
             "participation_phrase": participation_phrase
         }
 
@@ -495,7 +464,7 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
         participation_phrase = workflow_resources["participation_phrase"]
 
         for sentence_id, sentence_json in article_data.items():
-            nes = self.get_nes_from_sentence(sentence_json["data"])
+            nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag)
             relations = self._build_participation_relations(nes, article_title, participation_phrase)
             sentence = self._get_sentence(sentence_json["data"])
 
@@ -517,60 +486,3 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
     @staticmethod
     def _get_sentence(sentence_data):
         return " ".join([word for word, ne_tag in sentence_data])
-
-    def get_nes_from_sentence(self, sentence_data):
-        """
-        Extract all named entities from a named entity tagged sentence.
-        """
-        nes = []
-        current_ne = []
-        current_ne_tag = ""
-
-        for word, ne_tag in sentence_data:
-            # Start of named entity
-            if ne_tag != self.default_ne_tag and not current_ne:
-                current_ne.append(word)
-                current_ne_tag = ne_tag
-
-            # End of named entity
-            elif ne_tag == self.default_ne_tag and current_ne:
-                nes.append(" ".join(current_ne))
-                current_ne = []
-                current_ne_tag = ""
-
-            # Decide if named entity is ongoing or not
-            elif ne_tag != self.default_ne_tag and current_ne:
-                # New named entity
-                if current_ne_tag == ne_tag:
-                    current_ne.append(word)
-                # New named entity
-                else:
-                    nes.append(" ".join(current_ne))
-                    current_ne = [word]
-                    current_ne_tag = ne_tag
-
-        return nes
-
-
-class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
-    """
-    Merge relations gained from OpenRelationExtractionTask and ParticipationExtractionTask.
-    """
-    # TODO (Implement)
-    pass
-
-
-class CategorieCompletionTask(luigi.Task, ArticleProcessingMixin):
-    """
-    Add categories from Wikidata to Named Entities.
-    """
-    # TODO (Implement)
-    pass
-
-
-class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
-    """
-    Writes information extracted from text by means of the NLP pipeline into a database.
-    """
-    # TODO (Implement)
-    pass

@@ -102,7 +102,6 @@ class ArticleProcessingMixin:
             yield serializing_kwargs
 
     @property
-    @abc.abstractmethod
     def workflow_resources(self):
         """
         Property that provides resources necessary to complete the task's workflow.

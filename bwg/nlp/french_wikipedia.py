@@ -14,8 +14,10 @@ from bwg.nlp.standard_tasks import (
     DependencyParseTask,
     NaiveOpenRelationExtractionTask,
     PoSTaggingTask,
-    ParticipationExtractionTask
+    ParticipationExtractionTask,
+    AttributeCompletionTask
 )
+from bwg.nlp.additional_tasks import RelationMergingTask
 from bwg.nlp.corenlp_server_tasks import (
     ServerNERTask,
     ServerDependencyParseTask,
@@ -27,6 +29,7 @@ from bwg.nlp.config_management import build_task_config_for_language
 
 
 # ---------------------------- Default tasks for french ---------------------------------
+# TODO (Refactor): Could this be simplified with a Meta-programming approach?
 
 class FrenchWikipediaReadingTask(WikipediaReadingTask):
     """
@@ -43,7 +46,7 @@ class FrenchWikipediaReadingTask(WikipediaReadingTask):
 
 class FrenchNERTask(NERTask):
     """
-    A luigi task tagging Named Entities in a sentence, but it's specific for the french Wikipedia.
+    A luigi task tagging Named Entities in a sentence, but it's specifically for the french Wikipedia.
     """
     def requires(self):
         return FrenchWikipediaReadingTask(task_config=self.task_config)
@@ -51,7 +54,7 @@ class FrenchNERTask(NERTask):
 
 class FrenchPoSTaggingTask(PoSTaggingTask):
     """
-    A luigi task tagging a sentence with PoS tags, but it's specific to the french Wikipedia.
+    A luigi task tagging a sentence with PoS tags, but it's specifically to the french Wikipedia.
     """
     def requires(self):
         return FrenchWikipediaReadingTask(task_config=self.task_config)
@@ -59,7 +62,7 @@ class FrenchPoSTaggingTask(PoSTaggingTask):
 
 class FrenchDependencyParseTask(DependencyParseTask):
     """
-    A luigi task dependency-parsing a sentence, but it's specific for the french Wikipedia.
+    A luigi task dependency-parsing a sentence, but it's specifically for the french Wikipedia.
     """
     def requires(self):
         return FrenchWikipediaReadingTask(task_config=self.task_config)
@@ -67,7 +70,7 @@ class FrenchDependencyParseTask(DependencyParseTask):
 
 class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
     """
-    A luigi task performing a naive version of Open Relation Extraction on a sentence, but it's specific for the french
+    A luigi task performing a naive version of Open Relation Extraction on a sentence, but it's specifically for the french
     Wikipedia.
     """
     def requires(self):
@@ -78,7 +81,24 @@ class FrenchNaiveOpenRelationExtractionTask(NaiveOpenRelationExtractionTask):
 
 class FrenchParticipationExtractionTask(ParticipationExtractionTask):
     """
-    A luigi Task performing participation extraction, but it's specific for the Wikipedia.
+    A luigi Task performing participation extraction, but it's specifically for the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchNERTask(task_config=self.task_config)
+
+
+class FrenchRelationMergingTask(RelationMergingTask):
+    """
+    A luigi Task that merges extracted relations from other tasks, but it's specifically for the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchParticipationExtractionTask(task_config=self.task_config),\
+               FrenchNaiveOpenRelationExtractionTask(task_config=self.task_config)
+
+
+class FrenchAttributeCompletionTask(AttributeCompletionTask):
+    """
+    A luigi Task that  adds attributes from Wikidata to Named Entities, but it's specifically for the french Wikipedia.
     """
     def requires(self):
         return FrenchNERTask(task_config=self.task_config)
@@ -88,7 +108,7 @@ class FrenchParticipationExtractionTask(ParticipationExtractionTask):
 
 class FrenchServerNERTask(ServerNERTask):
     """
-    A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it's specific for the
+    A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it's specifically for the
     french Wikipedia.
     """
     def requires(self):
@@ -104,7 +124,7 @@ class FrenchServerNERTask(ServerNERTask):
 
 class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
     """
-    A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it's specific to the french
+    A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it's specifically to the french
     Wikipedia.
     """
     def requires(self):
@@ -117,7 +137,7 @@ class FrenchServerPoSTaggingTask(ServerPoSTaggingTask):
 
 class FrenchServerDependencyParseTask(ServerDependencyParseTask):
     """
-    A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it's specific for the french
+    A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it's specifically for the french
     Wikipedia.
     """
     def requires(self):
@@ -134,7 +154,7 @@ class FrenchServerDependencyParseTask(ServerDependencyParseTask):
 class FrenchServerNaiveOpenRelationExtractionTask(ServerNaiveOpenRelationExtractionTask):
     """
     A luigi task performing a naive version of Open Relation Extraction on a sentence using a Stanford CoreNLP server,
-    but it's specific for the french Wikipedia.
+    but it's specifically for the french Wikipedia.
     """
     def requires(self):
         return FrenchServerNERTask(task_config=self.task_config),\
@@ -144,7 +164,25 @@ class FrenchServerNaiveOpenRelationExtractionTask(ServerNaiveOpenRelationExtract
 
 class FrenchServerParticipationExtractionTask(FrenchParticipationExtractionTask):
     """
-    A luigi Task performing participation extraction, but it's specific for the Wikipedia.
+    A luigi Task performing participation extraction, but it's specifically for the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchServerNERTask(task_config=self.task_config)
+
+
+class FrenchServerRelationMergingTask(RelationMergingTask):
+    """
+    A luigi Task that merges extracted relations from other tasks, but it's specifically for the french Wikipedia.
+    """
+
+    def requires(self):
+        return FrenchServerParticipationExtractionTask(task_config=self.task_config), \
+               FrenchServerNaiveOpenRelationExtractionTask(task_config=self.task_config)
+
+
+class FrenchServerAttributeCompletionTask(FrenchAttributeCompletionTask):
+    """
+    A luigi Task that  adds attributes from Wikidata to Named Entities, but it's specifically for the french Wikipedia.
     """
     def requires(self):
         return FrenchServerNERTask(task_config=self.task_config)
@@ -161,12 +199,14 @@ if __name__ == "__main__":
             "pos_tagging",
             "dependency_parsing",
             "open_relation_extraction",
-            "participation_extraction"
+            "participation_extraction",
+            "relation_merging",
+            "attribute_completion"
         ],
         language="french",
         config_file_path="../../pipeline_config.py"
     )
     luigi.build(
-        [FrenchServerNaiveOpenRelationExtractionTask(task_config=french_task_config)],
+        [FrenchAttributeCompletionTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
     )

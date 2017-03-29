@@ -1,3 +1,4 @@
 nltk
 luigi
 pycorenlp
+pywikibot
