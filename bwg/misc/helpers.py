@@ -23,6 +23,21 @@ def filter_dict(dictionary, keep_fields):
     }
 
 
+def construct_dict_from_source(fields, source):
+    """
+    Construct a new dict from a source dict and catch all KeyErrors.
+    """
+    new_dict = {}
+
+    for field_name, getter_func in fields.items():
+        try:
+            new_dict[field_name] = getter_func(source)
+        except KeyError:
+            pass
+
+    return new_dict
+
+
 def get_config_from_py_file(config_path):
     """
     Load a configuration from a .py file.

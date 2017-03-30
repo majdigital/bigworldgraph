@@ -5,7 +5,9 @@ Utilities for the NLP pipeline.
 
 # STD
 import json
+import functools
 
+# PROJECT
 from bwg.misc.helpers import filter_dict
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
@@ -137,12 +139,29 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", 
     return serialized_relation
 
 
-def serialize_wikidata_entity(wikidata_entity):
+def serialize_wikidata_entity(sentence_id, entity_id, wikidata_entity, infix="", state="raw", pretty=False, dump=True):
     """
     Serialize relevant information of a Wikidata entity.
     """
-    # TODO (Feature): Implement
-    pass
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options["indent"] = 4
+
+    # TODO (Refactor): Make this sentence-wise
+    serialized_entity = {
+        "meta": {
+            "id": "{}/{}{}".format(sentence_id, infix, str(entity_id).zfill(5)),
+            "state": state,
+            "type": "wikidata_entity"
+        },
+        "data": wikidata_entity
+    }
+
+    if dump:
+        return json.dumps(serialized_entity, **options)
+
+    return serialized_entity
 
 
 def serialize_article(article_id, article_url, article_title, sentences, state="raw", from_scratch=True, pretty=False,
@@ -185,10 +204,16 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
     return serialized_article
 
 
-def get_nes_from_sentence(sentence_data, default_ne_tag):
+def get_nes_from_sentence(sentence_data, default_ne_tag, include_tag=False):
     """
     Extract all named entities from a named entity tagged sentence.
     """
+    def add_ne(nes_, current_ne_, current_ne_tag_, include_tag_):
+        ne = " ".join(current_ne_)
+        to_add = ne if not include_tag_ else (ne, current_ne_tag_)
+        nes_.append(to_add)
+        return nes_
+
     nes = []
     current_ne = []
     current_ne_tag = ""
@@ -201,7 +226,7 @@ def get_nes_from_sentence(sentence_data, default_ne_tag):
 
         # End of named entity
         elif ne_tag == default_ne_tag and current_ne:
-            nes.append(" ".join(current_ne))
+            nes = add_ne(nes, current_ne, current_ne_tag, include_tag)
             current_ne = []
             current_ne_tag = ""
 
@@ -212,7 +237,7 @@ def get_nes_from_sentence(sentence_data, default_ne_tag):
                 current_ne.append(word)
             # New named entity
             else:
-                nes.append(" ".join(current_ne))
+                nes = add_ne(nes, current_ne, current_ne_tag, include_tag)
                 current_ne = [word]
                 current_ne_tag = ne_tag
 
@@ -236,3 +261,27 @@ def deserialize_line(line, encoding="utf-8"):
     Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
     """
     return json.loads(line, encoding=encoding)
+
+
+# TODO (Refactor): try this out
+def retry_with_fallback(triggering_error, **fallback_kwargs):
+    """
+    Rerun a function in case a specific error occurs with new arguments.
+    """
+    def time_decorator(func):
+        """
+        Actual decorator
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            try:
+                function_result = func(*args, **kwargs)
+            except triggering_error:
+                kwargs.update(fallback_kwargs)
+                function_result = func(*args, **kwargs)
+
+            return function_result
+
+        return func_wrapper
+
+    return time_decorator

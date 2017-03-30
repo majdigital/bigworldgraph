@@ -14,8 +14,7 @@ from bwg.nlp.standard_tasks import (
     DependencyParseTask,
     NaiveOpenRelationExtractionTask,
     PoSTaggingTask,
-    ParticipationExtractionTask,
-    AttributeCompletionTask
+    ParticipationExtractionTask
 )
 from bwg.nlp.additional_tasks import RelationMergingTask
 from bwg.nlp.corenlp_server_tasks import (
@@ -24,7 +23,7 @@ from bwg.nlp.corenlp_server_tasks import (
     ServerPoSTaggingTask,
     ServerNaiveOpenRelationExtractionTask
 )
-from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
+from bwg.nlp.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
 from bwg.nlp.config_management import build_task_config_for_language
 
 
@@ -96,7 +95,7 @@ class FrenchRelationMergingTask(RelationMergingTask):
                FrenchNaiveOpenRelationExtractionTask(task_config=self.task_config)
 
 
-class FrenchAttributeCompletionTask(AttributeCompletionTask):
+class FrenchPropertiesCompletionTask(PropertiesCompletionTask):
     """
     A luigi Task that  adds attributes from Wikidata to Named Entities, but it's specifically for the french Wikipedia.
     """
@@ -180,7 +179,7 @@ class FrenchServerRelationMergingTask(RelationMergingTask):
                FrenchServerNaiveOpenRelationExtractionTask(task_config=self.task_config)
 
 
-class FrenchServerAttributeCompletionTask(FrenchAttributeCompletionTask):
+class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
     """
     A luigi Task that  adds attributes from Wikidata to Named Entities, but it's specifically for the french Wikipedia.
     """
@@ -201,12 +200,12 @@ if __name__ == "__main__":
             "open_relation_extraction",
             "participation_extraction",
             "relation_merging",
-            "attribute_completion"
+            "properties_completion"
         ],
         language="french",
         config_file_path="../../pipeline_config.py"
     )
     luigi.build(
-        [FrenchAttributeCompletionTask(task_config=french_task_config)],
+        [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
     )

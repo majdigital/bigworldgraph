@@ -4,7 +4,7 @@ import pywikibot
 import pprint
 import functools
 
-LANGUAGE_ABBREVIATION = "fr"
+LANGUAGE_ABBREVIATION = "kw"
 RELEVANT_PROPERTIES_PER = {"P21", "P463", "P106", "P108", "P39", "P102", "P1416"}
 
 
