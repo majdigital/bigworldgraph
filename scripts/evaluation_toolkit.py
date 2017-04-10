@@ -669,6 +669,7 @@ class Relation:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    # TODO (Feature): Make this a command line parameter
     @staticmethod
     def _strict(relation1, relation2):
         return (

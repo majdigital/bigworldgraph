@@ -8,7 +8,7 @@ import json
 import functools
 
 # PROJECT
-from bwg.misc.helpers import filter_dict
+from bwg.misc.helpers import filter_dict, is_collection
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
@@ -139,7 +139,7 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", 
     return serialized_relation
 
 
-def serialize_wikidata_entity(sentence_id, entity_id, wikidata_entity, infix="", state="raw", pretty=False, dump=True):
+def serialize_wikidata_entity(sentence_id, wikidata_entities, infix="", state="raw", pretty=False, dump=True):
     """
     Serialize relevant information of a Wikidata entity.
     """
@@ -148,14 +148,25 @@ def serialize_wikidata_entity(sentence_id, entity_id, wikidata_entity, infix="",
     if pretty:
         options["indent"] = 4
 
-    # TODO (Refactor): Make this sentence-wise
     serialized_entity = {
         "meta": {
-            "id": "{}/{}{}".format(sentence_id, infix, str(entity_id).zfill(5)),
+            "id": sentence_id,
             "state": state,
             "type": "wikidata_entity"
         },
-        "data": wikidata_entity
+        "data": {
+            "entities": {
+                "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)): {
+                    "meta": {
+                        "id": "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)),
+                        "state": state,
+                        "type": "Wikidata entity" if len(wd_entity) == 1 else "Ambiguous Wikidata entity"
+                    },
+                    "data": wd_entity
+                }
+                for wd_entity, wd_entity_id in zip(wikidata_entities, range(1, len(wikidata_entities) + 1))
+            }
+        }
     }
 
     if dump:
@@ -263,12 +274,11 @@ def deserialize_line(line, encoding="utf-8"):
     return json.loads(line, encoding=encoding)
 
 
-# TODO (Refactor): try this out
 def retry_with_fallback(triggering_error, **fallback_kwargs):
     """
     Rerun a function in case a specific error occurs with new arguments.
     """
-    def time_decorator(func):
+    def decorator(func):
         """
         Actual decorator
         """
@@ -278,10 +288,46 @@ def retry_with_fallback(triggering_error, **fallback_kwargs):
                 function_result = func(*args, **kwargs)
             except triggering_error:
                 kwargs.update(fallback_kwargs)
+                # TODO (Refactor): Remove debug statement [DU 10.04.17]
+                print(
+                    "Retrying {} with fallback parameters {}.".format(
+                        func.__name__, " ,".join(
+                            ["{}: {}".format(key, value) for key, value in kwargs.items()]
+                        )
+                    )
+                )
                 function_result = func(*args, **kwargs)
 
             return function_result
 
         return func_wrapper
 
-    return time_decorator
+    return decorator
+
+
+def retry_when_exception(triggering_error, max_times=10):
+    """
+    Rerun a function if a specific error occurs.
+    """
+    def decorator(func):
+        """
+        Actual decorator.
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            unsuccessful_tries = 0
+
+            while True:
+                try:
+                    function_result = func(*args, **kwargs)
+                    break
+                except triggering_error:
+                    unsuccessful_tries += 1
+                    if unsuccessful_tries > max_times:
+                        raise
+
+            return function_result
+
+        return func_wrapper
+
+    return decorator

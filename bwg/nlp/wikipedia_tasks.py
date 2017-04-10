@@ -19,7 +19,8 @@ from bwg.nlp.utilities import (
     serialize_article,
     get_nes_from_sentence,
     serialize_wikidata_entity,
-    retry_with_fallback
+    retry_with_fallback,
+    retry_when_exception
 )
 from bwg.nlp.mixins import ArticleProcessingMixin
 import bwg.nlp.standard_tasks
@@ -148,15 +149,15 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                 )
 
     def task_workflow(self, article, **workflow_resources):
+        # TODO (Improve): Speed this up
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         request_cache = {}
         requested_ids = set()
+        wikidata_entities = []
 
-        # TODO (Refactor): Do it sentence-wise! flatten_dictlist overwrites all entities except for the last one
         for sentence_id, sentence_json in article_data.items():
             nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag, include_tag=True)
-            wikidata_entities = []
 
             entity_number = 0
             for named_entity, ne_tag in nes:
@@ -166,6 +167,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                     continue
 
                 elif len(entity_senses) > 1:
+                    ambiguous_entities = []
+
                     # Deal with ambiguous entities
                     for entity_sense in entity_senses:
                         entity_id = entity_sense["id"]
@@ -177,9 +180,9 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                             request_cache[entity_id] = wikidata_entity
                             requested_ids.add(entity_id)
 
-                        wikidata_entities.append(wikidata_entity)
+                        ambiguous_entities.append(wikidata_entity)
 
-                    entity_number += 1
+                    wikidata_entities.append(ambiguous_entities)
 
                 else:
                     entity_sense = entity_senses[0]
@@ -187,16 +190,14 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                         entity_sense["id"], ne_tag, language=language_abbreviation
                     )
 
-                    wikidata_entities.append(wikidata_entity)
+                    wikidata_entities.append([wikidata_entity])
 
-                    entity_number += 1
+                entity_number += 1
 
-            # TODO (Refactor): Change these
             serializing_arguments = {
                 "sentence_id": sentence_id,
-                "sentence": sentence,
-                "relations": relations,
-                "infix": "PE"
+                "wikidata_entities": wikidata_entities,
+                "infix": "WDE"
             }
 
             yield serializing_arguments
@@ -210,9 +211,12 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
 
         return {}
 
-    # TODO (Bug): language is None on fallback
-    @retry_with_fallback(triggering_error=KeyError, language=fallback_language_abbreviation)
+    @retry_with_fallback(triggering_error=KeyError, language="en")
+    @retry_when_exception(triggering_error=api.APIError)
     def get_entity_senses(self, name, language):
+        """
+        Gets matches for an entity name in wikidata.
+        """
         request_parameters = {
             'action': 'wbsearchentities',
             'format': 'json',
@@ -220,7 +224,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
             'type': 'item',
             'search': name
         }
-        request = api.Request(site=self.wikidata_site, **request_parameters)
+        request = api.Request(site=self.wikidata_site, use_get=True, **request_parameters)
         response = request.submit()
 
         if len(response["search"]) == 0:
@@ -239,14 +243,19 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
             for search_result in response["search"]
         ]
 
-    # TODO (Bug): language is None on fallback
-    @retry_with_fallback(triggering_error=KeyError, language=fallback_language_abbreviation)
+    @retry_with_fallback(triggering_error=KeyError, language="en")
+    @retry_when_exception(triggering_error=api.APIError)
     def get_entity(self, wikidata_id, ne_tag, language):
+        """
+        Get an entity and further information from wikidate based its ID and Named Entity tag.
+        """
         request = api.Request(
             site=self.wikidata_site,
             action='wbgetentities',
             format='json',
-            ids=wikidata_id
+            ids=wikidata_id,
+            use_get=True,
+            throttle=False
         )
         response = request.submit()
 
@@ -268,9 +277,12 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
             for id_, entity in response["entities"].items()
         ][0]
 
-    # TODO (Bug): language is None on fallback
-    @retry_with_fallback(triggering_error=KeyError, language=fallback_language_abbreviation)
+    @retry_with_fallback(triggering_error=KeyError, language="en")
+    @retry_when_exception(triggering_error=api.APIError)
     def _resolve_claims(self, claims, ne_tag, language):
+        """
+        Resolve the claims (~ claimed facts) about a wikidata entity. 
+        """
         relevant_properties = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"][ne_tag]
 
         return {
@@ -280,14 +292,19 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
             if property_id in relevant_properties
         }
 
-    # TODO (Bug): language is None on fallback
-    @retry_with_fallback(triggering_error=KeyError, language=fallback_language_abbreviation)
+    @retry_with_fallback(triggering_error=KeyError, language="en")
+    @retry_when_exception(triggering_error=api.APIError)
     def _get_property_name(self, property_id, language):
+        """
+        Get the name of a wikidata property.
+        """
         request = api.Request(
             site=self.wikidata_site,
             action='wbgetentities',
             format='json',
-            ids=property_id
+            ids=property_id,
+            use_get=True,
+            throttle=False
         )
         response = request.submit()
 
@@ -296,14 +313,19 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
             for id_, entity in response["entities"].items()
         ][0]
 
-    # TODO (Bug): language is None on fallback
-    @retry_with_fallback(triggering_error=KeyError, language=fallback_language_abbreviation)
+    @retry_with_fallback(triggering_error=KeyError, language="en")
+    @retry_when_exception(triggering_error=api.APIError)
     def _get_entity_name(self, entity_id, language):
+        """
+        Get the name of a wikidata entity.
+        """
         request = api.Request(
             site=self.wikidata_site,
             action='wbgetentities',
             format='json',
-            ids=entity_id
+            ids=entity_id,
+            use_get=True,
+            throttle=False
         )
         response = request.submit()
 
