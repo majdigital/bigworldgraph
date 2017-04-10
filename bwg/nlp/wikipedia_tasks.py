@@ -5,6 +5,7 @@ NLP Pipeline tasks for french texts.
 
 # STD
 import codecs
+import multiprocessing
 import re
 
 # EXT
@@ -149,81 +150,109 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                 )
 
     def task_workflow(self, article, **workflow_resources):
-        # TODO (Improve): Speed this up
+        # TODO (Improve): Speed this up:
+        # TODO (Bug): Because of multiprocessing (?) program gets stuck at api.py:1555 [DU 10.04.17]
+        # TODO (Refactor): Try with Multithreading??? Shared memory might cause trouble [DU 10.04.17]
+        # - Make a queue
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
-        request_cache = {}
-        requested_ids = set()
-        wikidata_entities = []
+
+        manager = multiprocessing.Manager()
+        request_cache = manager.dict()
+        entity_number = multiprocessing.Value('i', 0)
+        ne_queue = multiprocessing.Queue()
+        serializing_arguments_dict = manager.dict()
+        number_of_processes = 1
 
         for sentence_id, sentence_json in article_data.items():
             nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag, include_tag=True)
 
-            entity_number = 0
-            for named_entity, ne_tag in nes:
-                entity_senses = self.get_entity_senses(named_entity, language=language_abbreviation)
+            for ne in nes:
+                ne_queue.put((sentence_id, ne))
 
-                if len(entity_senses) == 0:
-                    continue
+        while not ne_queue.empty():
+            job_nes = [ne_queue.get() for i in range(number_of_processes)]
 
-                elif len(entity_senses) > 1:
-                    ambiguous_entities = []
+            jobs = [
+                multiprocessing.Process(
+                    target=self._process_task_workflow,
+                    args=(ne, sentence_id, language_abbreviation, entity_number, request_cache,
+                          serializing_arguments_dict)
+                )
+                for sentence_id, ne in job_nes
+            ]
 
-                    # Deal with ambiguous entities
-                    for entity_sense in entity_senses:
-                        entity_id = entity_sense["id"]
+            for job in jobs:
+                job.start()
 
-                        if entity_id in requested_ids:
-                            wikidata_entity = request_cache[entity_id]
-                        else:
-                            wikidata_entity = self.get_entity(entity_id, ne_tag, language=language_abbreviation)
-                            request_cache[entity_id] = wikidata_entity
-                            requested_ids.add(entity_id)
+            for job in jobs:
+                job.join()
 
-                        ambiguous_entities.append(wikidata_entity)
+        for key, serializing_arguments in serializing_arguments_dict.items():
+            if serializing_arguments is not None:
+                yield serializing_arguments
 
-                    wikidata_entities.append(ambiguous_entities)
+    def _process_task_workflow(self, ne, sentence_id, language_abbreviation, entity_number, request_cache,
+                               serializing_arguments_dict):
 
+        named_entity, ne_tag = ne
+        wikidata_entities = []
+
+        entity_senses = self.get_entity_senses(named_entity, language=language_abbreviation)
+
+        if len(entity_senses) == 0:
+            return None
+
+        elif len(entity_senses) > 1:
+            ambiguous_entities = []
+
+            # Deal with ambiguous entities
+            for entity_sense in entity_senses:
+                entity_id = entity_sense["id"]
+
+                if entity_id in request_cache:
+                    wikidata_entity = request_cache[named_entity]
                 else:
-                    entity_sense = entity_senses[0]
-                    wikidata_entity = self.get_entity(
-                        entity_sense["id"], ne_tag, language=language_abbreviation
-                    )
+                    wikidata_entity = self.get_entity(entity_id, ne_tag, language=language_abbreviation)
+                    request_cache[named_entity] = wikidata_entity
 
-                    wikidata_entities.append([wikidata_entity])
+                ambiguous_entities.append(wikidata_entity)
 
-                entity_number += 1
+            wikidata_entities.append(ambiguous_entities)
 
-            serializing_arguments = {
-                "sentence_id": sentence_id,
-                "wikidata_entities": wikidata_entities,
-                "infix": "WDE"
-            }
+        else:
+            entity_sense = entity_senses[0]
+            wikidata_entity = self.get_entity(
+                entity_sense["id"], ne_tag, language=language_abbreviation
+            )
 
-            yield serializing_arguments
+            wikidata_entities.append([wikidata_entity])
 
-    @property
-    def workflow_resources(self):
-        """
-        Property that provides resources necessary to complete the task's workflow.
-        """
-        self.fallback_language_abbreviation = self.task_config["FALLBACK_LANGUAGE_ABBREVIATION"]
+        serializing_arguments = {
+            "sentence_id": sentence_id,
+            "wikidata_entities": wikidata_entities,
+            "infix": "WDE"
+        }
 
-        return {}
+        serializing_arguments_dict[entity_number] = serializing_arguments
+
+        entity_number += 1
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
     @retry_when_exception(triggering_error=api.APIError)
     def get_entity_senses(self, name, language):
         """
-        Gets matches for an entity name in wikidata.
+        Gets matches for an entity name in Wikidata.
         """
         request_parameters = {
             'action': 'wbsearchentities',
             'format': 'json',
             'language': language,
             'type': 'item',
-            'search': name
+            'search': name,
+            'throttle': False
         }
+        # TODO (Bug): Infinite loop during multiprocessing? [DU 10.04.17]
         request = api.Request(site=self.wikidata_site, use_get=True, **request_parameters)
         response = request.submit()
 
@@ -247,7 +276,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
     @retry_when_exception(triggering_error=api.APIError)
     def get_entity(self, wikidata_id, ne_tag, language):
         """
-        Get an entity and further information from wikidate based its ID and Named Entity tag.
+        Get an entity and further information from Wikidata based its ID and Named Entity tag.
         """
         request = api.Request(
             site=self.wikidata_site,
@@ -281,7 +310,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
     @retry_when_exception(triggering_error=api.APIError)
     def _resolve_claims(self, claims, ne_tag, language):
         """
-        Resolve the claims (~ claimed facts) about a wikidata entity. 
+        Resolve the claims (~ claimed facts) about a Wikidata entity. 
         """
         relevant_properties = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"][ne_tag]
 
@@ -296,7 +325,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
     @retry_when_exception(triggering_error=api.APIError)
     def _get_property_name(self, property_id, language):
         """
-        Get the name of a wikidata property.
+        Get the name of a Wikidata property.
         """
         request = api.Request(
             site=self.wikidata_site,
@@ -317,7 +346,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
     @retry_when_exception(triggering_error=api.APIError)
     def _get_entity_name(self, entity_id, language):
         """
-        Get the name of a wikidata entity.
+        Get the name of a Wikidata entity.
         """
         request = api.Request(
             site=self.wikidata_site,

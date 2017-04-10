@@ -24,6 +24,8 @@ Function 'run' of 'FrenchDependencyParseTask' took 0.00 hour(s), 37.00 minute(s)
 Function 'run' of 'FrenchNERTask' took 0.00 hour(s), 45.00 minute(s) and 48.97 second(s) to complete.
 Function 'run' of 'FrenchPoSTaggingTask' took 0.00 hour(s), 11.00 minute(s) and 45.30 second(s) to complete.
 Function 'run' of 'FrenchNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.31 second(s) to complete.
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 15.00 minute(s) and 54.29 second(s) to complete.
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 15.00 minute(s) and 45.75 second(s) to complete.
 
 # Stanford CoreNLP server
 

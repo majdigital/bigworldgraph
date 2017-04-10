@@ -61,7 +61,6 @@ CONFIG_DEPENDENCIES = {
     "properties_completion": [
         "{language}_PC_OUTPUT_PATH",
         "{language}_LANGUAGE_ABBREVIATION",
-        "{language}_FALLBACK_LANGUAGE_ABBREVIATION",
         "{language}_RELEVANT_WIKIDATA_PROPERTIES"
     ]
 }
@@ -107,7 +106,6 @@ FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 # Misc
 FRENCH_PARTICIPATION_PHRASE = "participé à"
 FRENCH_LANGUAGE_ABBREVIATION = "fr"
-FRENCH_FALLBACK_LANGUAGE_ABBREVIATION = "en"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"
