@@ -32,3 +32,20 @@ Function 'run' of 'FrenchServerDependencyParseTask' took 0.00 hour(s), 0.00 minu
 Function 'run' of 'FrenchServerNERTask' took 0.00 hour(s), 0.00 minute(s) and 5.75 second(s) to complete.
 Function 'run' of 'FrenchServerPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 4.55 second(s) to complete.
 Function 'run' of 'FrenchServerNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.10 second(s) to complete.
+
+# Property Completion
+
+# Default
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 33.00 minute(s) and 52.39 second(s) to complete.
+
+# No throttling
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 14.00 minute(s) and 18.69 second(s) to complete.
+
+# Caching & no throttling
+
+
+# Scraping instead of API
+
+# Scraping & Caching
+
+# Multiprocessing & Scraping & Caching

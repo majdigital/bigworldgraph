@@ -6,6 +6,7 @@ Utilities for the NLP pipeline.
 # STD
 import json
 import functools
+import time
 
 # PROJECT
 from bwg.misc.helpers import filter_dict, is_collection
@@ -288,14 +289,6 @@ def retry_with_fallback(triggering_error, **fallback_kwargs):
                 function_result = func(*args, **kwargs)
             except triggering_error:
                 kwargs.update(fallback_kwargs)
-                # TODO (Refactor): Remove debug statement [DU 10.04.17]
-                print(
-                    "Retrying {} with fallback parameters {}.".format(
-                        func.__name__, " ,".join(
-                            ["{}: {}".format(key, value) for key, value in kwargs.items()]
-                        )
-                    )
-                )
                 function_result = func(*args, **kwargs)
 
             return function_result
@@ -325,6 +318,7 @@ def retry_when_exception(triggering_error, max_times=10):
                     unsuccessful_tries += 1
                     if unsuccessful_tries > max_times:
                         raise
+                    time.sleep(0.5)
 
             return function_result
 
