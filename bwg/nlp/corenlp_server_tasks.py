@@ -10,9 +10,6 @@ Also, this approach comes with some other merits as well:
     * Avoiding using bulk operations like "parse_sents()" which complicate the current architecture of the pipeline
 """
 
-# STD
-import collections
-
 # PROJECT
 from bwg.nlp.mixins import CoreNLPServerMixin
 from bwg.nlp.standard_tasks import (
