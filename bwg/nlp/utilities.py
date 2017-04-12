@@ -9,7 +9,7 @@ import functools
 import time
 
 # PROJECT
-from bwg.misc.helpers import filter_dict, is_collection
+from bwg.misc.helpers import filter_dict
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 

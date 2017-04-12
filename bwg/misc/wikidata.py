@@ -5,12 +5,11 @@ This module provides two different way to access wikidata:
     - Over a scraper
 """
 
-# TODO (Refactor): Remove pywikibot from requirements.txt? [DU 11.04.17]
-# Notes
-# https://www.wikidata.org/wiki/Q1
-
 # STD
 import abc
+import re
+import urllib.request
+import urllib.parse
 
 # EXT
 import bs4
@@ -40,27 +39,6 @@ class AbstractWikidataMixin:
         """
         pass
 
-    @abc.abstractmethod
-    def resolve_claims(self, claims, language, relevant_properties):
-        """
-        Transform the claims made about a Wikidata entity into a human-readable format.
-        """
-        pass
-
-    @abc.abstractmethod
-    def get_property_name(self, property_id, language):
-        """
-        Get the name of a property based on its identifier.
-        """
-        pass
-
-    @abc.abstractmethod
-    def get_entity_name(self, entity_id, language):
-        """
-        Get the name of an entity based on its identifier.
-        """
-        pass
-
 
 class WikidataScraperMixin(AbstractWikidataMixin):
     """
@@ -69,45 +47,125 @@ class WikidataScraperMixin(AbstractWikidataMixin):
     wikidata_base_url = "https://www.wikidata.org/wiki/"
     wikidata_entity_url = "https://www.wikidata.org/wiki/{entity_id}"
     wikidata_property_url = "https://www.wikidata.org/wiki/Property:{property_id}"
-    wikidata_search_url = "https://www.wikidata.org/w/index.php?search=&search={name}"
+    wikidata_search_url = "https://www.wikidata.org/w/index.php?search=&search={name}&language={language}"
 
     def get_matches(self, name, language):
         """
         Get matches for an entity's name on Wikidata.
         """
-        # TODO (Feature): Implement [DU 11.07.17]
-        pass
+        parsed_html = self._get_parsed_html(self.wikidata_search_url.format(
+            name=urllib.parse.quote(name), language=language)
+        )
+        raw_search_results = [result.text for result in parsed_html.find_all("div", ["mw-search-result-heading"])]
 
-    def get_entity(self, wikidata_id, language, relevant_properties):
+        matches = [re.search("(.+?) \((Q\d+)\): (.+)", raw_result) for raw_result in raw_search_results]
+
+        return [
+            {
+                "id": match.group(2),
+                "description": match.group(3),
+                "label": match.group(1)
+            }
+            for match in matches if match is not None
+        ]
+
+    @retry_with_fallback(triggering_error=AssertionError, language="en")
+    def get_entity(self, entity_id, language, relevant_properties):
         """
         Get Wikidata information about an entity based on its identifier.
         """
         # TODO (Feature): Implement [DU 11.07.17]
-        pass
+        # aliases, description, id, label, modified, claims
+        parsed_html = self._get_parsed_html(self.wikidata_entity_url.format(entity_id=entity_id))
+        search_results = [
+            result for result in parsed_html.find_all(
+                "tr", [
+                    "wikibase-entitytermsforlanguageview-{}".format(language)
+                ]
+            )
+        ]
+        # If no results found for language, raise AssertionError and re-try function with English
+        assert len(search_results) != 0 or language == "en"
 
-    def resolve_claims(self, claims, language, relevant_properties):
-        """
-        Transform the claims made about a Wikidata entity into a human-readable format.
-        """
-        # TODO (Feature): Implement [DU 11.07.17]
-        pass
+        return [
+            {
+                "id": entity_id,
+                "aliases": self._unwrap_aliases(result),
+                "description": self._unwrap_description(result),
+                "label": self._unwrap_label(result),
+                "modified": self._get_last_modification(parsed_html),
+                "claims": self._get_claims(parsed_html, language=language, relevant_properties=relevant_properties)
+            }
+            for result in search_results
+        ]
 
-    def get_entity_name(self, entity_id, language):
-        """
-        Get the name of an entity based on its identifier.
-        """
-        # TODO (Feature): Implement [DU 11.07.17]
-        pass
+    @staticmethod
+    def _unwrap_aliases(result):
+        raw_aliases = result.find_all("li", ["wikibase-aliasesview-list-item"])
+        aliases = [raw_alias.text.strip() for raw_alias in raw_aliases]
+        return aliases
 
-    def get_property_name(self, property_id, language):
-        """
-        Get the name of a property based on its identifier.
-        """
-        # TODO (Feature): Implement [DU 11.07.17]
-        pass
+    @staticmethod
+    def _unwrap_description(result):
+        return result.find_all("td", ["wikibase-entitytermsforlanguageview-description"])[0].text.strip()
 
-    def _get_soup(self, url):
-        return bs4.BeautifulSoup(url, "html.parser")
+    @staticmethod
+    def _unwrap_label(result):
+        return result.find_all("td", ["wikibase-entitytermsforlanguageview-label"])[0].text.strip()
+
+    @staticmethod
+    def _get_last_modification(parsed_html):
+        raw_modification_time = parsed_html.find("li", {"id": "footer-info-lastmod"}).text.strip()
+        matches = re.search("on (.+?), at (\d{2}:\d{2})", raw_modification_time)
+        modification_time = "{}, {}".format(matches.group(1), matches.group(2))
+        return modification_time
+
+    def _get_claims(self, parsed_html, language, relevant_properties):
+        raw_claims = parsed_html.find_all("div", ["wikibase-statementgroupview"])
+        filtered_raw_claims = [raw_claim for raw_claim in raw_claims if raw_claim.attrs["id"] in relevant_properties]
+
+        return {
+            property: value
+            for property, value in zip(
+                [self._get_claim_property(raw_claim, language=language) for raw_claim in filtered_raw_claims],
+                [self._get_claim_value(raw_claim, language) for raw_claim in filtered_raw_claims]
+            )
+            if property is not None and value is not None
+        }
+
+    @staticmethod
+    @retry_with_fallback(triggering_error=AssertionError, language="en")
+    def _get_claim_property(raw_claim, language):
+        # TODO (Refactor): Get name of property in current language [DU 12.04.17]
+        raw_property_name = raw_claim.find("div", "wikibase-statementgroupview-property")
+
+        assert raw_property_name is not None or language == "en"
+
+        if raw_property_name is not None:
+            property_name = raw_property_name.text.strip()
+            return property_name
+
+        return None
+
+    @staticmethod
+    @retry_with_fallback(triggering_error=AssertionError, language="en")
+    def _get_claim_value(raw_claim, language):
+        raw_value = raw_claim.find("div", "wikibase-snakview-variation-valuesnak")
+
+        assert raw_value is not None or language == "en"
+
+        if raw_value is not None:
+            property_value = raw_value.text.strip()
+            return property_value
+
+        return None
+
+    @staticmethod
+    def _get_parsed_html(url):
+        # TODO (Improve): Use other library than urllib [DU 12.04.17]
+        with urllib.request.urlopen(url) as response:
+            html = response.read()
+            return bs4.BeautifulSoup(html, "lxml")
 
 
 class WikidataAPIMixin(AbstractWikidataMixin):
