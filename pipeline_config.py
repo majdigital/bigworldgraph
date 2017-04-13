@@ -95,7 +95,7 @@ FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.jso
 FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.json"
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample2.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"

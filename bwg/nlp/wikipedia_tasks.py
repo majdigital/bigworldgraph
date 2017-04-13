@@ -150,7 +150,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
-        request_cache = {}  # TODO (Refactor): Make cache an optional argument [DU 12.04.17]
+        request_cache = {}
         requested_ids = set()
         wikidata_entities = []
 
@@ -171,7 +171,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
                     # Deal with ambiguous entities
                     for entity_sense in entity_senses:
                         wikidata_entity, request_cache, requested_ids = self._request_or_use_cache(
-                            entity_sense["id"], language_abbreviation, relevant_properties, request_cache, requested_ids
+                            entity_sense["id"], language_abbreviation, relevant_properties, request_cache,
+                            requested_ids
                         )
 
                         ambiguous_entities.append(wikidata_entity)
@@ -182,7 +183,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
                     entity_sense = entity_senses[0]
 
                     wikidata_entity, request_cache, requested_ids = self._request_or_use_cache(
-                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache, requested_ids
+                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache, requested_ids,
                     )
 
                     wikidata_entities.append([wikidata_entity])
@@ -197,15 +198,17 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
 
             yield serializing_arguments
 
-    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, request_cache, requested_ids):
-        if entity_id in requested_ids:
+    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, request_cache, requested_ids,
+                              caching=True):
+        if entity_id in requested_ids and caching:
             wikidata_entity = request_cache[entity_id]
         else:
             wikidata_entity = self.get_entity(
                 entity_id, language=language_abbreviation,
                 relevant_properties=relevant_properties
             )
-            request_cache[entity_id] = wikidata_entity
-            requested_ids.add(entity_id)
+            if caching:
+                request_cache[entity_id] = wikidata_entity
+                requested_ids.add(entity_id)
 
         return wikidata_entity, request_cache, requested_ids

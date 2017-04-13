@@ -205,7 +205,11 @@ if __name__ == "__main__":
         language="french",
         config_file_path="../../pipeline_config.py"
     )
-    luigi.build(
+
+    import cProfile
+    cProfile.run(
+    """luigi.build(
         [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
+    )""", sort=True
     )

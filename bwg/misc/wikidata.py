@@ -125,12 +125,12 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         filtered_raw_claims = [raw_claim for raw_claim in raw_claims if raw_claim.attrs["id"] in relevant_properties]
 
         return {
-            property: value
-            for property, value in zip(
+            property_: value
+            for property_, value in zip(
                 [self._get_claim_property(raw_claim, language=language) for raw_claim in filtered_raw_claims],
                 [self._get_claim_value(raw_claim, language) for raw_claim in filtered_raw_claims]
             )
-            if property is not None and value is not None
+            if property_ is not None and value is not None
         }
 
     @staticmethod
@@ -162,10 +162,10 @@ class WikidataScraperMixin(AbstractWikidataMixin):
 
     @staticmethod
     def _get_parsed_html(url):
-        # TODO (Improve): Use other library than urllib [DU 12.04.17]
+        strainer = bs4.SoupStrainer("body")
         with urllib.request.urlopen(url) as response:
             html = response.read()
-            return bs4.BeautifulSoup(html, "lxml")
+            return bs4.BeautifulSoup(html, "lxml", parse_only=strainer)
 
 
 class WikidataAPIMixin(AbstractWikidataMixin):
