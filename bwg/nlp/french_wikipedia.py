@@ -206,10 +206,17 @@ if __name__ == "__main__":
         config_file_path="../../pipeline_config.py"
     )
 
-    import cProfile
-    cProfile.run(
-    """luigi.build(
+    # TODO (Refactor): Remove this [DU 13.04.17]
+    #import cProfile
+
+    #cProfile.run(
+    #"""luigi.build(
+    #    [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
+    #    local_scheduler=True, workers=1, log_level="INFO"
+    #)""", sort=True
+    #)
+
+    luigi.build(
         [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
-    )""", sort=True
     )

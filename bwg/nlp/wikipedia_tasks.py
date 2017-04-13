@@ -120,7 +120,27 @@ class WikipediaReadingTask(luigi.Task):
         return groups
 
 
-class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScraperMixin):
+class RequestCache:
+        def __init__(self):
+            self.cache = {}
+            self.requested = set()
+
+        def __contains__(self, item):
+            return item in self.requested
+
+        def __delitem__(self, key):
+            del self.cache[key]
+            self.requested.remove(key)
+
+        def __getitem__(self, key):
+            return self.cache[key]
+
+        def __setitem__(self, key, value):
+            self.cache[key] = value
+            self.requested.add(key)
+
+
+class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):
     """
     Add attributes from Wikidata to Named Entities.
     """
@@ -150,8 +170,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
-        request_cache = {}
-        requested_ids = set()
+        cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
@@ -170,9 +189,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
 
                     # Deal with ambiguous entities
                     for entity_sense in entity_senses:
-                        wikidata_entity, request_cache, requested_ids = self._request_or_use_cache(
-                            entity_sense["id"], language_abbreviation, relevant_properties, request_cache,
-                            requested_ids
+                        wikidata_entity, cache = self._request_or_use_cache(
+                            entity_sense["id"], language_abbreviation, relevant_properties, cache
                         )
 
                         ambiguous_entities.append(wikidata_entity)
@@ -182,8 +200,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
                 else:
                     entity_sense = entity_senses[0]
 
-                    wikidata_entity, request_cache, requested_ids = self._request_or_use_cache(
-                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache, requested_ids,
+                    wikidata_entity, cache = self._request_or_use_cache(
+                        entity_sense["id"], language_abbreviation, relevant_properties, cache
                     )
 
                     wikidata_entities.append([wikidata_entity])
@@ -198,17 +216,15 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataScrap
 
             yield serializing_arguments
 
-    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, request_cache, requested_ids,
-                              caching=True):
-        if entity_id in requested_ids and caching:
-            wikidata_entity = request_cache[entity_id]
+    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, cache, caching=True):
+        if entity_id in cache and caching:
+            wikidata_entity = cache[entity_id]
         else:
             wikidata_entity = self.get_entity(
                 entity_id, language=language_abbreviation,
                 relevant_properties=relevant_properties
             )
             if caching:
-                request_cache[entity_id] = wikidata_entity
-                requested_ids.add(entity_id)
+                cache[entity_id] = wikidata_entity
 
-        return wikidata_entity, request_cache, requested_ids
+        return wikidata_entity, cache

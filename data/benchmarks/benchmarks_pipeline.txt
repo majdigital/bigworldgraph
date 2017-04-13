@@ -50,7 +50,7 @@ Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 14.0
 Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 14.00 minute(s) and 10.11 second(s) to complete.
 
 # Scraping instead of API
-Too slow to even try
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 1.00 hour(s), 27.00 minute(s) and 14.97 second(s) to complete.
 
 # Scraping & Caching
 Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 52.00 minute(s) and 15.95 second(s) to complete.
