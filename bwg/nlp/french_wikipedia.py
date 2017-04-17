@@ -207,16 +207,16 @@ if __name__ == "__main__":
     )
 
     # TODO (Refactor): Remove this [DU 13.04.17]
-    #import cProfile
+    import cProfile
 
-    #cProfile.run(
-    #"""luigi.build(
+    cProfile.run(
+        """luigi.build(
+            [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
+            local_scheduler=True, workers=1, log_level="INFO"
+        )""", sort=True
+    )
+
+    #luigi.build(
     #    [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
     #    local_scheduler=True, workers=1, log_level="INFO"
-    #)""", sort=True
     #)
-
-    luigi.build(
-        [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
-        local_scheduler=True, workers=1, log_level="INFO"
-    )

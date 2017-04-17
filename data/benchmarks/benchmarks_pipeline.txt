@@ -17,6 +17,17 @@ Function 'run' of 'FrenchServerNERTask' took 0.00 hour(s), 0.00 minute(s) and 0.
 Function 'run' of 'FrenchServerPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 0.51 second(s) to complete.
 Function 'run' of 'FrenchServerNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.01 second(s) to complete.
 
+## Property completion
+# 1 process
+# 2 processes
+# 4 processes
+# 64
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 1.00 minute(s) and 42.53 second(s) to complete.
+# 64 with deque
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 1.00 minute(s) and 35.45 second(s) to complete.
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 1.00 minute(s) and 40.29 second(s) to complete.
+
+
 ### corpus_affairs_french_sample2.xml ###
 
 # Default
@@ -72,4 +83,14 @@ Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 12.0
 # Scraper & Caching & Straining & urllib
 Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 10.00 minute(s) and 54.21 second(s) to complete.
 
-# Scraper & Caching & Straining & Multiprocessing
+# Scraper & Caching & Straining & Multithreading
+# 8 processes
+
+# 64 processes
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 20.00 minute(s) and 27.17 second(s) to complete.
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 18.00 minute(s) and 6.35 second(s) to complete.
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 17.00 minute(s) and 40.42 second(s) to complete.  # Removing len()
+Function 'run' of 'FrenchServerPropertiesCompletionTask' took 0.00 hour(s), 18.00 minute(s) and 23.09 second(s) to complete.  # Removing locks
+
+# 128 processes
+

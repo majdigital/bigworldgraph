@@ -10,6 +10,7 @@ import abc
 import re
 import urllib.request
 import urllib.parse
+import requests
 
 # EXT
 import bs4
@@ -49,12 +50,12 @@ class WikidataScraperMixin(AbstractWikidataMixin):
     wikidata_property_url = "https://www.wikidata.org/wiki/Property:{property_id}"
     wikidata_search_url = "https://www.wikidata.org/w/index.php?search=&search={name}&language={language}"
 
-    def get_matches(self, name, language):
+    def get_matches(self, name, language, session=None):
         """
         Get matches for an entity's name on Wikidata.
         """
-        parsed_html = self._get_parsed_html(self.wikidata_search_url.format(
-            name=urllib.parse.quote(name), language=language)
+        parsed_html = self._get_parsed_html(
+            self.wikidata_search_url.format(name=urllib.parse.quote(name), language=language), session
         )
         raw_search_results = [result.text for result in parsed_html.find_all("div", ["mw-search-result-heading"])]
 
@@ -70,13 +71,13 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         ]
 
     @retry_with_fallback(triggering_error=AssertionError, language="en")
-    def get_entity(self, entity_id, language, relevant_properties):
+    def get_entity(self, entity_id, language, relevant_properties, session=None):
         """
         Get Wikidata information about an entity based on its identifier.
         """
         # TODO (Feature): Implement [DU 11.07.17]
         # aliases, description, id, label, modified, claims
-        parsed_html = self._get_parsed_html(self.wikidata_entity_url.format(entity_id=entity_id))
+        parsed_html = self._get_parsed_html(self.wikidata_entity_url.format(entity_id=entity_id), session)
         search_results = [
             result for result in parsed_html.find_all(
                 "tr", [
@@ -161,11 +162,15 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         return None
 
     @staticmethod
-    def _get_parsed_html(url):
+    def _get_parsed_html(url, session=None):
         strainer = bs4.SoupStrainer("body")
-        with urllib.request.urlopen(url) as response:
-            html = response.read()
-            return bs4.BeautifulSoup(html, "lxml", parse_only=strainer)
+        if session is None:
+            session = requests.Session()
+        html_ = session.get(url, headers={'Accept-Encoding': 'identity'}).content
+        return bs4.BeautifulSoup(html_, "lxml", parse_only=strainer)
+        #with urllib.request.urlopen(url) as response:
+        #    html = response.read()
+        #    return bs4.BeautifulSoup(html, "lxml", parse_only=strainer)
 
 
 class WikidataAPIMixin(AbstractWikidataMixin):
@@ -289,7 +294,9 @@ class WikidataAPIMixin(AbstractWikidataMixin):
             "format": 'json',
             "use_get": True,
             "throttle": False,
-            "max_retries": 5
+            "max_retries": 30,
+            "maxlag": 20,
+            "retry_wait": 20
         }
 
         request_parameters.update(additional_request_parameters)
