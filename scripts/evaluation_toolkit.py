@@ -113,6 +113,9 @@ class EvaluationSetCreator:
     def _write_articles(self, articles):
         """
         Write articles into the evaluation set file.
+        
+        :param articles: Sampled articles.
+        :type articles: list
         """
         named_entities_path = self.evaluation_set_outpath.replace(".xml", "_nes.xml")
         raw_relations_path = self.evaluation_set_outpath.replace(".xml", "_relations.xml")
@@ -204,9 +207,23 @@ class EvaluationSetCreator:
 
     @staticmethod
     def _get_sentence(sentence_json):
+        """
+        Get raw sentence from a Named Entity tagged sentence.
+        
+        :param sentence_json: Sentence as JSON object.
+        :type sentence_json: dict
+        :return: Raw sentence.
+        :rtype: str
+        """
         return " ".join([token for token, ne_tag in sentence_json["data"]])
 
     def _sample_articles(self, articles):
+        """
+        Sample articles for the evaluation set either by percentage or absolute number.
+        
+        :param articles: Sampled articles.
+        :type articles: list
+        """
         if self.keep_number is None:
             return random.sample(articles, int(len(articles) * self.keep_percentage))
         elif self.keep_percentage is None:
@@ -276,6 +293,9 @@ class NamedEntityEvaluator:
     def _fill_confusion_matrix(self, ne_tag, gold_ne_tag, confusion_matrices):
         """
         Fill the corresponding confusion matrix based on the current tag and gold tag.
+        
+        :return: Confusion matrix.
+        :rtype: ConfusionMatrix
         """
         # True Positive
         # Named entity was rightfully tagged
@@ -312,6 +332,11 @@ class NamedEntityEvaluator:
     def _get_sentences_from_article_json(article_json):
         """
         Get sentence data from all sentences from an article json object.
+        
+        :param article_json: Article as JSON object.
+        :type article_json: dict
+        :return: List of sentence data.
+        :rtype: list
         """
         return [
             sentence_json["data"]
@@ -321,6 +346,9 @@ class NamedEntityEvaluator:
     def _prepare_eval_data(self):
         """
         Read, filter and convert evaluation data into an appropriate data structure.
+        
+        :return: List of all articles from the pipeline result file as well as the gold standard. 
+        :rtype: tuple
         """
         articles = self._read_manually_annotated_file()
         tagged_articles = read_articles_file(self.ne_inpath, self.corpus_encoding)
@@ -338,6 +366,9 @@ class NamedEntityEvaluator:
     def _read_manually_annotated_file(self):
         """
         Read file with manually annotated name entities.
+        
+        :return: List of articles in file.
+        :rtype: list
         """
         global ARTICLE_OPENING_TAG_PATTERN, ARTICLE_CLOSING_TAG
         target_variables = {
@@ -356,15 +387,20 @@ class NamedEntityEvaluator:
         """
         Convert a manually tagged sentence into a data structure that fits the output of the Stanford Named Entity
         Tagger.
+        
+        :param manually_tagged_sentence: Raw and manually annotated sentence.
+        :type manually_tagged_sentence: str
+        :param default_tag: Default Named Entity tag for words that are not Named Entity tagged.
+        :type default_tag: str 
+        :return: List of NE tagged tokens.
+        :rtype: list
 
-        Example:
+        :Example:
 
-        "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne> defiance and also took
-        aim at <ne type='I-ORG'>China</ne>, the North’s main patron."
-
-        == is converted to ==>
-
-        [('Hours', 'O'), ('later', 'O'), ('Trump', 'I-Pers'), ('decried', 'O'), ('North', 'I-ORG'), ('Korea', 'I-ORG'),
+        >>> test_sentence = "Hours later, <ne type='I-Pers'>Trump</ne> decried <ne type='I_ORG'>North Korea’s</ne>" 
+        "defiance and also took aim at <ne type='I-ORG'>China</ne>, the North’s main patron."
+        >>> covert_manually_tagged_sentence(test_sentence)
+        ... [('Hours', 'O'), ('later', 'O'), ('Trump', 'I-Pers'), ('decried', 'O'), ('North', 'I-ORG'), ('Korea', 'I-ORG'),
         ('’s', 'I-ORG'), ('defiance', 'O'), ('and', 'O'), ('also', 'O'), ('took', 'O'), ('aim', 'O'), ('at', 'O'),
         ('China', 'I-ORG'), ('the', 'O'), ('North', 'O'), ('’s', 'O'), ('main', 'O'), ('patron', 'O'), ('.', 'O')]
         """
@@ -434,6 +470,9 @@ class RelationsEvaluator:
     def _read_manually_annotated_file(self):
         """
         Read file with manually extracted relations.
+        
+        :return: List of articles in file.
+        :rtype: list
         """
         global RELATIONS_OPENING_TAG_PATTERN, RELATIONS_CLOSING_TAG
         target_variables = {
@@ -441,15 +480,22 @@ class RelationsEvaluator:
             "title": ""
         }
 
-        targets = read_targets(
+        return read_targets(
             self.eval_inpath, RELATIONS_OPENING_TAG_PATTERN, RELATIONS_CLOSING_TAG, target_class=Relations,
             target_variables=target_variables, extraction_function=self._extract_relations_info,
             corpus_encoding=self.corpus_encoding
         )
-        return targets
 
     @staticmethod
     def _convert_manual_relations(manual_relations):
+        """
+        Convert manually extracted relations to an Relation objects.
+        
+        :param manual_relations: List of manually extracted raw relations.
+        :type manual_relations: list
+        :return: List of Relation objects.
+        :rtype: list
+        """
         return [
             Relation(*manual_relation_string.split("\t"))
             for manual_relation_string in manual_relations
@@ -457,6 +503,14 @@ class RelationsEvaluator:
 
     @staticmethod
     def _convert_extracted_relations(extracted_article):
+        """
+        Convert automatically extracted relations to an Relation objects.
+
+        :param extracted_article: Article as JSON object.
+        :type extracted_article: dict
+        :return: List of Relation objects.
+        :rtype: list
+        """
         relations = []
 
         for sentence_id, sentence in extracted_article["data"].items():
@@ -472,6 +526,9 @@ class RelationsEvaluator:
     def _prepare_eval_data(self):
         """
         Read, filter and convert evaluation data into an appropriate data structure.
+        
+        :return: List of all articles from the pipeline result file as well as the gold standard. 
+        :rtype: tuple
         """
         manual_relations = self._read_manually_annotated_file()
         extracted_relations = read_articles_file(self.relations_inpath, self.corpus_encoding)
@@ -492,6 +549,9 @@ class RelationsEvaluator:
     def _extract_relations_info(line, target_opening_tag_pattern):
         """
         Extract relevant dates from articles.
+        
+        :return: Relevant information as dictionary.
+        :rtype: dict
         """
         groups = re.match(target_opening_tag_pattern, line).groups()
         return {
@@ -528,6 +588,9 @@ class ConfusionMatrix:
     def accuracy(self):
         """
         What's the proportion of correctly classified results (both positive and negative)?
+        
+        :return: Accuracy.
+        :rtype: float
         """
         return (self.tp + self.tn) / (self.tp + self.tn + self.fp + self.fn + self.epsilon)
 
@@ -535,6 +598,9 @@ class ConfusionMatrix:
     def precision(self):
         """
         How many of the selected items are relevant?
+        
+        :return: Precision.
+        :rtype: float
         """
         return self.tp / (self.tp + self.fp + self.epsilon)
 
@@ -542,6 +608,9 @@ class ConfusionMatrix:
     def recall(self):
         """
         How many relevant items are selected?
+        
+        :return: Recall.
+        :rtype: float
         """
         return self.tp / (self.tp + self.fn + self.epsilon)
 
@@ -549,6 +618,9 @@ class ConfusionMatrix:
     def f1_score(self):
         """
         Harmonic mean of precision and recall.
+        
+        :return: F1-Score.
+        :rtype: float
         """
         return (2 * self.precision * self.recall) / (self.precision + self.recall + self.epsilon)
 
@@ -564,6 +636,9 @@ class ConfusionMatrix:
         self._print_metrics()
 
     def _print_metrics(self):
+        """
+        Print evaluation metrics. 
+        """
         metric_format = "{:>34}: {:.2f}"
 
         for metric in self.defined_metrics:
@@ -571,6 +646,9 @@ class ConfusionMatrix:
         print("")
 
     def _print_confusion_matrix(self):
+        """
+        Print the confusion matrix. 
+        """
         row_format = "{:>10}" * 4
 
         # Print table
@@ -596,13 +674,28 @@ class RelationExtractionConfusionMatrix(ConfusionMatrix):
 
     @property
     def precision(self):
+        """
+        How many of the selected items are relevant?
+
+        :return: Precision.
+        :rtype: float
+        """
         return self.correct / (self.extractions + self.epsilon)
 
     @property
     def recall(self):
+        """
+        How many relevant items are selected?
+
+        :return: Recall.
+        :rtype: float
+        """
         return self.correct / (self.relations + self.epsilon)
 
     def _print_confusion_matrix(self):
+        """
+        Print the confusion matrix. 
+        """
         row_format = "{:>20}" * 2
 
         # Print table
@@ -672,6 +765,16 @@ class Relation:
     # TODO (Feature): Make this a command line parameter [DU 18.04.17]
     @staticmethod
     def _strict(relation1, relation2):
+        """
+        All of the parts of the relations have to match exactly,
+        
+        :param relation1: First relation to be checked.
+        :type relation1: Relation
+        :param relation2: Second relation to be checked.
+        :type relation2: Relation
+        :return: Result of check.
+        :rtype: bool
+        """
         return (
             relation1.subject == relation1.subject and
             relation1.verb == relation2.verb and
@@ -680,6 +783,16 @@ class Relation:
 
     @staticmethod
     def _disjunctive(relation1, relation2):
+        """
+        At least one part of the relations has to match exactly.
+
+        :param relation1: First relation to be checked.
+        :type relation1: Relation
+        :param relation2: Second relation to be checked.
+        :type relation2: Relation
+        :return: Result of check.
+        :rtype: bool
+        """
         return (
             relation1.subject == relation2.subject or
             relation1.verb == relation2.verb or
@@ -688,6 +801,16 @@ class Relation:
 
     @staticmethod
     def _strict_substring(relation1, relation2):
+        """
+        All of parts of the relations have to be substrings.
+
+        :param relation1: First relation to be checked.
+        :type relation1: Relation
+        :param relation2: Second relation to be checked.
+        :type relation2: Relation
+        :return: Result of check.
+        :rtype: bool
+        """
         return (
             (relation1.subject in relation2.subject or relation2.subject in relation1.subject) and
             (relation1.verb in relation2.verb or relation2.verb in relation1.verb) and
@@ -696,6 +819,16 @@ class Relation:
 
     @staticmethod
     def _substring_disjunctive(relation1, relation2):
+        """
+        At least one part of the relations has to be a substring.
+
+        :param relation1: First relation to be checked.
+        :type relation1: Relation
+        :param relation2: Second relation to be checked.
+        :type relation2: Relation
+        :return: Result of check.
+        :rtype: bool
+        """
         return (
             (relation1.subject in relation2.subject or relation2.subject in relation1.subject) or
             (relation1.verb in relation2.verb or relation2.verb in relation1.verb) or
@@ -706,7 +839,26 @@ class Relation:
 def read_targets(corpus_inpath, target_opening_tag_pattern, target_closing_tag, target_class, target_variables,
                  extraction_function, corpus_encoding="utf-8", formatting_function=None):
     """
-    Read articles from corpus.
+     Read articles from corpus.
+    
+    :param corpus_inpath: Path to corpus file.
+    :type corpus_inpath: str
+    :param target_opening_tag_pattern: Regex that matches the opening XML tag of an article.
+    :type target_opening_tag_pattern: str
+    :param target_closing_tag: Tag that indicates the end of an article.
+    :type target_closing_tag: str
+    :param target_class: Class the read article is put into.
+    :type target_class: class
+    :param target_variables: Additional variables for target class.
+    :type target_variables: dict
+    :param extraction_function: Function to extract information from article header.
+    :type extraction_function: func
+    :param corpus_encoding: Encoding of corpus (default is utf-8).
+    :type corpus_encoding: str
+    :param formatting_function: Function to format a line.
+    :type formatting_function: func, None
+    :return: List of articles wrapped in target objects.
+    :rtype: list
     """
     targets = set()
 
@@ -773,6 +925,11 @@ def read_targets(corpus_inpath, target_opening_tag_pattern, target_closing_tag, 
 def _reset_vars(target_variables):
     """
     Reset variables for a new target.
+    
+    :param target_variables: Variables to be reset.
+    :type target_variables: dict
+    :return: Reset variables.
+    :rtype: tuple
     """
     reset_types = {
         str: "",
@@ -792,6 +949,11 @@ def _reset_vars(target_variables):
 def _extract_article_info(line, target_opening_tag_pattern):
     """
     Extract relevant dates from articles.
+    
+    :param line: Line with article information.
+    :type line: str
+    :return: Information about article.
+    :rtype: tuple
     """
     groups = re.match(target_opening_tag_pattern, line).groups()
     return {
@@ -804,6 +966,9 @@ def _extract_article_info(line, target_opening_tag_pattern):
 def is_collection(obj):
     """
     Check if a object is iterable.
+    
+    :return: Result of check.
+    :rtype: bool
     """
     return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
@@ -811,6 +976,12 @@ def is_collection(obj):
 def id_collection_to_dict(collection, id_getter):
     """
     Convert a collection of items that possess an id attribute to a dictionary which the same id as their key.
+    
+    :param collection: Collection of IDs.
+    :type collection: dict, list, set, tuple
+    :param id_getter: Function to extract ID from collection item.
+    :type id_getter: func.
+    :return: Dictionary with IDs as keys and their corresponding elements as values.
     """
     id_dict = {}
 
@@ -824,6 +995,13 @@ def id_collection_to_dict(collection, id_getter):
 def read_articles_file(articles_inpath, corpus_encoding):
     """
     Read an article file from NLP pipeline.
+    
+    :param articles_inpath: Path to input file with articles.
+    :type articles_inpath: str
+    :param corpus_encoding: Encoding of corpus (default is utf-8).
+    :type corpus_encoding: str
+    :return: List of read articles.
+    :rtype: list
     """
     tagged_articles = []
 
@@ -838,6 +1016,13 @@ def read_articles_file(articles_inpath, corpus_encoding):
 def filter_tagged_articles(articles, tagged_articles):
     """
     Filter out those named entity tagged articles from the NLP pipeline which also appear in the evaluation set.
+    
+    :param articles: List of articles.
+    :type articles: list
+    :param tagged_articles: List of tagged articles.
+    :type tagged_articles: list
+    :return: List of filtered articles.
+    :rtype: list
     """
     article_ids = set([article.id for article in articles])
 
@@ -851,11 +1036,24 @@ def filter_tagged_articles(articles, tagged_articles):
 def deserialize_line(line, encoding="utf-8"):
     """
     Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
+    
+    :param line: Line to be serialized.
+    :type line: str
+    :param encoding: Encoding of line (default is utf-8).
+    :type encoding: str
     """
     return json.loads(line, encoding=encoding)
 
 
 def get_sorted_dict_items(dictionary):
+    """
+    Sort a dictionary by its items.
+    
+    :param dictionary: Dictionary to be sorted. 
+    :type dictionary: dict
+    :return: Sorted dictionary
+    :rtype: dict
+    """
     return OrderedDict(sorted(dictionary.items())).items()
 
 
@@ -864,6 +1062,9 @@ def get_sorted_dict_items(dictionary):
 def _init_evalset_argument_parser():
     """
     Initialize the argument parser for the evaluation set creator.
+    
+    :return: Initialized argument parser.
+    :rtype: argparse.ArgumentParser
     """
     argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
@@ -920,6 +1121,9 @@ def _init_evalset_argument_parser():
 def _init_ne_eval_argument_parser():
     """
     Initialize the argument parser for the named entity evaluator.
+    
+    :return: Initialized argument parser.
+    :rtype: argparse.ArgumentParser
     """
     argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
@@ -959,6 +1163,9 @@ def _init_ne_eval_argument_parser():
 def _init_relations_eval_argument_parser():
     """
     Initialize the argument parser for the relation evaluator.
+    
+    :return: Initialized argument parser.
+    :rtype: argparse.ArgumentParser
     """
     argument_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
@@ -1002,6 +1209,11 @@ def _init_relations_eval_argument_parser():
 
 
 def parse_and_start():
+    """
+    Parse the command line arguments with the adequate parser and run the corresponding action.
+    
+    :raise: Exception
+    """
     flags_to_parser = {
         "-ce": _start_evalset_creator,
         "--create-evalset": _start_evalset_creator,

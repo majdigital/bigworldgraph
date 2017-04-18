@@ -35,6 +35,14 @@ class FrenchWikipediaReadingTask(WikipediaReadingTask):
     A luigi task for reading a Wikipedia corpus, but sentences are split in a way that's appropriate for french.
     """
     def _additional_formatting(self, line):
+        """
+        Provide additional formatting for a line in French.
+
+        :param line: Line to be formatted.
+        :type line: str
+        :return: Formatted line.
+        :rtype: str
+        """
         french_sentence_tokenizer_path = self.task_config["SENTENCE_TOKENIZER_PATH"]
         download_nltk_resource_if_missing(french_sentence_tokenizer_path, "punkt")
 

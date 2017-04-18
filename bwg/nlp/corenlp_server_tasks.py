@@ -27,15 +27,30 @@ class ServerNERTask(CoreNLPServerMixin, NERTask):
     def _ner_tag(self, sentence_data, **workflow_resources):
         """
         Tag a single sentence with named entities using a Stanford CoreNLP server.
+        
+        :param sentence_data: Data of the sentence that is going to be named entity tagged.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
         corenlp_server = workflow_resources["corenlp_server"]
 
         return self.process_sentence_with_corenlp_server(
-            sentence_data, action="ner", server=corenlp_server,
-            postprocessing_func=self._postprocess_ner_tagged,
+            sentence_data, action="ner", postprocessing_func=self._postprocess_ner_tagged
         )
 
     def _postprocess_ner_tagged(self, result_json):
+        """
+        Apply a bit of postprocessing to the tagged data (mainly to be consistent with the taggers output if you don't 
+        use CoreNLP server).
+        
+        :param result_json: Processed sentence data.
+        :type result_json: dict
+        :return: Sentence data as a list of tuples.
+        :rtype: list
+        """
         if len(result_json["sentences"]) == 0:
             return []
 
@@ -53,15 +68,28 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
     def _dependency_parse(self, sentence_data, **workflow_resources):
         """
         Dependency parse a sentence using a Stanford CoreNLP server.
+        
+        :param sentence_data: Data of the sentence that is going to be dependency parsed.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
-        corenlp_server = workflow_resources["corenlp_server"]
-
         return self.process_sentence_with_corenlp_server(
-            sentence_data, action="depparse", server=corenlp_server,
-            postprocessing_func=self._postprocess_dependency_parsed,
+            sentence_data, action="depparse", postprocessing_func=self._postprocess_dependency_parsed,
         )
 
     def _postprocess_dependency_parsed(self, result_json):
+        """
+        Apply a bit of postprocessing to the parsed data (mainly to be consistent with the taggers output if 
+        you don't use CoreNLP server).
+
+        :param result_json: Processed sentence data.
+        :type result_json: dict
+        :return: Dependency parse as dictionary.
+        :rtype: dict
+        """
         if len(result_json["sentences"]) == 0:
             return []
 
@@ -69,6 +97,14 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
         return self.edges_to_nodes(edges)
 
     def edges_to_nodes(self, edges):
+        """
+        Turn a dependency tree representation based on nodes to a representation based on edges.
+        
+        :param edges: List of tree edges.
+        :type edges: list
+        :return: Dictionary with the root node and a list of all nodes.
+        :rtype: dict
+        """
         nodes = {}
 
         for edge in edges:
@@ -100,6 +136,18 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
 
     @staticmethod
     def _create_node(node_address, node_gloss, node_rel):
+        """
+        Create a dictionary representation of a dependency tree node.
+        
+        :param node_address: Node number.
+        :type node_address: int
+        :param node_gloss: Word of this node.
+        :type node_gloss: str
+        :param node_rel: Relation of this node to its head.
+        :type node_rel: str
+        :return: Dictionary node representation.
+        :rtype: dict
+        """
         return {
             "address": node_address,
             "word": node_gloss,
@@ -115,15 +163,28 @@ class ServerPoSTaggingTask(CoreNLPServerMixin, PoSTaggingTask):
     def _pos_tag(self, sentence_data, **workflow_resources):
         """
         Tag a single sentence with Part-of-Speech tags using a Stanford CoreNLP server.
+        
+        :param sentence_data: Data of the sentence that is going to be pos tagged.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
-        corenlp_server = workflow_resources["corenlp_server"]
-
         return self.process_sentence_with_corenlp_server(
-            sentence_data, action="pos", server=corenlp_server,
-            postprocessing_func=self._postprocess_pos_tagged,
+            sentence_data, action="pos", postprocessing_func=self._postprocess_pos_tagged,
         )
 
     def _postprocess_pos_tagged(self, result_json):
+        """
+        Apply a bit of postprocessing to the parsed data (mainly to be consistent with the taggers output if 
+        you don't use CoreNLP server).
+
+        :param result_json: Processed sentence data.
+        :type result_json: dict
+        :return: Dependency parse as dictionary.
+        :rtype: dict
+        """
         if len(result_json["sentences"]) == 0:
             return []
 

@@ -27,7 +27,7 @@ class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["RELATION_MERGING_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input()[0].open("r") as pe_file, self.input()[1].open("r") as ore_file, \
                 self.output().open("w") as output_file:

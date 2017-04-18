@@ -331,6 +331,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :param language: Abbreviation of target language.
         :type language: str
         :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
         :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
         :rtype: list
         """
@@ -370,6 +371,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :param language: Abbreviation of target language.
         :type language: str
         :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
         :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
         """
         return {

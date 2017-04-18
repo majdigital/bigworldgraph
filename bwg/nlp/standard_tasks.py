@@ -37,7 +37,7 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["NES_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
@@ -100,7 +100,7 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["DEPENDENCY_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
@@ -162,7 +162,7 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["POS_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as input_file, self.output().open("w") as output_file:
             for line in input_file:
@@ -231,7 +231,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["ORE_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input()[0].open("r") as nes_input_file, self.input()[1].open("r") as dependency_input_file,\
          self.input()[2].open("r") as pos_input_file, self.output().open("w") as output_file:
@@ -429,7 +429,6 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that extracts all Named Entity participating in an issue or topic.
     """
-    default_ne_tag = "O"  # TODO (Refactor): Make this a config parameters?
 
     def requires(self):
         return NERTask(task_config=self.task_config)
@@ -439,7 +438,7 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
         output_path = self.task_config["PE_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as nes_input_file, self.output().open("w") as output_file:
             for nes_line in nes_input_file:
@@ -448,23 +447,14 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
                     serializing_function=serialize_relation, output_file=output_file
                 )
 
-    @property
-    def workflow_resources(self):
-        participation_phrase = self.task_config["PARTICIPATION_PHRASE"]
-
-        workflow_resources = {
-            "participation_phrase": participation_phrase
-        }
-
-        return workflow_resources
-
     def task_workflow(self, article, **workflow_resources):
         article_meta, article_data = article["meta"], article["data"]
         article_title = article_meta["title"]
-        participation_phrase = workflow_resources["participation_phrase"]
+        participation_phrase = self.task_config["PARTICIPATION_PHRASE"]
+        default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
 
         for sentence_id, sentence_json in article_data.items():
-            nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag)
+            nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag)
             relations = self._build_participation_relations(nes, article_title, participation_phrase)
             sentence = self._get_sentence(sentence_json["data"])
 

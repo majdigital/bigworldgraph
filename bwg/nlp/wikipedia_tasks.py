@@ -99,28 +99,66 @@ class WikipediaReadingTask(luigi.Task):
                         current_sentences.append(line)
 
     def _output_article(self, id_, url, title, sentences, output_file, **additional):
+        """
+        Write read article to file.
+        
+        :param id_: Article ID.
+        :type id_: int
+        :param url: URL of current article.
+        :type url: str
+        :param title: Title of current article.
+        :type title: str
+        :param sentences: Article sentences. 
+        :type sentences: list
+        :param output_file: Output file the article is written to.
+        :type output_file: _io.TextWrapper
+        :param additional: Additional parameters for serialization.
+        :type additional: dict
+        """
         article_json = serialize_article(
-            id_, url, title, sentences, state=additional["state"]
+            id_, url, title, sentences, **additional
         )
         output_file.write("{}\n".format(article_json))
 
     def _additional_formatting(self, line):
         """
         Provide additional formatting for a line possible subclasses by overwriting this function.
+        
+        :param line: Line to be formatted.
+        :type line: str
+        :return: Formatted line.
+        :rtype: str
         """
         return line
 
     @staticmethod
     def _reset_vars():
+        """
+        Reset temporary variables used while reading the input corpus.
+        
+        :return: Reset variables.
+        :rtype: tuple
+        """
         return "", "", "", []
 
     def _extract_article_info(self, line):
+        """
+        Extract important information from the opening article XML tag.
+        
+        :param line: Line with article information.
+        :type line: str
+        :return: Information about article.
+        :rtype: tuple
+        """
         article_tag_pattern = self.task_config["WIKIPEDIA_ARTICLE_TAG_PATTERN"]
         groups = re.match(article_tag_pattern, line).groups()
         return groups
 
 
 class RequestCache:
+    """
+    Special class used as a Cache, so that requests being made don't have to be repeated if they occurred in the past.
+    """
     def __init__(self):
         self.lock = threading.Lock()
         self.cache = {}
@@ -159,7 +197,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         output_path = self.task_config["PC_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as nes_input_file, self.output().open("w") as output_file:
             for nes_line in nes_input_file:
@@ -233,6 +271,22 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
             yield serializing_arguments
 
     def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, cache, caching=True):
+        """
+        Request a Wikidata entity. Make a lookup if this request has already been made if caching flag is set.
+        
+        :param entity_id: Wikidata entity ID.
+        :type entity_id: str
+        :param language_abbreviation: Abbreviation of target language.
+        :type language_abbreviation: str
+        :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
+        :param cache: Cache to store requests.
+        :type cache: RequestCache
+        :param caching: Flag to indicate whether caching should be used.
+        :type caching: bool
+        :return: The requested Wikidata entity as well as the enriched cache.
+        :rtype; tuple
+        """
         if caching:
             if entity_id in cache:
                 return cache[entity_id], cache
