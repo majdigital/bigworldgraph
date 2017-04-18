@@ -121,30 +121,30 @@ class WikipediaReadingTask(luigi.Task):
 
 
 class RequestCache:
-        def __init__(self):
-            self.lock = threading.Lock()
-            self.cache = {}
-            self.requested = set()
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.cache = {}
+        self.requested = set()
 
-        def __contains__(self, item):
-            return item in self.requested
+    def __contains__(self, item):
+        return item in self.requested
 
-        def __delitem__(self, key):
-            del self.cache[key]
-            self.requested.remove(key)
+    def __delitem__(self, key):
+        del self.cache[key]
+        self.requested.remove(key)
 
-        def __getitem__(self, key):
-            return self.cache[key]
+    def __getitem__(self, key):
+        return self.cache[key]
 
-        def __setitem__(self, key, value):
-            self.cache[key] = value
-            self.requested.add(key)
+    def __setitem__(self, key, value):
+        self.cache[key] = value
+        self.requested.add(key)
 
-        def __enter__(self):
-            self.lock.acquire()
+    def __enter__(self):
+        self.lock.acquire()
 
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            self.lock.release()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.lock.release()
 
 
 class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):

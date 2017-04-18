@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-This module provides two different way to access wikidata:
-    - Through the Wikimedia API
-    - Over a scraper
+This module provides two different way to access Wikidata:
+    * Through the Wikimedia API with Pywikibot as a wrapper
+    * Over a scraper using BeautifulSoup4
+    
+Currently, accessing the data via the API is faster than the scraper.
 """
 
 # STD
@@ -30,6 +32,13 @@ class AbstractWikidataMixin:
     def get_matches(self, name, language):
         """
         Get matches for an entity's name on Wikidata.
+        
+        :param name: Name of entity.
+        :type name: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: List of matches.
+        :rtype: list
         """
         pass
 
@@ -37,6 +46,15 @@ class AbstractWikidataMixin:
     def get_entity(self, wikidata_id, language, relevant_properties):
         """
         Get Wikidata information about an entity based on its identifier.
+        
+        :param wikidata_id: Wikidata ID of desired entity.
+        :type wikidata_id: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
+        :return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
+        :rtype: list
         """
         pass
 
@@ -50,12 +68,19 @@ class WikidataScraperMixin(AbstractWikidataMixin):
     wikidata_property_url = "https://www.wikidata.org/wiki/Property:{property_id}"
     wikidata_search_url = "https://www.wikidata.org/w/index.php?search=&search={name}&language={language}"
 
-    def get_matches(self, name, language, session=None):
+    def get_matches(self, name, language):
         """
         Get matches for an entity's name on Wikidata.
+        
+        :param name: Name of entity.
+        :type name: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: List of matches.
+        :rtype: list
         """
         parsed_html = self._get_parsed_html(
-            self.wikidata_search_url.format(name=urllib.parse.quote(name), language=language), session
+            self.wikidata_search_url.format(name=urllib.parse.quote(name), language=language)
         )
         raw_search_results = [result.text for result in parsed_html.find_all("div", ["mw-search-result-heading"])]
 
@@ -71,56 +96,108 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         ]
 
     @retry_with_fallback(triggering_error=AssertionError, language="en")
-    def get_entity(self, entity_id, language, relevant_properties, session=None):
+    def get_entity(self, wikidata_id, language, relevant_properties):
         """
         Get Wikidata information about an entity based on its identifier.
+        
+        :param wikidata_id: Wikidata ID of desired entity.
+        :type wikidata_id: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :param relevant_properties: Types of claims that should be included.
+        :return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
+        :rtype: list
         """
         # aliases, description, id, label, modified, claims
-        parsed_html = self._get_parsed_html(self.wikidata_entity_url.format(entity_id=entity_id), session)
-        search_results = [
+        parsed_html = self._get_parsed_html(self.wikidata_entity_url.format(entity_id=wikidata_id))
+        search_results_html = [
             result for result in parsed_html.find_all(
                 "tr", [
                     "wikibase-entitytermsforlanguageview-{}".format(language)
                 ]
             )
         ]
+
         # If no results found for language, raise AssertionError and re-try function with English
-        assert len(search_results) != 0 or language == "en"
+        assert len(search_results_html) != 0 or language == "en"
 
         return [
             {
-                "id": entity_id,
-                "aliases": self._unwrap_aliases(result),
-                "description": self._unwrap_description(result),
-                "label": self._unwrap_label(result),
+                "id": wikidata_id,
+                "aliases": self._unwrap_aliases(result_html),
+                "description": self._unwrap_description(result_html),
+                "label": self._unwrap_label(result_html),
                 "modified": self._get_last_modification(parsed_html),
                 "claims": self._get_claims(parsed_html, language=language, relevant_properties=relevant_properties)
             }
-            for result in search_results
+            for result_html in search_results_html
         ]
 
     @staticmethod
-    def _unwrap_aliases(result):
-        raw_aliases = result.find_all("li", ["wikibase-aliasesview-list-item"])
+    def _unwrap_aliases(search_result_html):
+        """
+        Extract aliases from the Wikidata site html of a Wikidata entity.
+        
+        :param search_result_html: Parsed html of an search result.
+        :type search_result_html: bs4.BeautifulSoup
+        :return: All aliases of a Wikidata entity.
+        :rtype: list
+        """
+        raw_aliases = search_result_html.find_all("li", ["wikibase-aliasesview-list-item"])
         aliases = [raw_alias.text.strip() for raw_alias in raw_aliases]
+
         return aliases
 
     @staticmethod
-    def _unwrap_description(result):
-        return result.find_all("td", ["wikibase-entitytermsforlanguageview-description"])[0].text.strip()
+    def _unwrap_description(search_result_html):
+        """
+        Extract the description from the Wikidata site html of a Wikidata entity.
+
+        :param search_result_html: Parsed html of an search result.
+        :type search_result_html: bs4.BeautifulSoup
+        :return: Description of a Wikidata entity.
+        :rtype: str
+        """
+        return search_result_html.find_all("td", ["wikibase-entitytermsforlanguageview-description"])[0].text.strip()
 
     @staticmethod
-    def _unwrap_label(result):
-        return result.find_all("td", ["wikibase-entitytermsforlanguageview-label"])[0].text.strip()
+    def _unwrap_label(search_result_html):
+        """
+        Extract the label from the Wikidata site html of a Wikidata entity.
+
+        :param search_result_html: Parsed html of an search result.
+        :type search_result_html: bs4.BeautifulSoup
+        :return: Label of a Wikidata entity.
+        :rtype: str
+        """
+        return search_result_html.find_all("td", ["wikibase-entitytermsforlanguageview-label"])[0].text.strip()
 
     @staticmethod
     def _get_last_modification(parsed_html):
+        """
+        Extract the last modification of this Wikipedia entry.
+        
+        :param parsed_html: Parsed html of this entry's Wikidata site.
+        :type parsed_html: bs4.BeautifulSoup 
+        :return: The date and time of the last modification.
+        :rtype: str
+        """
         raw_modification_time = parsed_html.find("li", {"id": "footer-info-lastmod"}).text.strip()
         matches = re.search("on (.+?), at (\d{2}:\d{2})", raw_modification_time)
         modification_time = "{}, {}".format(matches.group(1), matches.group(2))
+
         return modification_time
 
     def _get_claims(self, parsed_html, language, relevant_properties):
+        """
+        Extract the claims of this Wikipedia entry.
+
+        :param parsed_html: Parsed html of this entry's Wikidata site.
+        :type parsed_html: bs4.BeautifulSoup 
+        :param language: Abbreviation of target language.
+        :type language: str
+        :param relevant_properties:
+        """
         raw_claims = parsed_html.find_all("div", ["wikibase-statementgroupview"])
         filtered_raw_claims = [raw_claim for raw_claim in raw_claims if raw_claim.attrs["id"] in relevant_properties]
 
@@ -136,6 +213,16 @@ class WikidataScraperMixin(AbstractWikidataMixin):
     @staticmethod
     @retry_with_fallback(triggering_error=AssertionError, language="en")
     def _get_claim_property(raw_claim, language):
+        """
+        Extract the property from inside a claim.
+        
+        :param raw_claim: Parsed html of this entry's Wikidata site.
+        :type raw_claim: bs4.BeautifulSoup
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: Name of property or None
+        :rtype: str, None
+        """
         # TODO (Refactor): Get name of property in current language [DU 12.04.17]
         raw_property_name = raw_claim.find("div", "wikibase-statementgroupview-property")
 
@@ -150,6 +237,16 @@ class WikidataScraperMixin(AbstractWikidataMixin):
     @staticmethod
     @retry_with_fallback(triggering_error=AssertionError, language="en")
     def _get_claim_value(raw_claim, language):
+        """
+        Extract the value from inside a claim.
+
+        :param raw_claim: Parsed html of this entry's Wikidata site.
+        :type raw_claim: bs4.BeautifulSoup
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: Value or None
+        :rtype: str, None
+        """
         raw_value = raw_claim.find("div", "wikibase-snakview-variation-valuesnak")
 
         assert raw_value is not None or language == "en"
@@ -162,14 +259,23 @@ class WikidataScraperMixin(AbstractWikidataMixin):
 
     @staticmethod
     def _get_parsed_html(url, session=None):
-        strainer = bs4.SoupStrainer("body")
+        """
+        Get parsed HTML from an URL.
+        
+        :param url: URL of the site the HTML should be requested and parsed from.
+        :type url: str
+        :param session: Request session (optional).
+        :type session: request.Session, None
+        :return: Parsed HTML.
+        :rtype: bs4.BeautifulSoup
+        """
+        strainer = bs4.SoupStrainer("body")  # One parse the important part of the page
+
         if session is None:
             session = requests.Session()
         html_ = session.get(url, headers={'Accept-Encoding': 'identity'}).content
+
         return bs4.BeautifulSoup(html_, "lxml", parse_only=strainer)
-        #with urllib.request.urlopen(url) as response:
-        #    html = response.read()
-        #    return bs4.BeautifulSoup(html, "lxml", parse_only=strainer)
 
 
 class WikidataAPIMixin(AbstractWikidataMixin):
@@ -182,6 +288,13 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def get_matches(self, name, language):
         """
         Get matches for an entity's name on Wikidata.
+        
+        :param name: Name of entity.
+        :type name: str
+        :param language: Abbreviation of target language.
+        :type language: str 
+        :return: List of matches.
+        :rtype: list
         """
         additional_request_parameters = {
             "action": "wbsearchentities",
@@ -212,6 +325,14 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def get_entity(self, wikidata_id, language, relevant_properties):
         """
         Get Wikidata information about an entity based on its identifier.
+        
+        :param wikidata_id: Wikidata ID of desired entity.
+        :type wikidata_id: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :param relevant_properties: Types of claims that should be included.
+        :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
+        :rtype: list
         """
         additional_request_parameters = {
             "ids": wikidata_id
@@ -243,6 +364,13 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def resolve_claims(self, claims, language, relevant_properties):
         """
         Resolve the claims (~ claimed facts) about a wikidata entity. 
+        
+        :param claims: Dictionary with property ID as key and claim data as value.
+        :type claims: dict
+        :param language: Abbreviation of target language.
+        :type language: str
+        :param relevant_properties: Types of claims that should be included.
+        :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
         """
         return {
             self.get_property_name(property_id, language=language):
@@ -255,6 +383,13 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def get_property_name(self, property_id, language):
         """
         Get the name of a wikidata property.
+        
+        :param property_id: Wikidata property ID.
+        :type property_id: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: Name of property.
+        :rtype: str
         """
         additional_request_parameters = {
             "ids": property_id
@@ -271,6 +406,13 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def get_entity_name(self, entity_id, language):
         """
         Get the name of a wikidata entity.
+        
+        :param entity_id: Wikidata property ID.
+        :type entity_id: str
+        :param language: Abbreviation of target language.
+        :type language: str
+        :return: Name of entity.
+        :rtype: str
         """
         additional_request_parameters = {
             "ids": entity_id
@@ -286,6 +428,11 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     def _request(self, **additional_request_parameters):
         """
         Send a request to the API.
+        
+        :param additional_request_parameters: Additional parameters for the request that is being sent to the API.
+        :type additional_request_parameters: dict
+        :return: Response following the request.
+        :rtype: dict
         """
         request_parameters = {
             "site": self.wikidata_site,
