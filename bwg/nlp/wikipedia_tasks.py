@@ -5,22 +5,20 @@ NLP Pipeline tasks for french texts.
 
 # STD
 import codecs
+import threading
 import re
 
 # EXT
 import luigi
 import luigi.format
-import pywikibot
-from pywikibot.data import api
 
 # PROJECT
-from bwg.misc.helpers import is_collection, time_function, construct_dict_from_source
+from bwg.misc.helpers import is_collection, time_function
+from bwg.misc.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 from bwg.nlp.utilities import (
     serialize_article,
     get_nes_from_sentence,
-    serialize_wikidata_entity,
-    retry_with_fallback,
-    retry_when_exception
+    serialize_wikidata_entity
 )
 from bwg.nlp.mixins import ArticleProcessingMixin
 import bwg.nlp.standard_tasks
@@ -122,13 +120,38 @@ class WikipediaReadingTask(luigi.Task):
         return groups
 
 
-class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
+class RequestCache:
+        def __init__(self):
+            self.lock = threading.Lock()
+            self.cache = {}
+            self.requested = set()
+
+        def __contains__(self, item):
+            return item in self.requested
+
+        def __delitem__(self, key):
+            del self.cache[key]
+            self.requested.remove(key)
+
+        def __getitem__(self, key):
+            return self.cache[key]
+
+        def __setitem__(self, key, value):
+            self.cache[key] = value
+            self.requested.add(key)
+
+        def __enter__(self):
+            self.lock.acquire()
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self.lock.release()
+
+
+class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):
     """
     Add attributes from Wikidata to Named Entities.
     """
     default_ne_tag = "O"  # TODO (Refactor): Make this a config parameters?
-    wikidata_site = pywikibot.Site("wikidata", "wikidata")
-    fallback_language_abbreviation = None
 
     def requires(self):
         return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
@@ -149,11 +172,15 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                 )
 
     def task_workflow(self, article, **workflow_resources):
-        # TODO (Improve): Speed this up
+        # TODO (Improve): Speed this up [Comment DU 18.04.17]
+        # Not so easy: See branch parallelize_scraper for the most recent attempt:
+        #   - Accessing Wikidata via Scraper is much slower than via API
+        #   - Language support is very limited for the scraper
+        #   - Using multithreading only has minimal gains / is even slower so far
+        #   (probably due to GIL and sharing resources between threads)
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
-        request_cache = {}
-        requested_ids = set()
+        request_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
@@ -173,12 +200,11 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
                     for entity_sense in entity_senses:
                         entity_id = entity_sense["id"]
 
-                        if entity_id in requested_ids:
+                        if entity_id in request_cache:
                             wikidata_entity = request_cache[entity_id]
                         else:
                             wikidata_entity = self.get_entity(entity_id, ne_tag, language=language_abbreviation)
                             request_cache[entity_id] = wikidata_entity
-                            requested_ids.add(entity_id)
 
                         ambiguous_entities.append(wikidata_entity)
 
@@ -202,134 +228,17 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin):
 
             yield serializing_arguments
 
-    @property
-    def workflow_resources(self):
-        """
-        Property that provides resources necessary to complete the task's workflow.
-        """
-        self.fallback_language_abbreviation = self.task_config["FALLBACK_LANGUAGE_ABBREVIATION"]
+    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, cache, caching=True):
+        if caching:
+            if entity_id in cache:
+                return cache[entity_id], cache
 
-        return {}
-
-    @retry_with_fallback(triggering_error=KeyError, language="en")
-    @retry_when_exception(triggering_error=api.APIError)
-    def get_entity_senses(self, name, language):
-        """
-        Gets matches for an entity name in wikidata.
-        """
-        request_parameters = {
-            'action': 'wbsearchentities',
-            'format': 'json',
-            'language': language,
-            'type': 'item',
-            'search': name
-        }
-        request = api.Request(site=self.wikidata_site, use_get=True, **request_parameters)
-        response = request.submit()
-
-        if len(response["search"]) == 0:
-            return []
-
-        return [
-            construct_dict_from_source(
-                {
-                    "uri": lambda source: source["concepturi"],
-                    "id": lambda source: source["id"],
-                    "description": lambda source: source["description"],
-                    "label": lambda source: source["label"]
-                },
-                search_result
-            )
-            for search_result in response["search"]
-        ]
-
-    @retry_with_fallback(triggering_error=KeyError, language="en")
-    @retry_when_exception(triggering_error=api.APIError)
-    def get_entity(self, wikidata_id, ne_tag, language):
-        """
-        Get an entity and further information from wikidate based its ID and Named Entity tag.
-        """
-        request = api.Request(
-            site=self.wikidata_site,
-            action='wbgetentities',
-            format='json',
-            ids=wikidata_id,
-            use_get=True,
-            throttle=False
+        wikidata_entity = self.get_entity(
+            entity_id, language=language_abbreviation,
+            relevant_properties=relevant_properties
         )
-        response = request.submit()
 
-        if len(response["entities"]) == 0:
-            return {}
+        if caching:
+            cache[entity_id] = wikidata_entity
 
-        return [
-            construct_dict_from_source(
-                {
-                    "aliases": lambda source: [alias_dict["value"] for alias_dict in source["aliases"][language]],
-                    "description": lambda source: source["descriptions"][language]["value"],
-                    "id": lambda source: source["id"],
-                    "label": lambda source: source["labels"][language]["value"],
-                    "modified": lambda source: source["modified"],
-                    "claims": lambda source: self._resolve_claims(source["claims"], ne_tag, language=language)
-                },
-                entity
-            )
-            for id_, entity in response["entities"].items()
-        ][0]
-
-    @retry_with_fallback(triggering_error=KeyError, language="en")
-    @retry_when_exception(triggering_error=api.APIError)
-    def _resolve_claims(self, claims, ne_tag, language):
-        """
-        Resolve the claims (~ claimed facts) about a wikidata entity. 
-        """
-        relevant_properties = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"][ne_tag]
-
-        return {
-            self._get_property_name(property_id, language):
-                self._get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
-            for property_id, claim in claims.items()
-            if property_id in relevant_properties
-        }
-
-    @retry_with_fallback(triggering_error=KeyError, language="en")
-    @retry_when_exception(triggering_error=api.APIError)
-    def _get_property_name(self, property_id, language):
-        """
-        Get the name of a wikidata property.
-        """
-        request = api.Request(
-            site=self.wikidata_site,
-            action='wbgetentities',
-            format='json',
-            ids=property_id,
-            use_get=True,
-            throttle=False
-        )
-        response = request.submit()
-
-        return [
-            entity["labels"][language]["value"]
-            for id_, entity in response["entities"].items()
-        ][0]
-
-    @retry_with_fallback(triggering_error=KeyError, language="en")
-    @retry_when_exception(triggering_error=api.APIError)
-    def _get_entity_name(self, entity_id, language):
-        """
-        Get the name of a wikidata entity.
-        """
-        request = api.Request(
-            site=self.wikidata_site,
-            action='wbgetentities',
-            format='json',
-            ids=entity_id,
-            use_get=True,
-            throttle=False
-        )
-        response = request.submit()
-
-        return [
-            entity["labels"][language]["value"]
-            for id_, entity in response["entities"].items()
-        ][0]
+        return wikidata_entity, cache
