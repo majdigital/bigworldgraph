@@ -48,11 +48,9 @@ class CoreNLPServerMixin:
 
     @property
     def workflow_resources(self):
-        pretty_serialization = self.task_config["PRETTY_SERIALIZATION"]
         corenlp_server = pycorenlp.StanfordCoreNLP(self.task_config["STANFORD_CORENLP_SERVER_ADDRESS"])
 
         workflow_resources = {
-            "pretty": pretty_serialization,
             "corenlp_server": corenlp_server
         }
 
@@ -102,12 +100,15 @@ class ArticleProcessingMixin:
             yield serializing_kwargs
 
     @property
-    @abc.abstractmethod
     def workflow_resources(self):
         """
         Property that provides resources necessary to complete the task's workflow.
         """
-        workflow_resources = {}
+        # some_complicated_object = initialize_complicated_object(self.task_config["init_parameter"])
+
+        workflow_resources = {
+            # "complicated_object": some_complicated_object
+        }
 
         return workflow_resources
 

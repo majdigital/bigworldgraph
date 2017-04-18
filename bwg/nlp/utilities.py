@@ -5,8 +5,10 @@ Utilities for the NLP pipeline.
 
 # STD
 import json
+import functools
 
-from bwg.misc.helpers import filter_dict
+# PROJECT
+from bwg.misc.helpers import filter_dict, is_collection
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
@@ -137,6 +139,42 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", 
     return serialized_relation
 
 
+def serialize_wikidata_entity(sentence_id, wikidata_entities, infix="", state="raw", pretty=False, dump=True):
+    """
+    Serialize relevant information of a Wikidata entity.
+    """
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options["indent"] = 4
+
+    serialized_entity = {
+        "meta": {
+            "id": sentence_id,
+            "state": state,
+            "type": "wikidata_entity"
+        },
+        "data": {
+            "entities": {
+                "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)): {
+                    "meta": {
+                        "id": "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)),
+                        "state": state,
+                        "type": "Wikidata entity" if len(wd_entity) == 1 else "Ambiguous Wikidata entity"
+                    },
+                    "data": wd_entity
+                }
+                for wd_entity, wd_entity_id in zip(wikidata_entities, range(1, len(wikidata_entities) + 1))
+            }
+        }
+    }
+
+    if dump:
+        return json.dumps(serialized_entity, **options)
+
+    return serialized_entity
+
+
 def serialize_article(article_id, article_url, article_title, sentences, state="raw", from_scratch=True, pretty=False,
                       dump=True):
     """
@@ -177,6 +215,46 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
     return serialized_article
 
 
+def get_nes_from_sentence(sentence_data, default_ne_tag, include_tag=False):
+    """
+    Extract all named entities from a named entity tagged sentence.
+    """
+    def add_ne(nes_, current_ne_, current_ne_tag_, include_tag_):
+        ne = " ".join(current_ne_)
+        to_add = ne if not include_tag_ else (ne, current_ne_tag_)
+        nes_.append(to_add)
+        return nes_
+
+    nes = []
+    current_ne = []
+    current_ne_tag = ""
+
+    for word, ne_tag in sentence_data:
+        # Start of named entity
+        if ne_tag != default_ne_tag and not current_ne:
+            current_ne.append(word)
+            current_ne_tag = ne_tag
+
+        # End of named entity
+        elif ne_tag == default_ne_tag and current_ne:
+            nes = add_ne(nes, current_ne, current_ne_tag, include_tag)
+            current_ne = []
+            current_ne_tag = ""
+
+        # Decide if named entity is ongoing or not
+        elif ne_tag != default_ne_tag and current_ne:
+            # New named entity
+            if current_ne_tag == ne_tag:
+                current_ne.append(word)
+            # New named entity
+            else:
+                nes = add_ne(nes, current_ne, current_ne_tag, include_tag)
+                current_ne = [word]
+                current_ne_tag = ne_tag
+
+    return nes
+
+
 def just_dump(json_object, pretty=False):
     """
     Self-documenting?
@@ -194,3 +272,62 @@ def deserialize_line(line, encoding="utf-8"):
     Transform a line in a file that was created as a result from a Luigi task into its metadata and main data.
     """
     return json.loads(line, encoding=encoding)
+
+
+def retry_with_fallback(triggering_error, **fallback_kwargs):
+    """
+    Rerun a function in case a specific error occurs with new arguments.
+    """
+    def decorator(func):
+        """
+        Actual decorator
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            try:
+                function_result = func(*args, **kwargs)
+            except triggering_error:
+                kwargs.update(fallback_kwargs)
+                # TODO (Refactor): Remove debug statement [DU 10.04.17]
+                print(
+                    "Retrying {} with fallback parameters {}.".format(
+                        func.__name__, " ,".join(
+                            ["{}: {}".format(key, value) for key, value in kwargs.items()]
+                        )
+                    )
+                )
+                function_result = func(*args, **kwargs)
+
+            return function_result
+
+        return func_wrapper
+
+    return decorator
+
+
+def retry_when_exception(triggering_error, max_times=10):
+    """
+    Rerun a function if a specific error occurs.
+    """
+    def decorator(func):
+        """
+        Actual decorator.
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            unsuccessful_tries = 0
+
+            while True:
+                try:
+                    function_result = func(*args, **kwargs)
+                    break
+                except triggering_error:
+                    unsuccessful_tries += 1
+                    if unsuccessful_tries > max_times:
+                        raise
+
+            return function_result
+
+        return func_wrapper
+
+    return decorator
