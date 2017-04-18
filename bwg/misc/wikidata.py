@@ -128,7 +128,7 @@ class WikidataScraperMixin(AbstractWikidataMixin):
             property_: value
             for property_, value in zip(
                 [self._get_claim_property(raw_claim, language=language) for raw_claim in filtered_raw_claims],
-                [self._get_claim_value(raw_claim, language) for raw_claim in filtered_raw_claims]
+                [self._get_claim_value(raw_claim, language=language) for raw_claim in filtered_raw_claims]
             )
             if property_ is not None and value is not None
         }
@@ -245,7 +245,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         Resolve the claims (~ claimed facts) about a wikidata entity. 
         """
         return {
-            self.get_property_name(property_id, language):
+            self.get_property_name(property_id, language=language):
                 self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
             for property_id, claim in claims.items()
             if property_id in relevant_properties

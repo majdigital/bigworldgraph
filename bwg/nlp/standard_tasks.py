@@ -414,7 +414,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             expanded_subj_node = self._expand_node(subj_node, normalized_dependency_tree)
             expanded_obj_node = self._expand_node(obj_node, normalized_dependency_tree)
 
-            # TODO (FEATURE): Extend definition of verb nodes? (Allow more patterns)
+            # TODO (FEATURE): Extend definition of verb nodes? (Allow more patterns) [DU 18.04.17]
 
             if self._expanded_node_is_ne_tagged(expanded_subj_node, aligned_ne_tagged_line) or \
                self._expanded_node_is_ne_tagged(expanded_obj_node, aligned_ne_tagged_line):

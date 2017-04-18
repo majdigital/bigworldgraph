@@ -151,8 +151,6 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     """
     Add attributes from Wikidata to Named Entities.
     """
-    default_ne_tag = "O"  # TODO (Refactor): Make this a config parameters?
-
     def requires(self):
         return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
 
@@ -165,10 +163,9 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     def run(self):
         with self.input().open("r") as nes_input_file, self.output().open("w") as output_file:
             for nes_line in nes_input_file:
-                # TODO (Debug): Remove prettyprint
                 self.process_articles(
                     nes_line, new_state="added_properties",
-                    serializing_function=serialize_wikidata_entity, output_file=output_file, pretty=True
+                    serializing_function=serialize_wikidata_entity, output_file=output_file
                 )
 
     def task_workflow(self, article, **workflow_resources):
@@ -180,40 +177,47 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         #   (probably due to GIL and sharing resources between threads)
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
+        relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
+        default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
         request_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
-            nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag, include_tag=True)
+            nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
 
             entity_number = 0
             for named_entity, ne_tag in nes:
-                entity_senses = self.get_entity_senses(named_entity, language=language_abbreviation)
+                entity_senses = self.get_matches(named_entity, language=language_abbreviation)
+                relevant_properties = relevant_properties_all.get(ne_tag, [])
 
+                # No matches - skip
                 if len(entity_senses) == 0:
                     continue
 
+                # Deal with ambiguous entities
                 elif len(entity_senses) > 1:
                     ambiguous_entities = []
 
-                    # Deal with ambiguous entities
                     for entity_sense in entity_senses:
                         entity_id = entity_sense["id"]
 
                         if entity_id in request_cache:
                             wikidata_entity = request_cache[entity_id]
                         else:
-                            wikidata_entity = self.get_entity(entity_id, ne_tag, language=language_abbreviation)
+                            wikidata_entity, request_cache = self._request_or_use_cache(
+                                entity_sense["id"], language_abbreviation, relevant_properties, request_cache
+                            )
                             request_cache[entity_id] = wikidata_entity
 
                         ambiguous_entities.append(wikidata_entity)
 
                     wikidata_entities.append(ambiguous_entities)
 
+                # One match - lucky!
                 else:
                     entity_sense = entity_senses[0]
-                    wikidata_entity = self.get_entity(
-                        entity_sense["id"], ne_tag, language=language_abbreviation
+                    wikidata_entity, request_cache = self._request_or_use_cache(
+                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache
                     )
 
                     wikidata_entities.append([wikidata_entity])

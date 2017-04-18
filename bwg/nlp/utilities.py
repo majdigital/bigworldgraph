@@ -8,7 +8,7 @@ import json
 import functools
 
 # PROJECT
-from bwg.misc.helpers import filter_dict, is_collection
+from bwg.misc.helpers import filter_dict
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
@@ -288,14 +288,6 @@ def retry_with_fallback(triggering_error, **fallback_kwargs):
                 function_result = func(*args, **kwargs)
             except triggering_error:
                 kwargs.update(fallback_kwargs)
-                # TODO (Refactor): Remove debug statement [DU 10.04.17]
-                print(
-                    "Retrying {} with fallback parameters {}.".format(
-                        func.__name__, " ,".join(
-                            ["{}: {}".format(key, value) for key, value in kwargs.items()]
-                        )
-                    )
-                )
                 function_result = func(*args, **kwargs)
 
             return function_result

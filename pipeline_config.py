@@ -53,7 +53,8 @@ CONFIG_DEPENDENCIES = {
     ],
     "participation_extraction": [
         "{language}_PARTICIPATION_PHRASE",
-        "{language}_PE_OUTPUT_PATH"
+        "{language}_PE_OUTPUT_PATH",
+        "DEFAULT_NE_TAG"
     ],
     "relation_merging": [
         "{language}_RELATION_MERGING_OUTPUT_PATH"
@@ -75,6 +76,7 @@ DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
 STANFORD_PATH = "../../data/stanford/models/"
 VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
+DEFAULT_NE_TAG = "O"
 PIPELINE_DEBUG = True
 CORPUS_ENCODING = "utf-8"
 OMITTED_TOKENS_FOR_ALIGNMENT = []

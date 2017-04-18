@@ -28,7 +28,7 @@ from bwg.nlp.config_management import build_task_config_for_language
 
 
 # ---------------------------- Default tasks for french ---------------------------------
-# TODO (Refactor): Could this be simplified with a Meta-programming approach?
+# TODO (Refactor): Could this be simplified with a Meta-programming approach? [DU 18.04.17]
 
 class FrenchWikipediaReadingTask(WikipediaReadingTask):
     """
@@ -190,7 +190,7 @@ class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
-    # TODO (FEATURE): Use remote scheduler for server deployment
+    # TODO (FEATURE): Use remote scheduler for server deployment [DU 18.04.17]
     french_task_config = build_task_config_for_language(
         tasks=[
             "wikipedia_reading",

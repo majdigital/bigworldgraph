@@ -6,10 +6,12 @@ Module for simple helper functions.
 # STD
 import codecs
 import functools
-import nltk
 import sys
 import time
 import types
+
+# EXT
+import nltk
 
 
 def filter_dict(dictionary, keep_fields):
