@@ -34,6 +34,7 @@ The versions listed here try to follow [Semantic Versioning](http://semver.or).
 * Adding Dependency Parsing.
 * Adding Named Entity Recognition.
 * Adding Relation extraction.
+* Adding categorization of NE via Wikidata
 
 ### v0.5.0
 
@@ -71,5 +72,9 @@ The versions listed here try to follow [Semantic Versioning](http://semver.or).
 This paragraph lists features that haven't been assigned to specific version
 of the project yet.
 
-* World domination
-* ...
+* Make parsing etc. scale better - it takes ages.
+    * Introduce workers
+    * http://stackoverflow.com/questions/23322674/how-to-improve-speed-with-stanford-nlp-tagger-and-nltk/23323042
+    * tag_sents() / parse_sents() (but requires refactoring)
+    * https://github.com/nltk/nltk/pull/1249
+* Better Tokenizer for French

@@ -1,2 +1,13 @@
-.DS_Store
+*.DS_Store
 ./vscode/*
+.idea/*
+__pycache__/*
+data/stanford/*
+data/pipeline_*/*
+python_sudo.sh
+__pycache__
+data/corpora_*/*
+data/evaluation/*
+*.ctrl
+*.ipynb
+*/apicache/*

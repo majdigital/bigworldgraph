@@ -1,0 +1,5 @@
+nltk
+luigi
+pycorenlp
+pywikibot
+bs4

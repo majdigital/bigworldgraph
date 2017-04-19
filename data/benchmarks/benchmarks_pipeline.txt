@@ -1,0 +1,34 @@
+### corpus_affairs_french_sample.xml ###
+
+# Default
+
+Function 'run' of 'FrenchPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 33.38 second(s) to complete.
+Function 'run' of 'FrenchDependencyParseTask' took 0.00 hour(s), 1.00 minute(s) and 46.02 second(s) to complete.
+Function 'run' of 'FrenchNERTask' took 0.00 hour(s), 1.00 minute(s) and 54.67 second(s) to complete.
+Function 'run' of 'FrenchNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.06 second(s) to complete.
+
+# Stanford CoreNLP server
+
+Function 'run' of 'WikipediaReadingTask' took 0.00 hour(s), 0.00 minute(s) and 0.07 second(s) to complete.
+Function 'run' of 'FrenchServerDependencyParseTask' took 0.00 hour(s), 0.00 minute(s) and 1.56 second(s) to complete.
+Function 'run' of 'FrenchServerNERTask' took 0.00 hour(s), 0.00 minute(s) and 0.58 second(s) to complete.
+Function 'run' of 'FrenchServerPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 0.51 second(s) to complete.
+Function 'run' of 'FrenchServerNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.01 second(s) to complete.
+
+### corpus_affairs_french_sample2.xml ###
+
+# Default
+
+Function 'run' of 'FrenchWikipediaReadingTask' took 0.00 hour(s), 0.00 minute(s) and 0.14 second(s) to complete.
+Function 'run' of 'FrenchDependencyParseTask' took 0.00 hour(s), 37.00 minute(s) and 28.07 second(s) to complete.
+Function 'run' of 'FrenchNERTask' took 0.00 hour(s), 45.00 minute(s) and 48.97 second(s) to complete.
+Function 'run' of 'FrenchPoSTaggingTask' took 0.00 hour(s), 11.00 minute(s) and 45.30 second(s) to complete.
+Function 'run' of 'FrenchNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.31 second(s) to complete.
+
+# Stanford CoreNLP server
+
+Function 'run' of 'WikipediaReadingTask' took 0.00 hour(s), 0.00 minute(s) and 0.07 second(s) to complete.
+Function 'run' of 'FrenchServerDependencyParseTask' took 0.00 hour(s), 0.00 minute(s) and 22.08 second(s) to complete.
+Function 'run' of 'FrenchServerNERTask' took 0.00 hour(s), 0.00 minute(s) and 5.75 second(s) to complete.
+Function 'run' of 'FrenchServerPoSTaggingTask' took 0.00 hour(s), 0.00 minute(s) and 4.55 second(s) to complete.
+Function 'run' of 'FrenchServerNaiveOpenRelationExtractionTask' took 0.00 hour(s), 0.00 minute(s) and 0.10 second(s) to complete.
