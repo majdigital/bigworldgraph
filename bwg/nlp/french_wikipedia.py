@@ -16,7 +16,7 @@ from bwg.nlp.standard_tasks import (
     PoSTaggingTask,
     ParticipationExtractionTask
 )
-from bwg.nlp.additional_tasks import RelationMergingTask
+from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask
 from bwg.nlp.corenlp_server_tasks import (
     ServerNERTask,
     ServerDependencyParseTask,
@@ -49,6 +49,14 @@ class FrenchWikipediaReadingTask(WikipediaReadingTask):
         tokenizer = nltk.data.load(french_sentence_tokenizer_path)
         sentences = tokenizer.tokenize(line)
         return sentences
+
+
+class FrenchPipelineRunInfoGenerationTask(PipelineRunInfoGenerationTask):
+    """
+    Generates information about the current run of the pipeline, but it's specifically for the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchWikipediaReadingTask(task_config=self.task_config)
 
 
 class FrenchNERTask(NERTask):
@@ -208,12 +216,13 @@ if __name__ == "__main__":
             "open_relation_extraction",
             "participation_extraction",
             "relation_merging",
-            "properties_completion"
+            "properties_completion",
+            "pipeline_run_info_generation"
         ],
         language="french",
         config_file_path="../../pipeline_config.py"
     )
     luigi.build(
-        [FrenchServerPropertiesCompletionTask(task_config=french_task_config)],
+        [FrenchPipelineRunInfoGenerationTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
     )

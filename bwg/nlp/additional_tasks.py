@@ -3,6 +3,10 @@
 Defining additional tasks for the NLP pipeline.
 """
 
+# STD
+import time
+import datetime
+
 # EXT
 import luigi
 import luigi.format
@@ -11,8 +15,8 @@ from bwg.nlp.mixins import ArticleProcessingMixin
 # PROJECT
 from bwg.nlp.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
 from bwg.misc.helpers import time_function
-from bwg.nlp.utilities import serialize_relation
-from bwg.nlp.wikipedia_tasks import PropertiesCompletionTask
+from bwg.nlp.utilities import serialize_relation, deserialize_line, just_dump
+from bwg.nlp.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
 from bwg.db.mongo import MongoDBTarget
 from bwg.db.neo4j import Neo4jTarget
 
@@ -84,6 +88,72 @@ class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
         return len(sentence["data"]["relations"]) > 0
 
 
+class PipelineRunInfoGenerationTask(luigi.Task):
+    """
+    Generates information about the current run of the pipeline.
+    """
+    task_config = luigi.DictParameter()
+
+    def requires(self):
+        return WikipediaReadingTask(task_config=self.task_config)
+
+    def output(self):
+        text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
+        output_path = self.task_config["PIPELINE_RUN_INFO_OUTPUT_PATH"]
+        return luigi.LocalTarget(output_path, format=text_format)
+
+    @time_function(is_classmethod=True)
+    def run(self):
+        encoding = self.task_config["CORPUS_ENCODING"]
+        article_ids = []
+
+        with self.input().open("r") as input_file, self.output().open("w") as output_file:
+            for line in input_file:
+                article = deserialize_line(line, encoding)
+                article_ids.append(article["meta"]["id"])
+
+            run_info = self._generate_run_information(article_ids)
+            output_file.write("{}\n".format(just_dump(run_info)))
+
+    def _generate_run_information(self, article_ids):
+        """
+        Generate information about this pipeline run.
+        
+        :param article_ids: List of all article IDs.
+        :type article_ids: list
+        :return: Information about this run.
+        :rtype: dict
+        """
+        return {
+            "run_id": self._generate_run_hash(article_ids),
+            "article_ids": article_ids,
+            "timestamp": self._generate_timestamp()
+        }
+
+    @staticmethod
+    def _generate_run_hash(article_ids):
+        """
+        Generate a specific hash for this run based on the articles that the pipeline processed.
+        
+        :param article_ids: List of all article IDs.
+        :type article_ids: list
+        :return: Hash value for this run.
+        :rtype: int
+        """
+        return hash(frozenset(article_ids))
+
+    @staticmethod
+    def _generate_timestamp():
+        """
+        Generate a timestamp containing date and time for this pipeline run.
+        
+        :return: Timestamp.
+        :rtype: str
+        """
+        now = time.time()
+        return datetime.datetime.fromtimestamp(now).strftime('%Y.%m.%d %H:%M:%S')
+
+
 class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
     """
     Writes information extracted from text by means of the NLP pipeline into a database.
@@ -118,4 +188,5 @@ class PropertiesDatabaseWritingTask(DatabaseWritingTask):
 
     def output(self):
         # TODO (Implement): Add necessary config parameters [DU 19.04.17]
-        return MongoDBTarget()
+        pass
+        #return MongoDBTarget(task_config=self.task_config)

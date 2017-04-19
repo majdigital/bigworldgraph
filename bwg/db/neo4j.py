@@ -5,53 +5,43 @@ Create support for the Neo4j graph database.
 
 # EXT
 import luigi
-import neo4j.v1 as neo4j
+import neomodel
 
 
-class Neo4jSession:
-    """
-    Context manager to handle connections to a Neo4j graph database.
-    """
-    def __init__(self, uri, user, password):
-        self.driver = neo4j.GraphDatabase.driver(uri, auth=neo4j.basic_auth(user, password))
-        self.session = self.driver.session()
-
-    def __enter__(self):
-        self.session = self.driver.session()
-        return self.session
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.session.close()
+class Entity(neomodel.StructuredNode):
+    # TODO (Implement) [DU 19.04.17]
+    pass
 
 
-class Neo4jTarget(luigi.target):
+class Neo4jTarget(luigi.Target):
     """
     Additional luigi target to write a tasks output into a neo4j graph database.
     """
     mode = None
 
-    def __init__(self, uri, user, password, schemata):
-        self.uri = uri
-        self.user = user
-        self.password = password
-        self.schemata = schemata
+    def __init__(self, user, password, host="localhost", port=7687):
+        neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
+            user=user, password=password, host=host, port=port
+        )
 
     def exists(self):
         # TODO (Implement) [DU 19.04.17]
-        return
+        # Find way to not overwrite data each time
+        return False
 
     def open(self, mode):
         assert mode in ("w", "a")
         self.mode = mode
+
+        # Overwrite database
+        if mode == "w":
+            self._delete_all_entries()
+
         return self
 
-    def add_entry(self, schema_name, entry_data):
-        assert type(entry_data) == dict
+    @staticmethod
+    def _delete_all_entries():
+        entities = Entity.nodes.get()
 
-        try:
-            schema = self.schemata[schema_name]
-        except KeyError:
-            raise KeyError("No schema named '{}' found.".format(schema_name))
-
-        with Neo4jSession as session:
-            session.run("CREATE {}".format(schema), entry_data)
+        for entity in entities:
+            entity.delete()

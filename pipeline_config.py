@@ -72,6 +72,10 @@ CONFIG_DEPENDENCIES = {
     "properties_completion": [
         "{language}_PC_OUTPUT_PATH",  # Path to output file of this task
         "{language}_RELEVANT_WIKIDATA_PROPERTIES"  # Relevant Wikidata properties for different kind of named entities
+    ],
+    # Necessary config parameters to generate general information about the current pipeline run
+    "pipeline_run_info_generation": [
+        "{language}_PIPELINE_RUN_INFO_OUTPUT_PATH"  # Path to output file of this task
     ]
     # TODO (Implement): Add database writing tasks [DU 19.04.17]
 }
@@ -114,6 +118,7 @@ FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.jso
 FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.json"
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
+FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
 FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample2.xml"
 
 # Paths for french Stanford models
