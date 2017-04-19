@@ -12,6 +12,9 @@ from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
 from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import serialize_relation
+from bwg.nlp.wikipedia_tasks import PropertiesCompletionTask
+from bwg.db.mongo import MongoDBTarget
+from bwg.db.neo4j import Neo4jTarget
 
 
 class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
@@ -87,3 +90,32 @@ class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
     """
     # TODO (Implement)
     pass
+
+
+class RelationsDatabaseWritingTask(DatabaseWritingTask):
+    """
+    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.
+    """
+    # TODO (Implement) [DU 19.04.17]
+    def requires(self):
+        RelationMergingTask(task_config=self.task_config)
+
+    def output(self):
+        uri = self.task_config["NEO4J_URI"]
+        user = self.task_config["NEO4J_USER"]
+        password = self.task_config["NEO4J_PASSWORD"]
+        schemata = self.task_config["NEO$J_SCHEMATA"]
+        return Neo4jTarget(uri, user, password, schemata)
+
+
+class PropertiesDatabaseWritingTask(DatabaseWritingTask):
+    """
+    Writes properties of entities extracted from Wikidata into a database.
+    """
+    # TODO (Implement) [DU 19.04.17]
+    def requires(self):
+        PropertiesCompletionTask(task_config=self.task_config)
+
+    def output(self):
+        # TODO (Implement): Add necessary config parameters [DU 19.04.17]
+        return MongoDBTarget()

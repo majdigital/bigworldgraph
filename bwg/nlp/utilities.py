@@ -249,7 +249,7 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
     :param article_title: Title of current article.
     :type article_title: str
     :param sentences: Sentences of current article.
-    :type sentences: list
+    :type sentences: list, dict
     :param state: State that describes the kind of processing that is applied to the data in this step. It's 
     included in the metadata of each sentence.
     :type state: str

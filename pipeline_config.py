@@ -73,6 +73,7 @@ CONFIG_DEPENDENCIES = {
         "{language}_PC_OUTPUT_PATH",  # Path to output file of this task
         "{language}_RELEVANT_WIKIDATA_PROPERTIES"  # Relevant Wikidata properties for different kind of named entities
     ]
+    # TODO (Implement): Add database writing tasks [DU 19.04.17]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
 
@@ -91,6 +92,14 @@ OMITTED_TOKENS_FOR_ALIGNMENT = []
 # OMITTED_TOKENS_FOR_ALIGNMENT = [",", ".", "-LRB-", "-RRB-"]
 ONLY_INCLUDE_RELEVANT_SENTENCES = True
 ONLY_INCLUDE_RELEVANT_ARTICLES = True
+
+# ------------------------------ Database configurations --------------------------------
+
+# Neo4j
+# TODO (Implement): Add Neo4j configuration parameters [DU 19.04.17]
+
+# MongoDB
+# TODO (Implement) Add MongoDB configuration parameters [DU 19.04.17]
 
 # ------------------------------- French configurations ---------------------------------
 
