@@ -28,13 +28,21 @@ from bwg.nlp.config_management import build_task_config_for_language
 
 
 # ---------------------------- Default tasks for french ---------------------------------
-# TODO (Refactor): Could this be simplified with a Meta-programming approach?
+# TODO (Refactor): Could this be simplified with a Meta-programming approach? [DU 18.04.17]
 
 class FrenchWikipediaReadingTask(WikipediaReadingTask):
     """
     A luigi task for reading a Wikipedia corpus, but sentences are split in a way that's appropriate for french.
     """
     def _additional_formatting(self, line):
+        """
+        Provide additional formatting for a line in French.
+
+        :param line: Line to be formatted.
+        :type line: str
+        :return: Formatted line.
+        :rtype: str
+        """
         french_sentence_tokenizer_path = self.task_config["SENTENCE_TOKENIZER_PATH"]
         download_nltk_resource_if_missing(french_sentence_tokenizer_path, "punkt")
 
@@ -190,7 +198,7 @@ class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
-    # TODO (FEATURE): Use remote scheduler for server deployment
+    # TODO (FEATURE): Use remote scheduler for server deployment [DU 18.04.17]
     french_task_config = build_task_config_for_language(
         tasks=[
             "wikipedia_reading",

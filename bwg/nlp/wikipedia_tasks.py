@@ -99,60 +99,96 @@ class WikipediaReadingTask(luigi.Task):
                         current_sentences.append(line)
 
     def _output_article(self, id_, url, title, sentences, output_file, **additional):
+        """
+        Write read article to file.
+        
+        :param id_: Article ID.
+        :type id_: int
+        :param url: URL of current article.
+        :type url: str
+        :param title: Title of current article.
+        :type title: str
+        :param sentences: Article sentences. 
+        :type sentences: list
+        :param output_file: Output file the article is written to.
+        :type output_file: _io.TextWrapper
+        :param additional: Additional parameters for serialization.
+        :type additional: dict
+        """
         article_json = serialize_article(
-            id_, url, title, sentences, state=additional["state"]
+            id_, url, title, sentences, **additional
         )
         output_file.write("{}\n".format(article_json))
 
     def _additional_formatting(self, line):
         """
         Provide additional formatting for a line possible subclasses by overwriting this function.
+        
+        :param line: Line to be formatted.
+        :type line: str
+        :return: Formatted line.
+        :rtype: str
         """
         return line
 
     @staticmethod
     def _reset_vars():
+        """
+        Reset temporary variables used while reading the input corpus.
+        
+        :return: Reset variables.
+        :rtype: tuple
+        """
         return "", "", "", []
 
     def _extract_article_info(self, line):
+        """
+        Extract important information from the opening article XML tag.
+        
+        :param line: Line with article information.
+        :type line: str
+        :return: Information about article.
+        :rtype: tuple
+        """
         article_tag_pattern = self.task_config["WIKIPEDIA_ARTICLE_TAG_PATTERN"]
         groups = re.match(article_tag_pattern, line).groups()
         return groups
 
 
 class RequestCache:
-        def __init__(self):
-            self.lock = threading.Lock()
-            self.cache = {}
-            self.requested = set()
+    """
+    Special class used as a Cache, so that requests being made don't have to be repeated if they occurred in the past.
+    """
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.cache = {}
+        self.requested = set()
 
-        def __contains__(self, item):
-            return item in self.requested
+    def __contains__(self, item):
+        return item in self.requested
 
-        def __delitem__(self, key):
-            del self.cache[key]
-            self.requested.remove(key)
+    def __delitem__(self, key):
+        del self.cache[key]
+        self.requested.remove(key)
 
-        def __getitem__(self, key):
-            return self.cache[key]
+    def __getitem__(self, key):
+        return self.cache[key]
 
-        def __setitem__(self, key, value):
-            self.cache[key] = value
-            self.requested.add(key)
+    def __setitem__(self, key, value):
+        self.cache[key] = value
+        self.requested.add(key)
 
-        def __enter__(self):
-            self.lock.acquire()
+    def __enter__(self):
+        self.lock.acquire()
 
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            self.lock.release()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.lock.release()
 
 
 class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):
     """
     Add attributes from Wikidata to Named Entities.
     """
-    default_ne_tag = "O"  # TODO (Refactor): Make this a config parameters?
-
     def requires(self):
         return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
 
@@ -161,14 +197,13 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         output_path = self.task_config["PC_OUTPUT_PATH"]
         return luigi.LocalTarget(output_path, format=text_format)
 
-    @time_function(is_classmethod=True, give_report=True)
+    @time_function(is_classmethod=True)
     def run(self):
         with self.input().open("r") as nes_input_file, self.output().open("w") as output_file:
             for nes_line in nes_input_file:
-                # TODO (Debug): Remove prettyprint
                 self.process_articles(
                     nes_line, new_state="added_properties",
-                    serializing_function=serialize_wikidata_entity, output_file=output_file, pretty=True
+                    serializing_function=serialize_wikidata_entity, output_file=output_file
                 )
 
     def task_workflow(self, article, **workflow_resources):
@@ -180,40 +215,47 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         #   (probably due to GIL and sharing resources between threads)
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
+        relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
+        default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
         request_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
-            nes = get_nes_from_sentence(sentence_json["data"], self.default_ne_tag, include_tag=True)
+            nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
 
             entity_number = 0
             for named_entity, ne_tag in nes:
-                entity_senses = self.get_entity_senses(named_entity, language=language_abbreviation)
+                entity_senses = self.get_matches(named_entity, language=language_abbreviation)
+                relevant_properties = relevant_properties_all.get(ne_tag, [])
 
+                # No matches - skip
                 if len(entity_senses) == 0:
                     continue
 
+                # Deal with ambiguous entities
                 elif len(entity_senses) > 1:
                     ambiguous_entities = []
 
-                    # Deal with ambiguous entities
                     for entity_sense in entity_senses:
                         entity_id = entity_sense["id"]
 
                         if entity_id in request_cache:
                             wikidata_entity = request_cache[entity_id]
                         else:
-                            wikidata_entity = self.get_entity(entity_id, ne_tag, language=language_abbreviation)
+                            wikidata_entity, request_cache = self._request_or_use_cache(
+                                entity_sense["id"], language_abbreviation, relevant_properties, request_cache
+                            )
                             request_cache[entity_id] = wikidata_entity
 
                         ambiguous_entities.append(wikidata_entity)
 
                     wikidata_entities.append(ambiguous_entities)
 
+                # One match - lucky!
                 else:
                     entity_sense = entity_senses[0]
-                    wikidata_entity = self.get_entity(
-                        entity_sense["id"], ne_tag, language=language_abbreviation
+                    wikidata_entity, request_cache = self._request_or_use_cache(
+                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache
                     )
 
                     wikidata_entities.append([wikidata_entity])
@@ -229,6 +271,22 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
             yield serializing_arguments
 
     def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, cache, caching=True):
+        """
+        Request a Wikidata entity. Make a lookup if this request has already been made if caching flag is set.
+        
+        :param entity_id: Wikidata entity ID.
+        :type entity_id: str
+        :param language_abbreviation: Abbreviation of target language.
+        :type language_abbreviation: str
+        :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
+        :param cache: Cache to store requests.
+        :type cache: RequestCache
+        :param caching: Flag to indicate whether caching should be used.
+        :type caching: bool
+        :return: The requested Wikidata entity as well as the enriched cache.
+        :rtype; tuple
+        """
         if caching:
             if entity_id in cache:
                 return cache[entity_id], cache

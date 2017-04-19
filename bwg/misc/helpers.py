@@ -6,15 +6,24 @@ Module for simple helper functions.
 # STD
 import codecs
 import functools
-import nltk
 import sys
 import time
 import types
+
+# EXT
+import nltk
 
 
 def filter_dict(dictionary, keep_fields):
     """
     Filter a dictionary's entries.
+    
+    :param dictionary: Dictionary that is going to be filtered.
+    :type dictionary: dict
+    :param keep_fields: Dictionary keys that aren't going to be filtered.
+    :type keep_fields: dict
+    :return: Filtered dictionary.
+    :rtype: dict
     """
     return {
         key: value
@@ -25,7 +34,16 @@ def filter_dict(dictionary, keep_fields):
 
 def construct_dict_from_source(fields, source):
     """
-    Construct a new dict from a source dict and catch all KeyErrors.
+    Construct a new dict from a source dict and catch all KeyErrors, using predefined functions to extract desired 
+    values from a source dictionary.
+    
+    :param fields: Dictionary with fields in the the target dict as keys and functions to extract their desired value .
+    for these fields from the source dict
+    :type fields: dict
+    :param source: Source dictionary.
+    :type source: dict
+    :return: Target dictionary.
+    :rtype: dict
     """
     new_dict = {}
 
@@ -41,6 +59,11 @@ def construct_dict_from_source(fields, source):
 def get_config_from_py_file(config_path):
     """
     Load a configuration from a .py file.
+    
+    :param config_path: Path to configuration file.
+    :type config_path: str
+    :return: Configuration parameters as a dictionary.
+    :rtype: dict
     """
     config = types.ModuleType('config')
     config.__file__ = config_path
@@ -60,9 +83,17 @@ def get_config_from_py_file(config_path):
 def flatten_dictlist(dictlist):
     """
     Turns a list of dictionaries into a single dictionary.
+    
+    :param dictlist: List of dictionaries.
+    :type dictlist: list
+    :return: Flattened dictionary.
+    :rtype: dict
 
-    Example:
-        [{"a": 1}, {"b": 2, "a": 3}, {"c": 4}] -> {"a": 3, "b": 2, "c": 4}
+    :Example:
+    
+    >>> dictlist = [{"a": 1}, {"b": 2, "a": 3}, {"c": 4}]
+    >>> flatten_dictlist(dictlist)
+    {"a": 3, "b": 2, "c": 4}
     """
     new_dict = {}
 
@@ -75,6 +106,11 @@ def flatten_dictlist(dictlist):
 def download_nltk_resource_if_missing(resource_path, resource):
     """
     Download a missing resource from the Natural Language Processing Toolkit.
+    
+    :param resource_path: Link / path for NLTK resource.
+    :type resource_path: str
+    :param resource: Identifier / name of resource (will be used to download the resource if its not found).
+    :type resource: str
     """
     try:
         nltk.data.find(resource_path)
@@ -84,7 +120,12 @@ def download_nltk_resource_if_missing(resource_path, resource):
 
 def is_collection(obj):
     """
-    Check if a object is iterable.
+    Check if an object is iterable collection.
+    
+    :param obj: Object that is to be checked.
+    :type obj: object
+    :return: Result of check.
+    :rtype: bool
     """
     return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
@@ -92,20 +133,44 @@ def is_collection(obj):
 def seconds_to_hms(seconds):
     """
     Convert seconds to hours, minutes and seconds.
+    
+    :param seconds: Number of seconds to be converted.
+    :type seconds: int, float
+    :return: Number of seconds as hours, minutes and remaining seconds.
+    :rtype: tuple
     """
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
     return h, m, s
 
 
-def time_function(out=sys.stdout, is_classmethod=False, return_time=False, give_report=False):
+def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
     """
     Time run time of a function and write to stdout or a log file. Also has some extra functions in case you want to
     apply it to a ArticleProcessingMixin.
+    
+    :param out: Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the 
+    output being appended to a file.
+    :type out: None, str, _io.TextIOWrapper
+    :param is_classmethod: Declare the function being decorated a class method.
+    :type is_classmethod: bool
+    :param return_time: Flag to indicate whether the function's runtime should be returned alongside the decorated 
+    function's return value in an dictionary.
+    :return: Decorator function.
+    :rtype: func
+    
+    :Example:
+    
+    >>> @time_function(return_time=True)
+    >>> def test_func():
+    >>>    return 3
+    
+    >>> test_func()
+    {"return": 3, "runtime": 3.0994415283203125e-06}
     """
     def time_decorator(func):
         """
-        Actual decorator
+        Actual decorator.
         """
         @functools.wraps(func)
         def func_wrapper(*args, **kwargs):

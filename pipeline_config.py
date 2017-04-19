@@ -4,65 +4,74 @@
 # ---------------------------------- Meta config ----------------------------------------
 # Finds out which parts of the config are necessary for a specific task
 CONFIG_DEPENDENCIES = {
+    # Obligatory config parameter
     "all": [
-        "PIPELINE_DEBUG",
-        "CORPUS_ENCODING",
-        "STANFORD_CORENLP_SERVER_ADDRESS",
-        "{language}_LANGUAGE_ABBREVIATION"
+        "PIPELINE_DEBUG",  # Debug mode for Pipeline, will produce more terminal output
+        "CORPUS_ENCODING",  # Encoding of corpus and interim .json files
+        "STANFORD_CORENLP_SERVER_ADDRESS",  # Address of Stanford CoreNLP server
+        "{language}_LANGUAGE_ABBREVIATION"  # Abbreviation of pipeline language, e.g. "en"
     ],
+    # Optional config parameter
     "optional": [
-        "ONLY_INCLUDE_RELEVANT_SENTENCES",
-        "ONLY_INCLUDE_RELEVANT_ARTICLES"
+        "ONLY_INCLUDE_RELEVANT_SENTENCES",  # Flag to only include relevant sentences in task results
+        "ONLY_INCLUDE_RELEVANT_ARTICLES"  # Flag to only include relevant articles in task results
     ],
+    # Exclude the following parameters from the target config
     "exclude": [
-        "DEPENDENCIES",
+        "CONFIG_DEPENDENCIES",
         "SUPPORTED_LANGUAGES"
         "{language}_LUIGI_DATA_PATH",
         "STANFORD_PATH"
     ],
+    # Necessary config parameters for Named Entity Recognition
     "named_entity_recognition": [
-        "{language}_STANFORD_MODELS_PATH",
-        "{language}_STANFORD_NER_MODEL_PATH",
-        "{language}_NES_OUTPUT_PATH",
-        "{language}_CORENLP_STANFORD_NER_MODEL_PATH",
+        "{language}_STANFORD_MODELS_PATH",  # Path to language-specific Stanford NLP model files
+        "{language}_STANFORD_NER_MODEL_PATH",  # Path to language-specific Stanford NER model file
+        "{language}_NES_OUTPUT_PATH",  # Path to output file of this task
+        "{language}_CORENLP_STANFORD_NER_MODEL_PATH"  # Path to language-specific CoreNLP Stanford NER model path
     ],
+    # Necessary config parameters for Part-of-Speech tagging
     "pos_tagging": [
-        "STANFORD_POSTAGGER_PATH",
-        "{language}_STANFORD_POS_MODEL_PATH",
-        "{language}_STANFORD_MODELS_PATH",
-        "{language}_POS_OUTPUT_PATH"
+        "STANFORD_POSTAGGER_PATH",  # Path to Stanford PoS tagger
+        "{language}_STANFORD_POS_MODEL_PATH",  # Path to language-specific Stanford PoS tagger model file
+        "{language}_STANFORD_MODELS_PATH",  # Path to language-specific Stanford model file
+        "{language}_POS_OUTPUT_PATH"  # Path to output file of this task
     ],
+    # Necessary config parameters for Dependency Parsing
     "dependency_parsing": [
-        "DEPENDENCY_TREE_KEEP_FIELDS",
-        "STANFORD_CORENLP_MODELS_PATH",
-        "{language}_STANFORD_DEPENDENCY_MODEL_PATH",
-        "{language}_DEPENDENCY_OUTPUT_PATH"
+        "DEPENDENCY_TREE_KEEP_FIELDS",  # Fields of dependency tree that are relevant to the task
+        "STANFORD_CORENLP_MODELS_PATH",  # Path to Stanford CoreNLP models file (jar)
+        "{language}_STANFORD_DEPENDENCY_MODEL_PATH",  # Path to language-specific Stanford model file
+        "{language}_DEPENDENCY_OUTPUT_PATH"  # Path to output file of this task
     ],
+    # Necessary config parameters for Open Relation Extraction
     "open_relation_extraction": [
-        "VERB_NODE_POS_TAGS",
-        "OMITTED_TOKENS_FOR_ALIGNMENT",
-        "NER_TAGSET",
-        "{language}_ORE_OUTPUT_PATH"
+        "VERB_NODE_POS_TAGS",  # PoS tags indicating verbs
+        "OMITTED_TOKENS_FOR_ALIGNMENT",  # Omitted tokens to align dependency parse with ne tagged sentence
+        "NER_TAGSET",  # Named entity tag set without the default tag
+        "{language}_ORE_OUTPUT_PATH"  # Path to output file of this task
     ],
+    # Necessary config parameters for reading a Wikipedia corpus file
     "wikipedia_reading": [
-        "{language}_SENTENCE_TOKENIZER_PATH",
-        "CORPUS_ENCODING",
-        "{language}_CORPUS_INPATH",
-        "{language}_WIKIPEDIA_ARTICLE_TAG_PATTERN",
-        "{language}_WIKIPEDIA_READING_OUTPUT_PATH"
+        "{language}_SENTENCE_TOKENIZER_PATH",  # Path to language-specific sentence tokenizer
+        "{language}_CORPUS_INPATH",  # Path to corpus file
+        "{language}_WIKIPEDIA_ARTICLE_TAG_PATTERN",  # Regex to recognize the beginning of a new article
+        "{language}_WIKIPEDIA_READING_OUTPUT_PATH"  # Path to output file of this task
     ],
+    # Necessary config parameters for Participation Extraction
     "participation_extraction": [
-        "{language}_PARTICIPATION_PHRASE",
-        "{language}_PE_OUTPUT_PATH"
+        "{language}_PARTICIPATION_PHRASE",  # Language-se
+        "{language}_PE_OUTPUT_PATH",  # Path to output file of this task
+        "DEFAULT_NE_TAG"  # Default tag for words that aren't named entities
     ],
+    # Necessary config parameters for merging relations from PE and ORE
     "relation_merging": [
-        "{language}_RELATION_MERGING_OUTPUT_PATH"
+        "{language}_RELATION_MERGING_OUTPUT_PATH"  # Path to output file of this task
     ],
+    # Necessary config parameters for Property Completion via Wikidata
     "properties_completion": [
-        "{language}_PC_OUTPUT_PATH",
-        "{language}_LANGUAGE_ABBREVIATION",
-        "{language}_FALLBACK_LANGUAGE_ABBREVIATION",
-        "{language}_RELEVANT_WIKIDATA_PROPERTIES"
+        "{language}_PC_OUTPUT_PATH",  # Path to output file of this task
+        "{language}_RELEVANT_WIKIDATA_PROPERTIES"  # Relevant Wikidata properties for different kind of named entities
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -75,6 +84,7 @@ DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
 STANFORD_PATH = "../../data/stanford/models/"
 VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
+DEFAULT_NE_TAG = "O"
 PIPELINE_DEBUG = True
 CORPUS_ENCODING = "utf-8"
 OMITTED_TOKENS_FOR_ALIGNMENT = []
@@ -107,7 +117,6 @@ FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 # Misc
 FRENCH_PARTICIPATION_PHRASE = "participé à"
 FRENCH_LANGUAGE_ABBREVIATION = "fr"
-FRENCH_FALLBACK_LANGUAGE_ABBREVIATION = "en"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
 FRENCH_WIKIPEDIA_REFERENCE_PATTERN = "[a-zA-Z-'áéíúóàèìùòâêîôûäëïöüçÇÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜ]+\d+((,\d+)+)?"

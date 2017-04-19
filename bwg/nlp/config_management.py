@@ -12,7 +12,7 @@ class MissingConfigParameterException(Exception):
     Exception that's being raised, when there are parameter missing in a configuration.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(args, kwargs)
 
 
 class UnsupportedLanguageException(Exception):
@@ -20,12 +20,23 @@ class UnsupportedLanguageException(Exception):
     Exception that's being raised, when a user starts the NLP pipeline for a language that's not supported yet.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(args, kwargs)
 
 
 def build_task_config_for_language(tasks, language, config_file_path, include_optionals=True):
     """
     Builds a configuration for a NLP pipeline for a specific language given a list of tasks the pipeline should include.
+    
+    :param tasks: List of tasks that are included in this pipeline.
+    :type tasks: list
+    :param language: Pipeline language.
+    :type language: str
+    :param config_file_path: Path to config file.
+    :type config_file_path: str
+    :param include_optionals: Flag to include optional config parameters (True by default).
+    :type include_optionals: bool
+    :return: Dictionary with configuration parameters.
+    :rtype: dict
     """
     raw_config = get_config_from_py_file(config_file_path)
     dependencies = raw_config["CONFIG_DEPENDENCIES"]
@@ -77,6 +88,13 @@ def build_task_config_for_language(tasks, language, config_file_path, include_op
 def format_config_parameter(config_parameter, language):
     """
     Format the name of config parameter, adding the target language of necessary.
+    
+    :param config_parameter: Name of config parameter.
+    :type config_parameter: str
+    :param language: Pipeline language.
+    :type language: str
+    :return: Formatted config parameter.
+    :rtype: str
     """
     if "{language}" in config_parameter:
         return config_parameter.format(language=language.upper())
@@ -87,6 +105,11 @@ def format_task_config_key(config_parameter):
     """
     Format the name of config parameter to be included as in the final task config, without any language references
     (because the names of parameters in Luigi tasks are language agnostic).
+    
+    :param config_parameter: Name of config parameter.
+    :type config_parameter: str
+    :return: Formatted config parameter.
+    :rtype: str
     """
     if "{language}" in config_parameter:
         return "_".join(config_parameter.split("_")[1:])
@@ -98,6 +121,19 @@ def _add_from_config_dependencies(target_config, raw_config, language, dependenc
     Add configuration parameters from a specific configuration dependency (list of configuration parameters that should
     be included in the final configuration, given a list of tasks for the NLP pipeline).
     Raise an exception if parameters are missing.
+    
+    :param target_config: Target configuration.
+    :type target_config: dict
+    :param raw_config: Raw configuration.
+    :type raw_config: dict
+    :param language: Pipeline language.
+    :type language: str
+    :param dependency_name: Name of current configuration dependency.
+    :type: dependency_name: str
+    :param dependencies: Dictionary of all task dependencies.
+    :type dependencies: dict
+    :return: Enriched configuration.
+    :rtype: dict
     """
     dependent_config_parameters = dependencies[dependency_name]
 
