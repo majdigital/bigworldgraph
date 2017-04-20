@@ -43,7 +43,7 @@ class AbstractWikidataMixin:
         pass
 
     @abc.abstractmethod
-    def get_entity(self, wikidata_id, language, relevant_properties):
+    def get_entity(self, wikidata_id, language, relevant_properties, properties_implying_relations):
         """
         Get Wikidata information about an entity based on its identifier.
         
@@ -53,6 +53,9 @@ class AbstractWikidataMixin:
         :type language: str
         :param relevant_properties: Types of claims that should be included.
         :type relevant_properties: list
+        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
+        imply other relations that should later be shown in the graph.
+        :type properties_implying_relations: list, set
         :return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
         :rtype: list
         """
@@ -96,7 +99,7 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         ]
 
     @retry_with_fallback(triggering_error=AssertionError, language="en")
-    def get_entity(self, wikidata_id, language, relevant_properties):
+    def get_entity(self, wikidata_id, language, relevant_properties, properties_implying_relations):
         """
         Get Wikidata information about an entity based on its identifier.
         
@@ -105,6 +108,10 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         :param language: Abbreviation of target language.
         :type language: str
         :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
+        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
+        imply other relations that should later be shown in the graph.
+        :type properties_implying_relations: list, set
         :return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
         :rtype: list
         """
@@ -188,7 +195,7 @@ class WikidataScraperMixin(AbstractWikidataMixin):
 
         return modification_time
 
-    def _get_claims(self, parsed_html, language, relevant_properties):
+    def _get_claims(self, parsed_html, language, relevant_properties, properties_implying_relations):
         """
         Extract the claims of this Wikipedia entry.
 
@@ -196,16 +203,32 @@ class WikidataScraperMixin(AbstractWikidataMixin):
         :type parsed_html: bs4.BeautifulSoup 
         :param language: Abbreviation of target language.
         :type language: str
-        :param relevant_properties:
+        :param relevant_properties: Types of claims that should be included.
+        :type relevant_properties: list
+        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
+        imply other relations that should later be shown in the graph.
+        :type properties_implying_relations: list, set
         """
         raw_claims = parsed_html.find_all("div", ["wikibase-statementgroupview"])
-        filtered_raw_claims = [raw_claim for raw_claim in raw_claims if raw_claim.attrs["id"] in relevant_properties]
+        filtered_raw_claims = [
+            (raw_claim, raw_claim.attrs["id"] in properties_implying_relations)
+            for raw_claim in raw_claims if raw_claim.attrs["id"] in relevant_properties
+        ]
 
         return {
-            property_: value
-            for property_, value in zip(
-                [self._get_claim_property(raw_claim, language=language) for raw_claim in filtered_raw_claims],
-                [self._get_claim_value(raw_claim, language=language) for raw_claim in filtered_raw_claims]
+            property_: {
+                "target": value,
+                "implies_relation": implies_relation
+            }
+            for property_, (value, implies_relation) in zip(
+                [
+                    self._get_claim_property(raw_claim, language=language)
+                    for raw_claim, implies_relation in filtered_raw_claims
+                ],
+                [
+                    (self._get_claim_value(raw_claim, language=language), implies_relation)
+                    for raw_claim, implies_relation in filtered_raw_claims
+                ]
             )
             if property_ is not None and value is not None
         }
@@ -322,7 +345,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         ]
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
-    def get_entity(self, wikidata_id, language, relevant_properties):
+    def get_entity(self, wikidata_id, language, relevant_properties, properties_implying_relations):
         """
         Get Wikidata information about an entity based on its identifier.
         
@@ -332,6 +355,9 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :type language: str
         :param relevant_properties: Types of claims that should be included.
         :type relevant_properties: list
+        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
+        imply other relations that should later be shown in the graph.
+        :type properties_implying_relations: list, set
         :return: Wikidata entity as dictionary
         :rtype: dict
         """
@@ -353,7 +379,9 @@ class WikidataAPIMixin(AbstractWikidataMixin):
                     "label": lambda source: source["labels"][language]["value"],
                     "modified": lambda source: source["modified"],
                     "claims": lambda source: self.resolve_claims(
-                        source["claims"], language=language, relevant_properties=relevant_properties
+                        source["claims"], language=language,
+                        relevant_properties=relevant_properties,
+                        properties_implying_relations=properties_implying_relations
                     )
                 },
                 entity
@@ -362,7 +390,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         ][0]
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
-    def resolve_claims(self, claims, language, relevant_properties):
+    def resolve_claims(self, claims, language, relevant_properties, properties_implying_relations):
         """
         Resolve the claims (~ claimed facts) about a wikidata entity. 
         
@@ -372,11 +400,16 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :type language: str
         :param relevant_properties: Types of claims that should be included.
         :type relevant_properties: list
+        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
+        imply other relations that should later be shown in the graph.
+        :type properties_implying_relations: list, set
         :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
         """
         return {
-            self.get_property_name(property_id, language=language):
-                self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
+            self.get_property_name(property_id, language=language): {
+                "target": self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language),
+                "implies_relation": property_id in properties_implying_relations
+            }
             for property_id, claim in claims.items()
             if property_id in relevant_properties
         }

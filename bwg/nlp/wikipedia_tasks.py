@@ -218,9 +218,6 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     """
     Add attributes from Wikidata to Named Entities.
     """
-    named_entities = 0
-    number_of_requests = 0
-
     def requires(self):
         return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
 
@@ -238,28 +235,17 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                     serializing_function=serialize_wikidata_entity, output_file=output_file
                 )
 
-        print("Number of named entities: {}".format(self.named_entities))
-        print("Number of requests: {}".format(self.number_of_requests))
-
     def task_workflow(self, article, **workflow_resources):
-        # TODO (Improve): Profile this code! [DU 20.04.17]
-        # TODO (Improve): Speed this up [DU 18.04.17]
-        # Not so easy: See branch parallelize_scraper for the most recent attempt:
-        #   - Accessing Wikidata via Scraper is much slower than via API
-        #   - Language support is very limited for the scraper
-        #   - Using multithreading only has minimal gains / is even slower so far
-        #   (probably due to GIL and sharing resources between threads)
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
+        properties_implying_relations = set(self.task_config["WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"])
         default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
         request_cache = RequestCache()
         match_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
-            # TODO (Improve): Add type of entity [DU 20.04.17]
-            # TODO (Improve): Add information whether property implies a relationship or is a mere charateristic [DU 20.04.17]
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
             self.named_entities += len(nes)
 
@@ -282,8 +268,10 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                         wikidata_entity = request_cache.request(
                             entity_sense["id"], self.get_entity,
                             entity_sense["id"], language=language_abbreviation,
-                            relevant_properties=relevant_properties
+                            relevant_properties=relevant_properties,
+                            properties_implying_relations=properties_implying_relations
                         )
+                        wikidata_entity["type"] = ne_tag
 
                         ambiguous_entities.append(wikidata_entity)
 
@@ -295,8 +283,10 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                     wikidata_entity = request_cache.request(
                         entity_sense["id"], self.get_entity,
                         entity_sense["id"], language=language_abbreviation,
-                        relevant_properties=relevant_properties
+                        relevant_properties=relevant_properties,
+                        properties_implying_relations=properties_implying_relations
                     )
+                    wikidata_entity["type"] = ne_tag
 
                     wikidata_entities.append([wikidata_entity])
 
@@ -309,6 +299,3 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
             }
 
             yield serializing_arguments
-
-        self.number_of_requests += request_cache.number_of_requests
-        self.number_of_requests += match_cache.number_of_requests

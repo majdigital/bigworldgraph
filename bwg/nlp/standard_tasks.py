@@ -456,7 +456,6 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
         default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
 
         for sentence_id, sentence_json in article_data.items():
-            # TODO (Improve): Distinguish participation phrase depending on NE tag [DU 20.04.17]
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, True)
             relations = self._build_participation_relations(nes, article_title, participation_phrases)
             sentence = self._get_sentence(sentence_json["data"])

@@ -71,7 +71,8 @@ CONFIG_DEPENDENCIES = {
     # Necessary config parameters for Property Completion via Wikidata
     "properties_completion": [
         "{language}_PC_OUTPUT_PATH",  # Path to output file of this task
-        "{language}_RELEVANT_WIKIDATA_PROPERTIES"  # Relevant Wikidata properties for different kind of named entities
+        "{language}_RELEVANT_WIKIDATA_PROPERTIES",  # Relevant Wikidata properties for different kind of named entities
+        "{language}_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"  # Create relations out of these Wikidata properties later
     ],
     # Necessary config parameters to generate general information about the current pipeline run
     "pipeline_run_info_generation": [
@@ -79,9 +80,9 @@ CONFIG_DEPENDENCIES = {
     ],
     "relations_database_writing_task": [
         "NEO4J_USER",
-        "NEO4J_PASSWORD"
+        "NEO4J_PASSWORD",
+        "NEO4J_NETAG2MODEL"
     ]
-    # TODO (Implement): Add database writing tasks [DU 19.04.17]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
 
@@ -106,9 +107,13 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # Neo4j
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "neo4jj"
-
-# MongoDB
-# TODO (Implement) Add MongoDB configuration parameters [DU 19.04.17]
+NEO4J_NETAG2MODEL = {
+    "I-PER": "Person",
+    "I-LOC": "Location",
+    "I-ORG": "Organization",
+    "DATE": "Date",
+    "I-MISC": "Miscellaneous"
+}
 
 # ------------------------------- French configurations ---------------------------------
 
@@ -167,3 +172,4 @@ FRENCH_RELEVANT_WIKIDATA_PROPERTIES = {
     ],
     "I-MISC": []
 }
+FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = ["P463", "P108", "P102", "P1416", "P17", "P335"]
