@@ -161,7 +161,8 @@ class RelationsDatabaseWritingTask(luigi.Task):
     pipeline_run_info = None
 
     def requires(self):
-        return RelationMergingTask(task_config=self.task_config), \
+        return RelationMergingTask(task_config=self.task_config),\
+               PropertiesCompletionTask(task_config=self.task_config),\
                PipelineRunInfoGenerationTask(task_config=self.task_config)
 
     def output(self):
@@ -171,8 +172,10 @@ class RelationsDatabaseWritingTask(luigi.Task):
 
     @time_function(is_classmethod=True)
     def run(self):
-        with self.input()[0].open("r") as mr_file, self.input()[1].open("r") as pri_file:
+        with self.input()[0].open("r") as mr_file, self.input()[1].open("r") as pc_file,\
+                self.input()[1].open("r") as pri_file:
             self._read_pipeline_run_info(pri_file)
+            self._read_properties(pc_file)
             with self.output() as database:
                 for mr_line in mr_file:
                     self.process_article(mr_line, database)
@@ -193,6 +196,45 @@ class RelationsDatabaseWritingTask(luigi.Task):
 
             for relation_id, relation_json in sentence_json["data"]["relations"].items():
                 database.add_relation(relation_json, sentence_json["data"]["sentence"])
+
+    def _read_properties(self, properties_file):
+        encoding = self.task_config["CORPUS_ENCODING"]
+        entity_properties = {}
+
+        for line in properties_file:
+            article = deserialize_line(line, encoding)
+            article_meta, article_data = article["meta"], article["data"]
+
+            for sentence_id, sentence_json in article_data.items():
+                sentence_meta, sentence_data = sentence_json["meta"], sentence_json["data"]
+
+                for entity_id, entity_json in sentence_data["entities"].items():
+                    entity_meta, entity_data = entity_json["meta"], entity_json["data"]
+
+                    if entity_meta["type"] == "Ambiguous Wikidata entity":
+                        pass
+
+                    else:
+                        entity_info = dict(entity_data)
+                        del entity_info["label"]
+                        entity_info = self._rename_field("modified", "wikidata_last_modified", entity_info)
+                        entity_info = self._rename_field("id", "wikidata_id, entity_info", entity_info)
+                        del entity_info["aliases"]
+
+                    entity_properties[entity_data["label"]] = entity_info
+
+                    if "aliases" in entity_data:
+                        for alias in entity_data["aliases"]:
+                            entity_properties[alias] = entity_info
+
+        print(entity_properties)
+
+    def _rename_field(self, field, new_name, dictionary):
+        dictionary[new_name] = dictionary[field]
+        del dictionary[field]
+        return dictionary
+
+
 
     def _read_pipeline_run_info(self, pri_file):
         encoding = self.task_config["CORPUS_ENCODING"]

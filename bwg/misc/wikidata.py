@@ -332,8 +332,8 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :type language: str
         :param relevant_properties: Types of claims that should be included.
         :type relevant_properties: list
-        :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
-        :rtype: list
+        :return: Wikidata entity as dictionary
+        :rtype: dict
         """
         additional_request_parameters = {
             "ids": wikidata_id

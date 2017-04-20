@@ -65,7 +65,8 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     but it's specifically for the french Wikipedia.
     """
     def requires(self):
-        return FrenchServerRelationMergingTask(task_config=self.task_config), \
+        return FrenchServerRelationMergingTask(task_config=self.task_config),\
+               FrenchServerPropertiesCompletionTask(task_config=self.task_config),\
                FrenchPipelineRunInfoGenerationTask(task_config=self.task_config)
 
 
