@@ -242,7 +242,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         print("Number of requests: {}".format(self.number_of_requests))
 
     def task_workflow(self, article, **workflow_resources):
-        # TODO (Improve): Speed this up [Comment DU 18.04.17]
+        # TODO (Improve): Profile this code! [DU 20.04.17]
+        # TODO (Improve): Speed this up [DU 18.04.17]
         # Not so easy: See branch parallelize_scraper for the most recent attempt:
         #   - Accessing Wikidata via Scraper is much slower than via API
         #   - Language support is very limited for the scraper
@@ -257,6 +258,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
+            # TODO (Improve): Add type of entity [DU 20.04.17]
+            # TODO (Improve): Add information whether property implies a relationship or is a mere charateristic [DU 20.04.17]
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
             self.named_entities += len(nes)
 

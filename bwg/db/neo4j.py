@@ -92,7 +92,7 @@ class Neo4jTarget(luigi.Target):
         except:
             pass
 
-    def add_relation(self, relation_json, sentence):
+    def add_relation(self, relation_json, sentence, entity_properties):
         """
         Add a new relation to the graph database.
         
@@ -100,14 +100,16 @@ class Neo4jTarget(luigi.Target):
         :type relation_json: dict
         :param sentence: Sentence the current relation occurs in.
         :type sentence: str
+        :param entity_properties: Wikidata properties as dictionary with the entity's name as key and the properties as 
+        value.
+        :type entity_properties: dict
         """
-        # TODO (Bug): Check if relations are already in database and retrieve them if so [DU 19.04.17]
-        # TODO (Improve): Add Wikidata properties to entites [DU 19.04.17]
+        # TODO (Improve): Add Wikidata claims if they are relations [DU 20.04.17]
         relation_meta, relation_data = relation_json["meta"], relation_json["data"]
         subj_phrase, verb, obj_phrase = relation_data["subject_phrase"], relation_data["verb"], relation_data["object_phrase"]
-        subj_entity = self._get_or_create_node(label=subj_phrase, data={"phrase": subj_phrase})
-        obj_entity = self._get_or_create_node(label=obj_phrase, data={"phrase": obj_phrase})
-        relation = self._get_or_create_connection(
+        subj_entity = self._get_or_create_node(label=subj_phrase, data=entity_properties.get(subj_phrase, {}))
+        obj_entity = self._get_or_create_node(label=obj_phrase, data=entity_properties.get(obj_phrase, {}))
+        self._get_or_create_connection(
             subj_entity,
             obj_entity,
             label=verb,

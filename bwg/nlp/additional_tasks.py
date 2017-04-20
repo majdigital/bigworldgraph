@@ -157,6 +157,7 @@ class RelationsDatabaseWritingTask(luigi.Task):
     """
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.
     """
+    # TODO (Documentation): Add missing Docstrings [DU 20.04.17]
     task_config = luigi.DictParameter()
     pipeline_run_info = None
 
@@ -175,13 +176,13 @@ class RelationsDatabaseWritingTask(luigi.Task):
         with self.input()[0].open("r") as mr_file, self.input()[1].open("r") as pc_file,\
                 self.input()[1].open("r") as pri_file:
             self._read_pipeline_run_info(pri_file)
-            self._read_properties(pc_file)
+            entity_properties = self._read_properties_file(pc_file)
             with self.output() as database:
                 for mr_line in mr_file:
-                    self.process_article(mr_line, database)
+                    self.process_article(mr_line, database, entity_properties)
 
     @time_function(is_classmethod=True)
-    def process_article(self, raw_article, database):
+    def process_article(self, raw_article, database, entity_properties):
         debug = self.task_config.get("PIPELINE_DEBUG", False)
         encoding = self.task_config["CORPUS_ENCODING"]
         article = deserialize_line(raw_article, encoding)
@@ -195,9 +196,9 @@ class RelationsDatabaseWritingTask(luigi.Task):
                 print("{} finished sentence #{}.".format(self.__class__.__name__, sentence_id))
 
             for relation_id, relation_json in sentence_json["data"]["relations"].items():
-                database.add_relation(relation_json, sentence_json["data"]["sentence"])
+                database.add_relation(relation_json, sentence_json["data"]["sentence"], entity_properties)
 
-    def _read_properties(self, properties_file):
+    def _read_properties_file(self, properties_file):
         encoding = self.task_config["CORPUS_ENCODING"]
         entity_properties = {}
 
@@ -205,36 +206,65 @@ class RelationsDatabaseWritingTask(luigi.Task):
             article = deserialize_line(line, encoding)
             article_meta, article_data = article["meta"], article["data"]
 
-            for sentence_id, sentence_json in article_data.items():
-                sentence_meta, sentence_data = sentence_json["meta"], sentence_json["data"]
+            entity_properties.update(self._extract_properties(article_data))
 
-                for entity_id, entity_json in sentence_data["entities"].items():
-                    entity_meta, entity_data = entity_json["meta"], entity_json["data"]
+        return entity_properties
 
-                    if entity_meta["type"] == "Ambiguous Wikidata entity":
-                        pass
+    def _extract_properties(self, article_data):
+        entity_properties = {}
 
-                    else:
-                        entity_info = dict(entity_data)
-                        del entity_info["label"]
-                        entity_info = self._rename_field("modified", "wikidata_last_modified", entity_info)
-                        entity_info = self._rename_field("id", "wikidata_id, entity_info", entity_info)
-                        del entity_info["aliases"]
+        for sentence_id, sentence_json in article_data.items():
+            sentence_meta, sentence_data = sentence_json["meta"], sentence_json["data"]
 
-                    entity_properties[entity_data["label"]] = entity_info
+            for entity_id, entity_json in sentence_data["entities"].items():
+                entity_meta, entity_data = entity_json["meta"], entity_json["data"]
 
-                    if "aliases" in entity_data:
-                        for alias in entity_data["aliases"]:
-                            entity_properties[alias] = entity_info
+                if entity_meta["type"] == "Ambiguous Wikidata entity":
+                    new_entity_data = {
+                        "ambiguous": True,
+                        "senses": [self._convert_entity_sense(entity_sense) for entity_sense in entity_data]
+                    }
 
-        print(entity_properties)
+                    for entity_sense in new_entity_data["senses"]:
+                        entity_properties = self._add_entity_data_to_properties_dict(entity_sense, entity_properties)
 
-    def _rename_field(self, field, new_name, dictionary):
+                else:
+                    new_entity_data = self._convert_entity_sense(entity_data[0])
+                    new_entity_data["ambiguous"] = False
+
+                    entity_properties = self._add_entity_data_to_properties_dict(new_entity_data, entity_properties)
+
+        return entity_properties
+
+    @staticmethod
+    def _add_entity_data_to_properties_dict(entity_data, entity_properties):
+        if "label" not in entity_data:
+            return entity_properties
+
+        entity_properties[entity_data["label"]] = entity_data
+
+        if "aliases" in entity_data:
+            for alias in entity_data["aliases"]:
+                alias_entity_data = dict(entity_data)
+                alias_entity_data["label"] = alias
+                alias_entity_data["aliases"].remove(alias)
+                alias_entity_data["aliases"].append(entity_data["label"])
+                entity_properties[alias] = alias_entity_data
+
+        return entity_properties
+
+    def _convert_entity_sense(self, entity_data):
+        new_entity_data = dict(entity_data)
+        new_entity_data = self._rename_field("modified", "wikidata_last_modified", new_entity_data)
+        new_entity_data = self._rename_field("id", "wikidata_id", new_entity_data)
+
+        return new_entity_data
+
+    @staticmethod
+    def _rename_field(field, new_name, dictionary):
         dictionary[new_name] = dictionary[field]
         del dictionary[field]
         return dictionary
-
-
 
     def _read_pipeline_run_info(self, pri_file):
         encoding = self.task_config["CORPUS_ENCODING"]
