@@ -7,6 +7,8 @@ Create support for the Neo4j graph database.
 import luigi
 import neomodel
 
+# Test commit
+
 
 class Relation(neomodel.StructuredRel):
     """
