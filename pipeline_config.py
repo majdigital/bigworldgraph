@@ -60,7 +60,7 @@ CONFIG_DEPENDENCIES = {
     ],
     # Necessary config parameters for Participation Extraction
     "participation_extraction": [
-        "{language}_PARTICIPATION_PHRASE",  # Language-se
+        "{language}_PARTICIPATION_PHRASES",  # Language-specific phrases to indicate involvement in an article
         "{language}_PE_OUTPUT_PATH",  # Path to output file of this task
         "DEFAULT_NE_TAG"  # Default tag for words that aren't named entities
     ],
@@ -76,6 +76,10 @@ CONFIG_DEPENDENCIES = {
     # Necessary config parameters to generate general information about the current pipeline run
     "pipeline_run_info_generation": [
         "{language}_PIPELINE_RUN_INFO_OUTPUT_PATH"  # Path to output file of this task
+    ],
+    "relations_database_writing_task": [
+        "NEO4J_USER",
+        "NEO4J_PASSWORD"
     ]
     # TODO (Implement): Add database writing tasks [DU 19.04.17]
 }
@@ -100,7 +104,8 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # ------------------------------ Database configurations --------------------------------
 
 # Neo4j
-# TODO (Implement): Add Neo4j configuration parameters [DU 19.04.17]
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "neo4jj"
 
 # MongoDB
 # TODO (Implement) Add MongoDB configuration parameters [DU 19.04.17]
@@ -129,7 +134,14 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
-FRENCH_PARTICIPATION_PHRASE = "participé à"
+FRENCH_PARTICIPATION_PHRASES = {
+    "I-PER": "participé à",
+    "I-LOC": "est la scène de",
+    "I-ORG": "est impliqué dans",
+    "I-MISC": "est lié à",
+    "DATE": "était au moment de",
+    "DEFAULT": "participé à"
+}
 FRENCH_LANGUAGE_ABBREVIATION = "fr"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'

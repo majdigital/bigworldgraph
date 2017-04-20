@@ -16,7 +16,7 @@ from bwg.nlp.standard_tasks import (
     PoSTaggingTask,
     ParticipationExtractionTask
 )
-from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask
+from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
 from bwg.nlp.corenlp_server_tasks import (
     ServerNERTask,
     ServerDependencyParseTask,
@@ -57,6 +57,16 @@ class FrenchPipelineRunInfoGenerationTask(PipelineRunInfoGenerationTask):
     """
     def requires(self):
         return FrenchWikipediaReadingTask(task_config=self.task_config)
+
+
+class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
+    """
+    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
+    but it's specifically for the french Wikipedia.
+    """
+    def requires(self):
+        return FrenchServerRelationMergingTask(task_config=self.task_config), \
+               FrenchPipelineRunInfoGenerationTask(task_config=self.task_config)
 
 
 class FrenchNERTask(NERTask):
@@ -217,12 +227,13 @@ if __name__ == "__main__":
             "participation_extraction",
             "relation_merging",
             "properties_completion",
-            "pipeline_run_info_generation"
+            "pipeline_run_info_generation",
+            "relations_database_writing_task"
         ],
         language="french",
         config_file_path="../../pipeline_config.py"
     )
     luigi.build(
-        [FrenchPipelineRunInfoGenerationTask(task_config=french_task_config)],
+        [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
     )

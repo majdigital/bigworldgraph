@@ -17,7 +17,6 @@ from bwg.nlp.standard_tasks import NaiveOpenRelationExtractionTask, Participatio
 from bwg.misc.helpers import time_function
 from bwg.nlp.utilities import serialize_relation, deserialize_line, just_dump
 from bwg.nlp.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
-from bwg.db.mongo import MongoDBTarget
 from bwg.db.neo4j import Neo4jTarget
 
 
@@ -41,7 +40,7 @@ class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
             for pe_line, ore_line in zip(pe_file, ore_file):
                 self.process_articles(
                     (pe_line, ore_line), new_state="merged_relations", serializing_function=serialize_relation,
-                    output_file=output_file, pretty=True
+                    output_file=output_file
                 )
 
     def task_workflow(self, article, **workflow_resources):
@@ -154,39 +153,50 @@ class PipelineRunInfoGenerationTask(luigi.Task):
         return datetime.datetime.fromtimestamp(now).strftime('%Y.%m.%d %H:%M:%S')
 
 
-class DatabaseWritingTask(luigi.Task, ArticleProcessingMixin):
-    """
-    Writes information extracted from text by means of the NLP pipeline into a database.
-    """
-    # TODO (Implement)
-    pass
-
-
-class RelationsDatabaseWritingTask(DatabaseWritingTask):
+class RelationsDatabaseWritingTask(luigi.Task):
     """
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.
     """
-    # TODO (Implement) [DU 19.04.17]
+    task_config = luigi.DictParameter()
+    pipeline_run_info = None
+
     def requires(self):
-        RelationMergingTask(task_config=self.task_config)
+        return RelationMergingTask(task_config=self.task_config), \
+               PipelineRunInfoGenerationTask(task_config=self.task_config)
 
     def output(self):
-        uri = self.task_config["NEO4J_URI"]
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
-        schemata = self.task_config["NEO$J_SCHEMATA"]
-        return Neo4jTarget(uri, user, password, schemata)
+        return Neo4jTarget(self.pipeline_run_info, user, password)
 
+    @time_function(is_classmethod=True)
+    def run(self):
+        with self.input()[0].open("r") as mr_file, self.input()[1].open("r") as pri_file:
+            self._read_pipeline_run_info(pri_file)
+            with self.output() as database:
+                for mr_line in mr_file:
+                    self.process_article(mr_line, database)
 
-class PropertiesDatabaseWritingTask(DatabaseWritingTask):
-    """
-    Writes properties of entities extracted from Wikidata into a database.
-    """
-    # TODO (Implement) [DU 19.04.17]
-    def requires(self):
-        PropertiesCompletionTask(task_config=self.task_config)
+    @time_function(is_classmethod=True)
+    def process_article(self, raw_article, database):
+        debug = self.task_config.get("PIPELINE_DEBUG", False)
+        encoding = self.task_config["CORPUS_ENCODING"]
+        article = deserialize_line(raw_article, encoding)
+        article_meta, article_data = article["meta"], article["data"]
 
-    def output(self):
-        # TODO (Implement): Add necessary config parameters [DU 19.04.17]
-        pass
-        #return MongoDBTarget(task_config=self.task_config)
+        if debug:
+            print("{} processing article '{}'...".format(self.__class__.__name__, article["meta"]["title"]))
+
+        for sentence_id, sentence_json in article_data.items():
+            if debug:
+                print("{} finished sentence #{}.".format(self.__class__.__name__, sentence_id))
+
+            for relation_id, relation_json in sentence_json["data"]["relations"].items():
+                database.add_relation(relation_json, sentence_json["data"]["sentence"])
+
+    def _read_pipeline_run_info(self, pri_file):
+        encoding = self.task_config["CORPUS_ENCODING"]
+
+        for line in pri_file:
+            self.pipeline_run_info = deserialize_line(line, encoding)
+            break

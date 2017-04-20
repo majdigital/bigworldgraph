@@ -25,6 +25,8 @@ from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 
+# TODO (Documentation): Missing some docstring parameter descriptions in this module [DU 17.04.17]
+
 class NERTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
@@ -450,12 +452,13 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def task_workflow(self, article, **workflow_resources):
         article_meta, article_data = article["meta"], article["data"]
         article_title = article_meta["title"]
-        participation_phrase = self.task_config["PARTICIPATION_PHRASE"]
+        participation_phrases = self.task_config["PARTICIPATION_PHRASES"]
         default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
 
         for sentence_id, sentence_json in article_data.items():
-            nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag)
-            relations = self._build_participation_relations(nes, article_title, participation_phrase)
+            # TODO (Improve): Distinguish participation phrase depending on NE tag [DU 20.04.17]
+            nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, True)
+            relations = self._build_participation_relations(nes, article_title, participation_phrases)
             sentence = self._get_sentence(sentence_json["data"])
 
             serializing_arguments = {
@@ -468,9 +471,9 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
             yield serializing_arguments
 
     @staticmethod
-    def _build_participation_relations(nes, title, participation_phrase):
+    def _build_participation_relations(nes, title, participation_phrases):
         return [
-            (ne, participation_phrase, title) for ne in nes
+            (ne, participation_phrases.get(tag, participation_phrases["DEFAULT"]), title) for ne, tag in nes
         ]
 
     @staticmethod
