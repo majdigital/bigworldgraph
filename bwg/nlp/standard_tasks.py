@@ -25,8 +25,6 @@ from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 
-# TODO (Documentation): Missing some docstring parameter descriptions in this module [DU 17.04.17]
-
 class NERTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that performs Named Entity Recognition on a corpus.
@@ -80,6 +78,13 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
     def _ner_tag(self, sentence_data, **workflow_resources):
         """
         Tag a single sentence with named entities.
+
+        :param sentence_data: Data of the sentence that is going to be named entity tagged.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
         tokenizer = workflow_resources["tokenizer"]
         ner_tagger = workflow_resources["ner_tagger"]
@@ -144,6 +149,13 @@ class DependencyParseTask(luigi.Task, ArticleProcessingMixin):
     def _dependency_parse(self, sentence_data, **workflow_resources):
         """
         Dependency parse a sentence.
+
+        :param sentence_data: Data of the sentence that is going to be dependency parsed.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
         dependency_parser = workflow_resources["dependency_parser"]
 
@@ -209,6 +221,15 @@ class PoSTaggingTask(luigi.Task, ArticleProcessingMixin):
     def _pos_tag(self, sentence_data, **workflow_resources):
         """
         Tag a single sentence with Part-of-Speech tags.
+
+        Tag a single sentence with Part-of-Speech tags using a Stanford CoreNLP server.
+
+        :param sentence_data: Data of the sentence that is going to be pos tagged.
+        :type sentence_data: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: Processed sentence.
+        :rtype: dict
         """
         tokenizer = workflow_resources["tokenizer"]
         pos_tagger = workflow_resources["pos_tagger"]
@@ -260,6 +281,16 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             yield serializing_arguments
 
     def _extract_relations_from_sentence(self, sentence_dates, **workflow_resources):
+        """
+        Extract all relation from a sentence.
+
+        :param sentence_dates: Sentence's NE, PoS and dependency data.
+        :type sentence_dates: dict
+        :param workflow_resources: Additional resources for this step.
+        :type workflow_resources: dict
+        :return: All relationships and the raw sentence.
+        :rtype: tuple
+        """
         enriched_sentences = [sentence_date["data"] for sentence_date in sentence_dates.values()]
         relations = self.extract_relations(*enriched_sentences)
         sentence = self._get_sentence(enriched_sentences[0])
@@ -270,12 +301,22 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _get_sentence(ne_tagged_line):
         """
         Get the original (not de-tokenized) sentence from a line tagged with NE tags.
+
+        :param ne_tagged_line: Sentence with Named Entity tags.
+        :type ne_tagged_line: str
+        :return: Raw sentence.
+        :rtype: str
         """
         return " ".join([word for word, tag in ne_tagged_line])
 
     def _align_tagged_sentence(self, ne_tagged_sentence):
         """
         Align a NE tagged sentence with a dependency parse by omitting pre-defined punctuation marks.
+
+        :param ne_tagged_sentence: Sentence with Named Entity tags to be aligned.
+        :type ne_tagged_sentence: list
+        :return: Aligned sentence.
+        :rtype: list
         """
         omitted_tokens = self.task_config["OMITTED_TOKENS_FOR_ALIGNMENT"]
 
@@ -291,6 +332,11 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         Normalize the node addresses in a dependency tree.
         Because of the parsing, they will often contain gaps in their numbering, which makes it harder to align them
         with the words of a NE tagged sentence.
+
+        :param dependency_tree: Dependency tree to be normalized.
+        :type dependency_tree: dict
+        :return: Normalized tree.
+        :rtype: dict
         """
         # Delete graph's root node without word
         if "0" in dependency_tree["nodes"]:
@@ -326,6 +372,13 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _extract_verb_nodes(self, dependency_tree, pos_tagged_line):
         """
         Extract those moderating (verb) nodes with a direct subject (nsubj) and object (dobj).
+
+        :param dependency_tree: Dependency parse tree.
+        :type dependency_tree: dict
+        :param pos_tagged_line: Same sentence as dependency parse tree but with PoS tags.
+        :type pos_tagged_line: list
+        :return: List of all verb nodes in this dependency parse tree.
+        :rtype: list
         """
         verb_node_pos_tags = self.task_config["VERB_NODE_POS_TAGS"]
         verb_nodes = []
@@ -344,6 +397,16 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         """
         Expand a node from a dependency graph s.t. it includes the address and the word of all nodes that are dependent
         from it.
+
+        :param node: Node to be expanded.
+        :type node: dict
+        :param dependency_tree: Dependency parse tree.
+        :type dependency_tree: dict
+        :param is_verb_node: Flag to indicate whether the current node is a verb node (the node shouldn't be expanded
+        to its subject and object):
+        :type is_verb_node: bool
+        :return: Expanded node.
+        :rtype: dict
         """
         expanded_node = [(node["address"], node["word"])]
 
@@ -363,6 +426,13 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _word_is_ne_tagged(self, word_index, ne_tagged_line):
         """
         Check if a word is Named Entity tagged.
+
+        :param word_index: Index of word in current sentence.
+        :type word_index: int
+        :param ne_tagged_line: Current NE tagged sentence.
+        :type ne_tagged_line: list
+        :return: Result of check.
+        :rtype: bool
         """
         word, ne_tag = ne_tagged_line[word_index]
         return ne_tag in self.task_config["NER_TAGSET"]
@@ -370,6 +440,11 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _expanded_node_is_ne_tagged(self, expanded_node, ne_tagged_line):
         """
         Check if a word within an expanded node was assigned a Named Entity tag.
+
+        :param expanded_node: Expanded node to be checked.
+        :type expanded_node: dict
+        :param ne_tagged_line: Current NE tagged sentence.
+        :type ne_tagged_line: list
         """
         return any(
             [
@@ -382,6 +457,11 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _join_expanded_node(expanded_node):
         """
         Join all the words from an extended word into a phrase.
+
+        :param expanded_node: Expanded node to be joined.
+        :type expanded_node: dict
+        :return: Joined node.
+        :rtype: str
         """
         sorted_expanded_node = sorted(expanded_node, key=lambda x: x[0])
         return " ".join([word for address, word in sorted_expanded_node])
@@ -390,6 +470,13 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def _get_subj_and_obj(verb_node, dependency_tree):
         """
         Get the adjacent subject and object node from a verb node.
+
+        :param verb_node: Verb node subject and object should be found for.
+        :type verb_node: dict
+        :param dependency_tree: Dependency parse tree.
+        :type dependency_tree: dict
+        :return: Subject and object node.
+        :rtype: tuple
         """
         subj_node_index = verb_node["deps"]["nsubj"][0]
         subj_node = dependency_tree["nodes"][subj_node_index]
@@ -401,6 +488,15 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
     def extract_relations(self, ne_tagged_line, dependency_tree, pos_tagged_line):
         """
         Extract relations involving Named Entities from a sentence, using a dependency graph and named entity tags.
+
+        :param ne_tagged_line: Current NE tagged sentence.
+        :type ne_tagged_line: list
+        :param dependency_tree: Dependency parse tree.
+        :type dependency_tree: dict
+        :param pos_tagged_line: Same sentence as dependency parse tree but with PoS tags.
+        :type pos_tagged_line: list
+        :return: List of extracted relations.
+        :rtype: list
         """
         # Normalize resources
         aligned_ne_tagged_line = self._align_tagged_sentence(ne_tagged_line)
@@ -431,7 +527,6 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
     """
     Luigi task that extracts all Named Entity participating in an issue or topic.
     """
-
     def requires(self):
         return NERTask(task_config=self.task_config)
 
@@ -471,10 +566,31 @@ class ParticipationExtractionTask(luigi.Task, ArticleProcessingMixin):
 
     @staticmethod
     def _build_participation_relations(nes, title, participation_phrases):
+        """
+        Build participation relations based on the Named entities in a sentence, the current articles titles and a
+        dictionary of specific phrases for each Named entity tag.
+
+        :param nes: List of named entities in the current sentence.
+        :type nes: list
+        :param title: Title of current article.
+        :type title: str
+        :param participation_phrases: Dictionary of participation phrases for different Named Entity tags.
+        :type participation_phrases: dict
+        :return: List of participation relations.
+        :rtype: list
+        """
         return [
             (ne, participation_phrases.get(tag, participation_phrases["DEFAULT"]), title) for ne, tag in nes
         ]
 
     @staticmethod
     def _get_sentence(sentence_data):
+        """
+        Get the original (not de-tokenized) sentence from a line tagged with NE tags.
+
+        :param sentence_data: Sentence with Named Entity tags.
+        :type sentence_data: list
+        :return: Raw sentence.
+        :rtype: str
+        """
         return " ".join([word for word, ne_tag in sentence_data])

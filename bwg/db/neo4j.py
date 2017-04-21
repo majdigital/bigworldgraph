@@ -74,6 +74,9 @@ class PipelineRunInfo(neomodel.StructuredNode):
     article_ids = neomodel.ArrayProperty()
 
 
+# TODO (Refactor): Add database functions to its own wrapper class, from which the target inherits [DU 21.04.17]
+
+
 class Neo4jTarget(luigi.Target):
     """
     Additional luigi target to write a tasks output into a neo4j graph database.
