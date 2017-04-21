@@ -26,3 +26,5 @@ Commenting two lines (219) in nltk/parse/stanford.py when using utf-8 corpus, ot
 Only 1 Worker on MacOS with Python > 3.4
 
 user-config.py for pywikibot
+
+Neo4j installation

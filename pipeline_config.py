@@ -60,7 +60,7 @@ CONFIG_DEPENDENCIES = {
     ],
     # Necessary config parameters for Participation Extraction
     "participation_extraction": [
-        "{language}_PARTICIPATION_PHRASE",  # Language-se
+        "{language}_PARTICIPATION_PHRASES",  # Language-specific phrases to indicate involvement in an article
         "{language}_PE_OUTPUT_PATH",  # Path to output file of this task
         "DEFAULT_NE_TAG"  # Default tag for words that aren't named entities
     ],
@@ -71,7 +71,17 @@ CONFIG_DEPENDENCIES = {
     # Necessary config parameters for Property Completion via Wikidata
     "properties_completion": [
         "{language}_PC_OUTPUT_PATH",  # Path to output file of this task
-        "{language}_RELEVANT_WIKIDATA_PROPERTIES"  # Relevant Wikidata properties for different kind of named entities
+        "{language}_RELEVANT_WIKIDATA_PROPERTIES",  # Relevant Wikidata properties for different kind of named entities
+        "{language}_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"  # Create relations out of these Wikidata properties later
+    ],
+    # Necessary config parameters to generate general information about the current pipeline run
+    "pipeline_run_info_generation": [
+        "{language}_PIPELINE_RUN_INFO_OUTPUT_PATH"  # Path to output file of this task
+    ],
+    "relations_database_writing_task": [
+        "NEO4J_USER",
+        "NEO4J_PASSWORD",
+        "NEO4J_NETAG2MODEL"
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -92,6 +102,19 @@ OMITTED_TOKENS_FOR_ALIGNMENT = []
 ONLY_INCLUDE_RELEVANT_SENTENCES = True
 ONLY_INCLUDE_RELEVANT_ARTICLES = True
 
+# ------------------------------ Database configurations --------------------------------
+
+# Neo4j
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "neo4jj"
+NEO4J_NETAG2MODEL = {
+    "I-PER": "Person",
+    "I-LOC": "Location",
+    "I-ORG": "Organization",
+    "DATE": "Date",
+    "I-MISC": "Miscellaneous"
+}
+
 # ------------------------------- French configurations ---------------------------------
 
 # Paths for Luigi task outputs
@@ -105,6 +128,7 @@ FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.jso
 FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.json"
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
+FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
 FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_french_sample2.xml"
 
 # Paths for french Stanford models
@@ -115,7 +139,14 @@ FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
 FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
 
 # Misc
-FRENCH_PARTICIPATION_PHRASE = "participé à"
+FRENCH_PARTICIPATION_PHRASES = {
+    "I-PER": "participé à",
+    "I-LOC": "est la scène de",
+    "I-ORG": "est impliqué dans",
+    "I-MISC": "est lié à",
+    "DATE": "était au moment de",
+    "DEFAULT": "participé à"
+}
 FRENCH_LANGUAGE_ABBREVIATION = "fr"
 FRENCH_SENTENCE_TOKENIZER_PATH = "tokenizers/punkt/PY3/french.pickle"
 FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
@@ -141,3 +172,4 @@ FRENCH_RELEVANT_WIKIDATA_PROPERTIES = {
     ],
     "I-MISC": []
 }
+FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = ["P463", "P108", "P102", "P1416", "P17", "P335"]

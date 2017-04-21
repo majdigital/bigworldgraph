@@ -3,3 +3,4 @@ luigi
 pycorenlp
 pywikibot
 bs4
+neomodel

@@ -35,8 +35,6 @@ class ServerNERTask(CoreNLPServerMixin, NERTask):
         :return: Processed sentence.
         :rtype: dict
         """
-        corenlp_server = workflow_resources["corenlp_server"]
-
         return self.process_sentence_with_corenlp_server(
             sentence_data, action="ner", postprocessing_func=self._postprocess_ner_tagged
         )
@@ -144,7 +142,7 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
         :param node_gloss: Word of this node.
         :type node_gloss: str
         :param node_rel: Relation of this node to its head.
-        :type node_rel: str
+        :type node_rel: str, None
         :return: Dictionary node representation.
         :rtype: dict
         """

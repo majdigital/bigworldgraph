@@ -163,6 +163,8 @@ class RequestCache:
         self.lock = threading.Lock()
         self.cache = {}
         self.requested = set()
+        self.number_of_requests = 0
+        self.number_of_avoided_requests = 0
 
     def __contains__(self, item):
         return item in self.requested
@@ -183,6 +185,33 @@ class RequestCache:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.lock.release()
+
+    def __len__(self):
+        return len(self.requested)
+
+    def request(self, key, request_func, *request_args, **request_kwargs):
+        """
+        Make a request, but make a lookup to the cache first to see if you may be able to avoid it.
+
+        :param key: Key that should be used to cache the request.
+        :type key: str, int
+        :param request_func: Function to do the request.
+        :type request_func: func
+        :param request_args: Arguments for request.
+        :type request_args: tuple
+        :param request_kwargs: Key word arguments for request.
+        :type request_kwargs: dict
+        """
+        if key in self:
+            self.number_of_avoided_requests += 1
+            return self[key]
+
+        request_result = request_func(*request_args, **request_kwargs)
+        self.number_of_requests += 1
+
+        self[key] = request_result
+
+        return request_result
 
 
 class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):
@@ -207,25 +236,24 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                 )
 
     def task_workflow(self, article, **workflow_resources):
-        # TODO (Improve): Speed this up [Comment DU 18.04.17]
-        # Not so easy: See branch parallelize_scraper for the most recent attempt:
-        #   - Accessing Wikidata via Scraper is much slower than via API
-        #   - Language support is very limited for the scraper
-        #   - Using multithreading only has minimal gains / is even slower so far
-        #   (probably due to GIL and sharing resources between threads)
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
+        properties_implying_relations = set(self.task_config["WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"])
         default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
         request_cache = RequestCache()
+        match_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
+            self.named_entities += len(nes)
 
             entity_number = 0
             for named_entity, ne_tag in nes:
-                entity_senses = self.get_matches(named_entity, language=language_abbreviation)
+                entity_senses = match_cache.request(
+                    named_entity, self.get_matches, named_entity, language=language_abbreviation
+                )
                 relevant_properties = relevant_properties_all.get(ne_tag, [])
 
                 # No matches - skip
@@ -237,15 +265,13 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                     ambiguous_entities = []
 
                     for entity_sense in entity_senses:
-                        entity_id = entity_sense["id"]
-
-                        if entity_id in request_cache:
-                            wikidata_entity = request_cache[entity_id]
-                        else:
-                            wikidata_entity, request_cache = self._request_or_use_cache(
-                                entity_sense["id"], language_abbreviation, relevant_properties, request_cache
-                            )
-                            request_cache[entity_id] = wikidata_entity
+                        wikidata_entity = request_cache.request(
+                            entity_sense["id"], self.get_entity,
+                            entity_sense["id"], language=language_abbreviation,
+                            relevant_properties=relevant_properties,
+                            properties_implying_relations=properties_implying_relations
+                        )
+                        wikidata_entity["type"] = ne_tag
 
                         ambiguous_entities.append(wikidata_entity)
 
@@ -254,9 +280,13 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                 # One match - lucky!
                 else:
                     entity_sense = entity_senses[0]
-                    wikidata_entity, request_cache = self._request_or_use_cache(
-                        entity_sense["id"], language_abbreviation, relevant_properties, request_cache
+                    wikidata_entity = request_cache.request(
+                        entity_sense["id"], self.get_entity,
+                        entity_sense["id"], language=language_abbreviation,
+                        relevant_properties=relevant_properties,
+                        properties_implying_relations=properties_implying_relations
                     )
+                    wikidata_entity["type"] = ne_tag
 
                     wikidata_entities.append([wikidata_entity])
 
@@ -269,34 +299,3 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
             }
 
             yield serializing_arguments
-
-    def _request_or_use_cache(self, entity_id, language_abbreviation, relevant_properties, cache, caching=True):
-        """
-        Request a Wikidata entity. Make a lookup if this request has already been made if caching flag is set.
-        
-        :param entity_id: Wikidata entity ID.
-        :type entity_id: str
-        :param language_abbreviation: Abbreviation of target language.
-        :type language_abbreviation: str
-        :param relevant_properties: Types of claims that should be included.
-        :type relevant_properties: list
-        :param cache: Cache to store requests.
-        :type cache: RequestCache
-        :param caching: Flag to indicate whether caching should be used.
-        :type caching: bool
-        :return: The requested Wikidata entity as well as the enriched cache.
-        :rtype; tuple
-        """
-        if caching:
-            if entity_id in cache:
-                return cache[entity_id], cache
-
-        wikidata_entity = self.get_entity(
-            entity_id, language=language_abbreviation,
-            relevant_properties=relevant_properties
-        )
-
-        if caching:
-            cache[entity_id] = wikidata_entity
-
-        return wikidata_entity, cache

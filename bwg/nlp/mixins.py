@@ -139,7 +139,7 @@ class ArticleProcessingMixin:
         
         :param raw_articles: Raw articles (referring to the same article but carrying different kinds of data for their 
         sentences) read from input file.
-        :type raw_articles: list
+        :type raw_articles: list, tuple
         :param new_state: State that describes the kind of processing that is applied to the data in this step. It's 
         included in the metadata of each article.
         :type new_state: str

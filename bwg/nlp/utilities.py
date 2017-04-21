@@ -211,22 +211,24 @@ def serialize_wikidata_entity(sentence_id, wikidata_entities, infix="", state="r
         options["indent"] = 4
 
     serialized_entity = {
-        "meta": {
-            "id": sentence_id,
-            "state": state,
-            "type": "wikidata_entity"
-        },
-        "data": {
-            "entities": {
-                "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)): {
-                    "meta": {
-                        "id": "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)),
-                        "state": state,
-                        "type": "Wikidata entity" if len(wd_entity) == 1 else "Ambiguous Wikidata entity"
-                    },
-                    "data": wd_entity
+        sentence_id: {
+            "meta": {
+                "id": sentence_id,
+                "state": state,
+                "type": "wikidata_entity"
+            },
+            "data": {
+                "entities": {
+                    "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)): {
+                        "meta": {
+                            "id": "{}/{}{}".format(sentence_id, infix, str(wd_entity_id).zfill(5)),
+                            "state": state,
+                            "type": "Wikidata entity" if len(wd_entity) == 1 else "Ambiguous Wikidata entity"
+                        },
+                        "data": wd_entity
+                    }
+                    for wd_entity, wd_entity_id in zip(wikidata_entities, range(1, len(wikidata_entities) + 1))
                 }
-                for wd_entity, wd_entity_id in zip(wikidata_entities, range(1, len(wikidata_entities) + 1))
             }
         }
     }
@@ -249,7 +251,7 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
     :param article_title: Title of current article.
     :type article_title: str
     :param sentences: Sentences of current article.
-    :type sentences: list
+    :type sentences: list, dict
     :param state: State that describes the kind of processing that is applied to the data in this step. It's 
     included in the metadata of each sentence.
     :type state: str
