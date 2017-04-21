@@ -4,3 +4,4 @@ pycorenlp
 pywikibot
 bs4
 neomodel
+eve
