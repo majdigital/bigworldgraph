@@ -11,3 +11,5 @@ data/evaluation/*
 *.ctrl
 *.ipynb
 */apicache/*
+node_modules/
+.sass-cache/
