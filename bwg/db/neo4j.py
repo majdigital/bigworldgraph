@@ -3,10 +3,8 @@
 Create support for the Neo4j graph database.
 """
 
-# STD
-import sys
-
 # EXT
+from eve.io.base import DataLayer
 import luigi
 import neomodel
 
@@ -29,39 +27,8 @@ class Entity(neomodel.StructuredNode):
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
 
 
-class Person(Entity):
-    """
-    Node model people in the graph.
-    """
-    pass
-
-
-class Organization(Entity):
-    """
-    Node model for organizations in the graph.
-    """
-    pass
-
-
-class Date(Entity):
-    """
-    Node model for organizations in the graph.
-    """
-    pass
-
-
-class Location(Entity):
-    """
-    Node model for organization in the graph.
-    """
-    pass
-
-
-class Miscellaneous(Entity):
-    """
-    Node model for remaining entities in the graph that couldn't be assigned to any other model.
-    """
-    pass
+def create_entity_class(class_name):
+    return type(class_name, (Entity, ), {})
 
 
 class PipelineRunInfo(neomodel.StructuredNode):
@@ -74,10 +41,222 @@ class PipelineRunInfo(neomodel.StructuredNode):
     article_ids = neomodel.ArrayProperty()
 
 
-# TODO (Refactor): Add database functions to its own wrapper class, from which the target inherits [DU 21.04.17]
+class NEO4jDatabase:
+    def __init__(self, user, password, host, port):
+        neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
+            user=user, password=password, host=host, port=port
+        )
 
 
-class Neo4jTarget(luigi.Target):
+class Neo4jLayer(DataLayer, NEO4jDatabase):
+    """
+    This a simple re-implementation for a Neo4j data layer, because flask_neo4j doesn't seem to be maintained anymore, 
+    leading eve_neo4j to break.
+    
+    Docstring are mostly just copied from eve.io.DataLayer.
+    """
+    def init_app(self, app):
+        NEO4jDatabase.__init__(
+            user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
+            host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
+        )
+
+    def find(self, resource, req, sub_resource_lookup):
+        """
+        Retrieves a set of documents (rows), matching the current request.
+        Consumed when a request hits a collection/document endpoint
+        (`/people/`).
+
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve both
+                         the db collection/table and base query (filter), if
+                         any.
+        :param req: an instance of ``eve.utils.ParsedRequest``. This contains
+                    all the constraints that must be fulfilled in order to
+                    satisfy the original request (where and sort parts, paging,
+                    etc). Be warned that `where` and `sort` expresions will
+                    need proper parsing, according to the syntax that you want
+                    to support with your driver. For example ``eve.io.Mongo``
+                    supports both Python and Mongo-like query syntaxes.
+        :param sub_resource_lookup: sub-resource lookup from the endpoint url.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def aggregate(self, resource, pipeline, options):
+        """ 
+        Perform an aggregation on the resource datasource and returns
+        the result. Only implement this if the underlying db engine supports
+        aggregation operations.
+
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve
+                         the db collection/table consumed by the resource.
+        :param pipeline: aggregation pipeline to be executed.
+        :param options: aggregation options to be considered.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def find_one(self, resource, req, **lookup):
+        """ 
+        Retrieves a single document/record. Consumed when a request hits an
+        item endpoint (`/people/id/`).
+
+        :param resource: resource being accessed. You should then use the
+                         ``datasource`` helper function to retrieve both the
+                         db collection/table and base query (filter), if any.
+        :param req: an instance of ``eve.utils.ParsedRequest``. This contains
+                    all the constraints that must be fulfilled in order to
+                    satisfy the original request (where and sort parts, paging,
+                    etc). As we are going to only look for one document here,
+                    the only req attribute that you want to process here is
+                    ``req.projection``.
+
+        :param **lookup: the lookup fields. This will most likely be a record
+                         id or, if alternate lookup is supported by the API,
+                         the corresponding query.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def find_one_raw(self, resource, _id):
+        """ 
+        Retrieves a single, raw document. No projections or datasource
+        filters are being applied here. Just looking up the document by unique
+        id.
+
+        :param resource: resource name.
+        :param _id: unique id.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def find_list_of_ids(self, resource, ids, client_projection=None):
+        """
+        Retrieves a list of documents based on a list of primary keys
+        The primary key is the field defined in `ID_FIELD`.
+        This is a separate function to allow us to use per-database
+        optimizations for this type of query.
+
+        :param resource: resource name.
+        :param ids: a list of ids corresponding to the documents
+        to retrieve
+        :param client_projection: a specific projection to use
+        :return: a list of documents matching the ids in `ids` from the
+        collection specified in `resource` 
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def insert(self, resource, doc_or_docs):
+        """
+        Inserts a document into a resource collection/table.
+
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve both
+                         the actual datasource name.
+        :param doc_or_docs: json document or list of json documents to be added
+                            to the database.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def update(self, resource, id_, updates, original):
+        """
+        Updates a collection/table document/row.
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve
+                         the actual datasource name.
+        :param id_: the unique id of the document.
+        :param updates: json updates to be performed on the database document
+                        (or row).
+        :param original: definition of the json document that should be
+        updated.
+        :raise OriginalChangedError: raised if the database layer notices a
+        change from the supplied `original` parameter.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def replace(self, resource, id_, document, original):
+        """
+        Replaces a collection/table document/row.
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve
+                         the actual datasource name.
+        :param id_: the unique id of the document.
+        :param document: the new json document
+        :param original: definition of the json document that should be
+        updated.
+        :raise OriginalChangedError: raised if the database layer notices a
+        change from the supplied `original` parameter.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def remove(self, resource, lookup={}):
+        """
+        Removes a document/row or an entire set of documents/rows from a
+        database collection/table.
+
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve
+                         the actual datasource name.
+        :param lookup: a dict with the query that documents must match in order
+                       to qualify for deletion. For single document deletes,
+                       this is usually the unique id of the document to be
+                       removed.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def combine_queries(self, query_a, query_b):
+        """
+        Takes two db queries and applies db-specific syntax to produce
+        the intersection.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def get_value_from_query(self, query, field_name):
+        """
+        Parses the given potentially-complex query and returns the value
+        being assigned to the field given in `field_name`.
+
+        This mainly exists to deal with more complicated compound queries 
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def query_contains_field(self, query, field_name):
+        """
+        For the specified field name, does the query contain it?
+        Used know whether we need to parse a compound query.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+    def is_empty(self, resource):
+        """
+        Returns True if the collection is empty; False otherwise. While
+        a user could rely on self.find() method to achieve the same result,
+        this method can probably take advantage of specific datastore features
+        to provide better perfomance.
+
+        Don't forget, a 'resource' could have a pre-defined filter. If that is
+        the case, it will have to be taken into consideration when performing
+        the is_empty() check (see eve.io.mongo.mongo.py implementation).
+
+        :param resource: resource being accessed. You should then use
+                         the ``datasource`` helper function to retrieve
+                         the actual datasource name.
+        """
+        # TODO (Implement) [DU 26.04.17]
+        pass
+
+
+class Neo4jTarget(luigi.Target, NEO4jDatabase):
     """
     Additional luigi target to write a tasks output into a neo4j graph database.
     """
@@ -103,9 +282,7 @@ class Neo4jTarget(luigi.Target):
         :type ne_tag_to_model: dict
         """
         self.pipeline_run_info = pipeline_run_info
-        neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
-            user=user, password=password, host=host, port=port
-        )
+        NEO4jDatabase.__init__(user=user, password=password, host=host, port=port)
         self.ne_tag_to_model = ne_tag_to_model
         self._delete_all_entities()
         self._delete_all_relations()
@@ -213,12 +390,11 @@ class Neo4jTarget(luigi.Target):
         :return: Target node.
         :rtype: Entity
         """
-        entity_class_string = self.ne_tag_to_model.get(data.get("type", "Entity"), "Miscellaneous")
-        entity_class = getattr(sys.modules[__name__], entity_class_string)
-
         try:
-            return entity_class.nodes.get(label=label)
-        except entity_class.DoesNotExist:
+            return Entity.nodes.get(label=label)
+        except Entity.DoesNotExist:
+            entity_class_string = self.ne_tag_to_model.get(data.get("type", "Entity"), "Miscellaneous")
+            entity_class = create_entity_class(entity_class_string)
             entity = entity_class(label=label, data=data)
             entity.save()
             return entity
