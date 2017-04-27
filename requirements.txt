@@ -5,4 +5,3 @@ pywikibot
 bs4
 neomodel
 eve
-flask_restful

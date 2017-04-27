@@ -3,28 +3,32 @@
 Module to run the API that connects the graph database to the frontend
 """
 
+# STD
+import json
+
 # EXT
 from eve import Eve
-from eve_neo4j import Neo4j as Eve_neo4j
-import flask_restful
 
 # PROJECT
 import bwg
-from bwg.misc.helpers import get_config_from_py_file
+from bwg.db.neo4j import Neo4jLayer
+
+# TODO (Implement): Implement post-event-hook to make data more readable for frontend [DU 26.04.17]
 
 
-def setup_api(config_path):
-    config = get_config_from_py_file(config_path)
-    api = Eve(config=config, data=Eve_neo4j)
-    api.add_resource(Version, "/version")
-    api.run()
+api = Eve(data=Neo4jLayer)
 
 
-class Version(flask_restful.Resource):
-    def get(self):
-        return {"version": bwg.__version__}
+@api.route("/version")
+def version():
+    return json.dumps(
+        {
+            "version": bwg.__version__,
+            "license": "Copyright (c) 2017 Malabaristalicious Unipessoal, Lda.\nFor more information read LICENSE.md "
+            "on https://github.com/majdigital/bigworldgraph"
+        }
+    )
 
 
 if __name__ == "__main__":
-    setup_api(config_path="../../api_config.py")
-
+    api.run()

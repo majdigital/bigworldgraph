@@ -3,13 +3,30 @@
 Create support for the Neo4j graph database.
 """
 
+# STD
+import json
+
 # EXT
 from eve.io.base import DataLayer
 import luigi
 import neomodel
 
 
-class Relation(neomodel.StructuredRel):
+class EveCompabilityMixin:
+    """
+    Extend neomodel classes to make them compatible with Eve API functions.
+    """
+    def __contains__(self, item):
+        return item in vars(self)
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
+
+class Relation(neomodel.StructuredRel, EveCompabilityMixin):
     """
     Node model for relations in the graph.
     """
@@ -17,7 +34,7 @@ class Relation(neomodel.StructuredRel):
     data = neomodel.JSONProperty()
 
 
-class Entity(neomodel.StructuredNode):
+class Entity(neomodel.StructuredNode, EveCompabilityMixin):
     """
     Node model for entities in the graph.
     """
@@ -41,25 +58,96 @@ class PipelineRunInfo(neomodel.StructuredNode):
     article_ids = neomodel.ArrayProperty()
 
 
-class NEO4jDatabase:
+class Neo4jResult:
+    def __init__(self, selection, **kwargs):
+        # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
+        self.selection = selection
+        self._clean_selection()
+
+    def __iter__(self):
+        for result in self.cleaned_selection:
+            yield result
+
+    def count(self, with_limit_and_skip=False, **kwargs):
+        # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
+        return len(self.selection)
+
+    def _clean_selection(self):
+        self.cleaned_selection = [
+            {
+                key: value
+                for key, value in vars(node).items()
+                if self.is_json_serializable(value)
+            }
+            for node in self.selection
+        ]
+
+    @staticmethod
+    def is_json_serializable(value):
+        try:
+            json.dumps(value)
+            return True
+        except (TypeError, OverflowError):
+            return False
+
+
+class Neo4jDatabase:
     def __init__(self, user, password, host, port):
         neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
             user=user, password=password, host=host, port=port
         )
 
+    @staticmethod
+    def get_node_class(class_name, base_classes=(neomodel.StructuredNode, EveCompabilityMixin)):
+        return type(class_name, base_classes, {})
 
-class Neo4jLayer(DataLayer, NEO4jDatabase):
+    @staticmethod
+    def get_relation_class(class_name, base_classes=(neomodel.StructuredRel, EveCompabilityMixin)):
+        return type(class_name, base_classes, {})
+
+    @staticmethod
+    def find_nodes(node_class, **constraints):
+        try:
+            return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
+        except node_class.DoesNotExist:
+            return []
+
+    @staticmethod
+    def find_relations(relation_class, **constraints):
+        try:
+            return relation_class.nodes.get(**constraints) if constraints != {} else relation_class.nodes.all()
+        except relation_class.DoesNotExist:
+            return []
+
+
+class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
     This a simple re-implementation for a Neo4j data layer, because flask_neo4j doesn't seem to be maintained anymore, 
     leading eve_neo4j to break.
     
     Docstring are mostly just copied from eve.io.DataLayer.
     """
+    node_base_classes = None
+    node_types = None
+    relation_types = None
+    relation_base_classes = None
+
     def init_app(self, app):
-        NEO4jDatabase.__init__(
-            user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
+        self.app = app
+        Neo4jDatabase.__init__(
+            self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
             host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
         )
+        self.node_types = app.config["NODE_TYPES"]
+        self.relation_types = app.config["RELATION_TYPES"]
+        self.relation_base_classes = tuple([
+            self.get_relation_class(base_class_name)
+            for base_class_name in app.config.get("RELATIONS_BASE_CLASSES", [])
+        ]) if app.config.get("RELATIONS_BASE_CLASSES", []) != [] else (neomodel.StructuredRel, EveCompabilityMixin)
+        self.node_base_classes = tuple([
+            self.get_node_class(base_class_name)
+            for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
+        ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (neomodel.StructuredNode, EveCompabilityMixin)
 
     def find(self, resource, req, sub_resource_lookup):
         """
@@ -80,8 +168,19 @@ class Neo4jLayer(DataLayer, NEO4jDatabase):
                     supports both Python and Mongo-like query syntaxes.
         :param sub_resource_lookup: sub-resource lookup from the endpoint url.
         """
-        # TODO (Implement) [DU 26.04.17]
-        pass
+        item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
+
+        if resource in self.node_types:
+            node_class = self.get_node_class(item_title, self.node_base_classes)
+            results = self.find_nodes(node_class)
+        elif resource in self.relation_types:
+            relation_class = self.get_relation_class(item_title, self.relation_base_classes)
+            results = self.find_relations(relation_class)
+        else:
+            # TODO (Improve): Raise Error? [DU 26.04.17]
+            results = []
+
+        return Neo4jResult(results)
 
     def aggregate(self, resource, pipeline, options):
         """ 
@@ -256,7 +355,7 @@ class Neo4jLayer(DataLayer, NEO4jDatabase):
         pass
 
 
-class Neo4jTarget(luigi.Target, NEO4jDatabase):
+class Neo4jTarget(luigi.Target, Neo4jDatabase):
     """
     Additional luigi target to write a tasks output into a neo4j graph database.
     """
@@ -282,8 +381,9 @@ class Neo4jTarget(luigi.Target, NEO4jDatabase):
         :type ne_tag_to_model: dict
         """
         self.pipeline_run_info = pipeline_run_info
-        NEO4jDatabase.__init__(user=user, password=password, host=host, port=port)
+        Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
         self.ne_tag_to_model = ne_tag_to_model
+        # TODO (Refactor): Remove this or find better solution [DU 27.04.17]
         self._delete_all_entities()
         self._delete_all_relations()
 
