@@ -4,6 +4,9 @@
         fill:none;
         stroke:#999;
         stroke-opacity:1;
+        &.inactive{
+            opacity: 0.2;
+        }
     }
 }
 .nodes{
@@ -17,8 +20,14 @@
         fill:#000;
     }
 }
+.node{
+    &.inactive{
+        circle{
+            opacity:0.2;
+        }
+    }
+}
 text{
     font: 10px sans-serif;
-  pointer-events: none;
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
