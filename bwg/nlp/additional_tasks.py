@@ -171,7 +171,6 @@ class RelationsDatabaseWritingTask(luigi.Task):
     """
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.
     """
-    # TODO (Bug): Sometimes, entites with the same label will be written to the database multiple times
     task_config = luigi.DictParameter()
     pipeline_run_info = None
 

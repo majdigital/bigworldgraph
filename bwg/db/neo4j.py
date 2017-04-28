@@ -46,18 +46,6 @@ class Entity(neomodel.StructuredNode, EveCompabilityMixin):
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
 
 
-def create_entity_class(class_name):
-    """
-    Create a new subclass of an Entity node with a specific name.
-    
-    :param class_name: Name for subclass.
-    :type class_name: str
-    :return: New Entity subclass
-    :rtype: Entity
-    """
-    return type(class_name, (Entity, ), {})
-
-
 class PipelineRunInfo(neomodel.StructuredNode):
     """
     Define a model for pipeline run information.
@@ -536,9 +524,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         self.pipeline_run_info = pipeline_run_info
         Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
         self.ne_tag_to_model = ne_tag_to_model
-        # TODO (Refactor): Remove this or find better solution [DU 27.04.17]
-        self._delete_all_entities()
-        self._delete_all_relations()
 
     def exists(self):
         """
@@ -558,32 +543,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    @staticmethod
-    def _delete_all_entities():
-        """
-        Delete all entities in the database.
-        """
-        try:
-            entities = Entity.nodes
-
-            for entity in entities:
-                entity.delete()
-        except Entity.DoesNotExist:
-            pass
-
-    @staticmethod
-    def _delete_all_relations():
-        """
-        Delete all relations in the database.
-        """
-        try:
-            relation = Relation.nodes
-
-            for relation in relation:
-                relation.delete()
-        except:
-            pass
-
     def add_relation(self, relation_json, sentence, entity_properties):
         """
         Add a new relation to the graph database.
@@ -601,7 +560,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
                                         relation_data["object_phrase"]
         subj_data = entity_properties.get(subj_phrase, {})
         obj_data = entity_properties.get(subj_phrase, {})
-        # TODO (Refactor): Replace by native neomodel function [DU 28.04.17]
         subj_node = self._get_or_create_node(label=subj_phrase, data=subj_data)
         obj_node = self._get_or_create_node(label=obj_phrase, data=obj_data)
         self._add_wikidata_relations(subj_node, subj_data)
@@ -631,7 +589,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
                 target, implies_relation = claim_data["target"], claim_data["implies_relation"]
 
                 if implies_relation and target != node_data["label"]:
-                    # TODO (Refactor): Replace by native neomodel function [DU 28.04.17]
                     obj_node = self._get_or_create_node(label=target, data={})
                     self._get_or_create_connection(node, obj_node, label=claim, data={})
 
@@ -650,7 +607,7 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
             return Entity.nodes.get(label=label)
         except Entity.DoesNotExist:
             entity_class_string = self.ne_tag_to_model.get(data.get("type", "Entity"), "Miscellaneous")
-            entity_class = create_entity_class(entity_class_string)
+            entity_class = self.get_node_class(entity_class_string, (Entity, ))
             entity = entity_class(label=label, data=data)
             entity.save()
             return entity
