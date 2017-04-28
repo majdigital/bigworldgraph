@@ -13,9 +13,6 @@ from eve import Eve
 import bwg
 from bwg.db.neo4j import Neo4jLayer
 
-# TODO (Implement): Implement post-event-hook to make data more readable for frontend [DU 26.04.17]
-
-
 api = Eve(data=Neo4jLayer)
 
 

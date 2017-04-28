@@ -41,6 +41,7 @@ class Entity(neomodel.StructuredNode, EveCompabilityMixin):
     Node model for entities in the graph.
     """
     uid = neomodel.UniqueIdProperty()
+    category = neomodel.StringProperty()
     label = neomodel.StringProperty()
     data = neomodel.JSONProperty()
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
@@ -60,6 +61,9 @@ class Neo4jResult:
     """
     Object the result of a data layer query gets wrapped in.
     """
+    relations = []
+    relation_ids = set()
+
     def __init__(self, selection, **kwargs):
         """
         Constructor.
@@ -75,8 +79,10 @@ class Neo4jResult:
         self._apply_request_parameters()
 
     def __iter__(self):
-        for result in self.cleaned_selection:
-            yield result
+        yield {
+            "nodes": self.cleaned_selection,
+            "links": self.relations
+        }
 
     def __getitem__(self, start=0, stop=0, step=1):
         stop = len(self.return_selection)
@@ -90,14 +96,40 @@ class Neo4jResult:
         """
         Clean all elements of this selection of fields which values are not serializable.
         """
-        self.cleaned_selection = self.return_selection = [
-            {
-                key: value
-                for key, value in vars(node).items()
-                if self.is_json_serializable(value)
-            }
-            for node in self.selection
-        ]
+        self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
+
+    def _clean_node(self, node):
+        for target_node in node.relations:
+            relation = node.relations.relationship(target_node)
+            relation = self.clean_unserializables(relation)
+            relation["source"] = node.uid
+            relation["target"] = target_node.uid
+
+            if relation["id"] not in self.relation_ids:
+                self.relations.append(relation)
+                self.relation_ids.add(relation["id"])
+
+        # Clean non-serializable-fields
+        node = self.clean_unserializables(node)
+
+        # Clean claims
+        if "data" in node:
+            if "claims" in node["data"]:
+                node["data"]["claims"] = {
+                    claim: claim_data["target"]
+                    for claim, claim_data in node["data"]["claims"].items()
+                }
+
+        if "relations" in node:
+            del node["relations"]
+        return node
+
+    def clean_unserializables(self, dictionary):
+        return {
+            key: value
+            for key, value in vars(dictionary).items()
+            if self.is_json_serializable(value) and not key.startswith("_")
+        }
 
     @staticmethod
     def is_json_serializable(value):
@@ -205,25 +237,6 @@ class Neo4jDatabase:
         return node_class
 
     @staticmethod
-    def get_relation_class(class_name, base_classes=(neomodel.StructuredRel, EveCompabilityMixin)):
-        """
-        Get the corresponding relation class to a class name. If it isn't found in the current module, 
-        create it on the fly.
-
-        :param class_name: Name of class that is looked for.
-        :type class_name: str
-        :param base_classes: Classes the class should inherit from in case it's created from scratch.
-        :type base_classes: tuple
-        :return: Node class.
-        :rtype: neomodel.StructuredRel
-        """
-        relation_class = getattr(sys.modules[__name__], class_name, None)
-
-        if relation_class is None:
-            return type(class_name, base_classes, {})
-        return relation_class
-
-    @staticmethod
     def find_nodes(node_class, **constraints):
         """
         Find nodes of a certain class given optional constraints.
@@ -240,23 +253,6 @@ class Neo4jDatabase:
         except node_class.DoesNotExist:
             return []
 
-    @staticmethod
-    def find_relations(relation_class, **constraints):
-        """
-        Find relations of a certain class given optional constraints.
-
-        :param relation_class: Class of nodes that is of interest.
-        :type relation_class: neomodel.StructuredRel
-        :param constraints: Search constraints.
-        :type constraints: dict
-        :return: List of nodes matching the criteria.
-        :rtype: list
-        """
-        try:
-            return relation_class.nodes.get(**constraints) if constraints != {} else relation_class.nodes.all()
-        except relation_class.DoesNotExist:
-            return []
-
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
@@ -266,9 +262,11 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     Docstring are mostly just copied from eve.io.DataLayer.
     """
     node_base_classes = None
+    node_base_classes_names = None
     node_types = None
     relation_types = None
     relation_base_classes = None
+    relation_base_classes_names = None
 
     def init_app(self, app):
         self.app = app
@@ -282,14 +280,13 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         # Determine base types for nodes and vertices
         self.node_types = app.config["NODE_TYPES"]
         self.relation_types = app.config["RELATION_TYPES"]
-        self.relation_base_classes = tuple([
-            self.get_relation_class(base_class_name)
-            for base_class_name in app.config.get("RELATIONS_BASE_CLASSES", [])
-        ]) if app.config.get("RELATIONS_BASE_CLASSES", []) != [] else (neomodel.StructuredRel, EveCompabilityMixin)
         self.node_base_classes = tuple([
             self.get_node_class(base_class_name)
             for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
         ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (neomodel.StructuredNode, EveCompabilityMixin)
+        self.node_base_classes_names = [
+            node_base_class.__name__ for node_base_class in self.node_base_classes
+        ]
 
     def find(self, resource, req, sub_resource_lookup):
         """
@@ -304,7 +301,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param req: an instance of ``eve.utils.ParsedRequest``. This contains
                     all the constraints that must be fulfilled in order to
                     satisfy the original request (where and sort parts, paging,
-                    etc). Be warned that `where` and `sort` expresions will
+                    etc). Be warned that `where` and `sort` expressions will
                     need proper parsing, according to the syntax that you want
                     to support with your driver. For example ``eve.io.Mongo``
                     supports both Python and Mongo-like query syntaxes.
@@ -312,12 +309,12 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         """
         item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
 
-        if resource in self.node_types:
+        if item_title in self.node_base_classes_names:
+            node_class = self.get_node_class(item_title)
+            results = self.find_nodes(node_class)
+        elif resource in self.node_types:
             node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
             results = self.find_nodes(node_class)
-        elif resource in self.relation_types:
-            relation_class = self.get_relation_class(item_title, self.relation_base_classes)
-            results = self.find_relations(relation_class)
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
@@ -608,7 +605,7 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         except Entity.DoesNotExist:
             entity_class_string = self.ne_tag_to_model.get(data.get("type", "Entity"), "Miscellaneous")
             entity_class = self.get_node_class(entity_class_string, (Entity, ))
-            entity = entity_class(label=label, data=data)
+            entity = entity_class(category=entity_class_string, label=label, data=data)
             entity.save()
             return entity
 

@@ -1,40 +1,41 @@
+# TODO (Improve) Add more methods for resources [DU 28.04.17]
+entities = {
+    "item_title": "entity",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
 people = {
     "item_title": "person",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
 }
 locations = {
     "item_title": "location",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
 }
 organizations = {
     "item_title": "organization",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
 }
 dates = {
     "item_title": "date",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
 }
 misc = {
     "item_title": "misc",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
-}
-relations = {
-    "item_title": "relations",
-    "resource_methods": ["GET", "DELETE"],
-    "item_methods": ["GET", "PATCH", "PUT", "DELETE"]
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
 }
 DOMAIN = {
+    "entities": entities,
     "people": people,
     "locations": locations,
     "organizations": organizations,
     "dates": dates,
-    "misc": misc,
-    "relations": relations,
+    "misc": misc
 }
 
 # RELATION_BASE_CLASSES = ()
