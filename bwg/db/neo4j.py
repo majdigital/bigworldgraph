@@ -5,6 +5,7 @@ Create support for the Neo4j graph database.
 
 # STD
 import json
+import sys
 
 # EXT
 from eve.io.base import DataLayer
@@ -99,11 +100,19 @@ class Neo4jDatabase:
 
     @staticmethod
     def get_node_class(class_name, base_classes=(neomodel.StructuredNode, EveCompabilityMixin)):
-        return type(class_name, base_classes, {})
+        node_class = getattr(sys.modules[__name__], class_name, None)
+
+        if node_class is None:
+            return type(class_name, base_classes, {})
+        return node_class
 
     @staticmethod
     def get_relation_class(class_name, base_classes=(neomodel.StructuredRel, EveCompabilityMixin)):
-        return type(class_name, base_classes, {})
+        relation_class = getattr(sys.modules[__name__], class_name, None)
+
+        if relation_class is None:
+            return type(class_name, base_classes, {})
+        return relation_class
 
     @staticmethod
     def find_nodes(node_class, **constraints):
@@ -144,6 +153,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
             self.get_relation_class(base_class_name)
             for base_class_name in app.config.get("RELATIONS_BASE_CLASSES", [])
         ]) if app.config.get("RELATIONS_BASE_CLASSES", []) != [] else (neomodel.StructuredRel, EveCompabilityMixin)
+        # TODO (Bug): When this gets executed, the class will be created without any properties [DU 28.04.17]
         self.node_base_classes = tuple([
             self.get_node_class(base_class_name)
             for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
@@ -171,7 +181,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
 
         if resource in self.node_types:
-            node_class = self.get_node_class(item_title, self.node_base_classes)
+            node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
             results = self.find_nodes(node_class)
         elif resource in self.relation_types:
             relation_class = self.get_relation_class(item_title, self.relation_base_classes)
@@ -180,7 +190,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
             # TODO (Improve): Raise Error? [DU 26.04.17]
             results = []
 
-        return Neo4jResult(results)
+        return Neo4jResult([result for result in results])
 
     def aggregate(self, resource, pipeline, options):
         """ 
