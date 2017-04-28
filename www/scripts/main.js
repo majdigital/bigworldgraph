@@ -125,17 +125,23 @@ var BigWorldGraph = BigWorldGraph || {};
                         target : obj
                     };
                     link.strength = (link.source.linkStrength || 1) * (link.target.linkStrength || 1);
-                    console.log(link.strength);
+
                     _this.graph.links.push(link);
                 }
             }
             var nodeValues = d3.values(_this.graph.data.nodes);
-
-            console.log(nodeValues);
             console.log(_this.graph.links);
+
+            var zoom = d3.zoom()
+            .scaleExtent([1, 40])
+            .translateExtent([[-100, -100], [_this.width + 90, _this.height + 100]])
+            .on("zoom", _this.zoomed);
+
             _this.simulation = d3.forceSimulation(d3.values(_this.graph.data.nodes))
-            .force("link",d3.forceLink().distance(150).id(function(d) { return d.id; }))
-            .force("collision",d3.forceCollide(20))
+            .force("link",d3.forceLink().strength(0.5).id(function(d) { return d.id; }))
+            .force('xPos', d3.forceX(_this.width/2).strength(0.2))
+		    .force('yPos', d3.forceY(_this.height/2).strength(0.2))
+            .force("collision",d3.forceCollide(40).strength(0.6))
             .force("center",d3.forceCenter(_this.width / 2, _this.height / 2));
             _this.svg.append("defs").selectAll("marker")
                 .data(["default"])
@@ -157,7 +163,11 @@ var BigWorldGraph = BigWorldGraph || {};
                 .enter().append("path")
                 .attr("marker-end","url(#default)")
 
-            _this.node = _this.svg.selectAll('.node')
+            _this.nodes = _this.svg.append('g')
+                .attr('class','nodes');
+
+
+            _this.node = _this.nodes.selectAll('.node')
                 .data(d3.values(_this.graph.data.nodes))
                 .enter().append('g')
                 .attr('class','node')
@@ -218,9 +228,12 @@ var BigWorldGraph = BigWorldGraph || {};
                 .nodes(d3.values(_this.graph.data.nodes))
                 .on("tick", ticked);
 
-            _this.simulation.force("link")
-                .links(_this.graph.links);
-
+            /*_this.simulation.force("link")
+                .links(_this.graph.links).distance(function(d){
+                    console.log(d.target.group*10);
+                    return d.target.group*10;
+                });*/
+            _this.svg.call(zoom);
             function ticked(){
                 text.attr("transform", transform);
                 _this.link.attr("d", linkArc);
@@ -251,7 +264,11 @@ var BigWorldGraph = BigWorldGraph || {};
                 return "translate(" + d.x + "," + d.y + ")";
             }
         };
-
+        _this.zoomed = function(){
+            console.log(d3.event);
+            _this.nodes.attr('transform', d3.event.transform);
+            _this.link.attr('transform',d3.event.transform);
+        }
         _this.highlightObject = function(obj){
             if(obj){
                 if(obj != _this.highlighted){
@@ -275,18 +292,18 @@ var BigWorldGraph = BigWorldGraph || {};
         }
 
         _this.dragstarted = function(d){
-            if(!d3.event.active) _this.simulation.alphaTarget(0.3).restart();
+            /*if(!d3.event.active) _this.simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
-            d.fy = d.y;
+            d.fy = d.y;*/
         };
         _this.dragged = function(d){
-            d.fx = d3.event.x;
-            d.fy = d3.event.y;
+            /*d.fx = d3.event.x;
+            d.fy = d3.event.y;*/
         };
         _this.dragended = function(d){
-            if(!d3.event.active) _this.simulation.alphaTarget(0);
+            /*if(!d3.event.active) _this.simulation.alphaTarget(0);
             d.fx = null;
-            d.fy = null;
+            d.fy = null;*/
         };
     }
 }());
