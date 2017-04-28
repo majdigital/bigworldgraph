@@ -9,6 +9,7 @@ import sys
 
 # EXT
 from eve.io.base import DataLayer
+from eve.exceptions import ConfigException
 import luigi
 import neomodel
 
@@ -46,6 +47,14 @@ class Entity(neomodel.StructuredNode, EveCompabilityMixin):
 
 
 def create_entity_class(class_name):
+    """
+    Create a new subclass of an Entity node with a specific name.
+    
+    :param class_name: Name for subclass.
+    :type class_name: str
+    :return: New Entity subclass
+    :rtype: Entity
+    """
     return type(class_name, (Entity, ), {})
 
 
@@ -60,21 +69,40 @@ class PipelineRunInfo(neomodel.StructuredNode):
 
 
 class Neo4jResult:
+    """
+    Object the result of a data layer query gets wrapped in.
+    """
     def __init__(self, selection, **kwargs):
-        # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
+        """
+        Constructor.
+        
+        :param selection: Current database selection.
+        :type selection: list
+        :param kwargs: Additional key word arguments.
+        :type kwargs: dict
+        """
+        self.parsed_request = kwargs.get("parsed_request", None)
         self.selection = selection
         self._clean_selection()
+        self._apply_request_parameters()
 
     def __iter__(self):
         for result in self.cleaned_selection:
             yield result
+
+    def __getitem__(self, start=0, stop=0, step=1):
+        stop = len(self.return_selection)
+        return self.return_selection[start:stop:step]
 
     def count(self, with_limit_and_skip=False, **kwargs):
         # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
         return len(self.selection)
 
     def _clean_selection(self):
-        self.cleaned_selection = [
+        """
+        Clean all elements of this selection of fields which values are not serializable.
+        """
+        self.cleaned_selection = self.return_selection = [
             {
                 key: value
                 for key, value in vars(node).items()
@@ -85,14 +113,86 @@ class Neo4jResult:
 
     @staticmethod
     def is_json_serializable(value):
+        """
+        Test whether a value is JSON serializable.
+        
+        :param value: Value to be tested.
+        :type value: any
+        :return: Result of check.
+        :rtype: bool
+        """
         try:
             json.dumps(value)
             return True
         except (TypeError, OverflowError):
             return False
 
+    def _apply_request_parameters(self):
+        """
+        Apply additional request parameters to the current selection.
+        """
+        if self.parsed_request is not None:
+            aggregation = self.parsed_request.get("aggregation", None)
+            embedded = self.parsed_request.get("embedded", None)
+            if_match = self.parsed_request.get("if_match", None)
+            if_modified_since = self.parsed_request.get("if_modified_since", None)
+            if_none_match = self.parsed_request.get("if_none_match", None)
+            max_results = self.parsed_request.get("max_results", None)
+            page = self.parsed_request.get("page", None)
+            projection = self.parsed_request.get("projection", None)
+            show_deleted = self.parsed_request.get("show_deleted", None)
+            sort = self.parsed_request.get("sort", None)
+            where = self.parsed_request.get("where", None)
+
+            if aggregation is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if embedded is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if if_match is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if if_modified_since is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if if_none_match is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if page is not None:
+                # TODO (Implement) [DU 28.04.17]
+                pass
+
+            if projection is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if show_deleted is not None:
+                # TODO (Implement) [DU 28.04.17]
+                pass
+
+            if sort is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if where is not None:
+                # TODO (Implement) [DU 28.04.17]
+                raise NotImplementedError
+
+            if max_results is not None:
+                self.return_selection = self.return_selection[:max_results]
+
 
 class Neo4jDatabase:
+    """
+    Wrapper for a Neo4j Graph database, providing an easy way to connect to a database, querying nodes and relations as 
+    well as creating new Node and Relation classes on the fly.
+    """
     def __init__(self, user, password, host, port):
         neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
             user=user, password=password, host=host, port=port
@@ -100,6 +200,16 @@ class Neo4jDatabase:
 
     @staticmethod
     def get_node_class(class_name, base_classes=(neomodel.StructuredNode, EveCompabilityMixin)):
+        """
+        Get the corresponding node class to a class name. If it isn't found in the current module, create it on the fly.
+        
+        :param class_name: Name of class that is looked for.
+        :type class_name: str
+        :param base_classes: Classes the class should inherit from in case it's created from scratch.
+        :type base_classes: tuple
+        :return: Node class.
+        :rtype: neomodel.StructuredNode
+        """
         node_class = getattr(sys.modules[__name__], class_name, None)
 
         if node_class is None:
@@ -108,6 +218,17 @@ class Neo4jDatabase:
 
     @staticmethod
     def get_relation_class(class_name, base_classes=(neomodel.StructuredRel, EveCompabilityMixin)):
+        """
+        Get the corresponding relation class to a class name. If it isn't found in the current module, 
+        create it on the fly.
+
+        :param class_name: Name of class that is looked for.
+        :type class_name: str
+        :param base_classes: Classes the class should inherit from in case it's created from scratch.
+        :type base_classes: tuple
+        :return: Node class.
+        :rtype: neomodel.StructuredRel
+        """
         relation_class = getattr(sys.modules[__name__], class_name, None)
 
         if relation_class is None:
@@ -116,6 +237,16 @@ class Neo4jDatabase:
 
     @staticmethod
     def find_nodes(node_class, **constraints):
+        """
+        Find nodes of a certain class given optional constraints.
+        
+        :param node_class: Class of nodes that is of interest.
+        :type node_class: neomodel.StructuredNode
+        :param constraints: Search constraints.
+        :type constraints: dict
+        :return: List of nodes matching the criteria.
+        :rtype: list
+        """
         try:
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
@@ -123,6 +254,16 @@ class Neo4jDatabase:
 
     @staticmethod
     def find_relations(relation_class, **constraints):
+        """
+        Find relations of a certain class given optional constraints.
+
+        :param relation_class: Class of nodes that is of interest.
+        :type relation_class: neomodel.StructuredRel
+        :param constraints: Search constraints.
+        :type constraints: dict
+        :return: List of nodes matching the criteria.
+        :rtype: list
+        """
         try:
             return relation_class.nodes.get(**constraints) if constraints != {} else relation_class.nodes.all()
         except relation_class.DoesNotExist:
@@ -143,17 +284,20 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
 
     def init_app(self, app):
         self.app = app
+
+        # Init database connection
         Neo4jDatabase.__init__(
             self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
             host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
         )
+
+        # Determine base types for nodes and vertices
         self.node_types = app.config["NODE_TYPES"]
         self.relation_types = app.config["RELATION_TYPES"]
         self.relation_base_classes = tuple([
             self.get_relation_class(base_class_name)
             for base_class_name in app.config.get("RELATIONS_BASE_CLASSES", [])
         ]) if app.config.get("RELATIONS_BASE_CLASSES", []) != [] else (neomodel.StructuredRel, EveCompabilityMixin)
-        # TODO (Bug): When this gets executed, the class will be created without any properties [DU 28.04.17]
         self.node_base_classes = tuple([
             self.get_node_class(base_class_name)
             for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
@@ -187,10 +331,9 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
             relation_class = self.get_relation_class(item_title, self.relation_base_classes)
             results = self.find_relations(relation_class)
         else:
-            # TODO (Improve): Raise Error? [DU 26.04.17]
-            results = []
+            raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult([result for result in results])
+        return Neo4jResult(results)
 
     def aggregate(self, resource, pipeline, options):
         """ 
@@ -205,7 +348,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param options: aggregation options to be considered.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def find_one(self, resource, req, **lookup):
         """ 
@@ -227,7 +370,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
                          the corresponding query.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def find_one_raw(self, resource, _id):
         """ 
@@ -239,7 +382,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param _id: unique id.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def find_list_of_ids(self, resource, ids, client_projection=None):
         """
@@ -256,7 +399,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         collection specified in `resource` 
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def insert(self, resource, doc_or_docs):
         """
@@ -269,7 +412,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
                             to the database.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def update(self, resource, id_, updates, original):
         """
@@ -286,7 +429,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         change from the supplied `original` parameter.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def replace(self, resource, id_, document, original):
         """
@@ -302,7 +445,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         change from the supplied `original` parameter.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def remove(self, resource, lookup={}):
         """
@@ -318,7 +461,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
                        removed.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def combine_queries(self, query_a, query_b):
         """
@@ -326,7 +469,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         the intersection.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def get_value_from_query(self, query, field_name):
         """
@@ -336,7 +479,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         This mainly exists to deal with more complicated compound queries 
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def query_contains_field(self, query, field_name):
         """
@@ -344,7 +487,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Used know whether we need to parse a compound query.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
     def is_empty(self, resource):
         """
@@ -362,7 +505,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
                          the actual datasource name.
         """
         # TODO (Implement) [DU 26.04.17]
-        pass
+        raise NotImplementedError
 
 
 class Neo4jTarget(luigi.Target, Neo4jDatabase):
@@ -454,9 +597,11 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :type entity_properties: dict
         """
         relation_meta, relation_data = relation_json["meta"], relation_json["data"]
-        subj_phrase, verb, obj_phrase = relation_data["subject_phrase"], relation_data["verb"], relation_data["object_phrase"]
+        subj_phrase, verb, obj_phrase = relation_data["subject_phrase"], relation_data["verb"], \
+                                        relation_data["object_phrase"]
         subj_data = entity_properties.get(subj_phrase, {})
         obj_data = entity_properties.get(subj_phrase, {})
+        # TODO (Refactor): Replace by native neomodel function [DU 28.04.17]
         subj_node = self._get_or_create_node(label=subj_phrase, data=subj_data)
         obj_node = self._get_or_create_node(label=obj_phrase, data=obj_data)
         self._add_wikidata_relations(subj_node, subj_data)
@@ -486,6 +631,7 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
                 target, implies_relation = claim_data["target"], claim_data["implies_relation"]
 
                 if implies_relation and target != node_data["label"]:
+                    # TODO (Refactor): Replace by native neomodel function [DU 28.04.17]
                     obj_node = self._get_or_create_node(label=target, data={})
                     self._get_or_create_connection(node, obj_node, label=claim, data={})
 
