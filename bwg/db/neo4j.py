@@ -248,6 +248,7 @@ class Neo4jDatabase:
         :return: List of nodes matching the criteria.
         :rtype: list
         """
+        # TODO (Improve): Do not always return all nodes. [DU 01.05.17]
         try:
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
@@ -311,10 +312,10 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
 
         if item_title in self.node_base_classes_names:
             node_class = self.get_node_class(item_title)
-            results = self.find_nodes(node_class)
+            results = self.find_nodes(node_class, req)
         elif resource in self.node_types:
             node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
-            results = self.find_nodes(node_class)
+            results = self.find_nodes(node_class, req)
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 

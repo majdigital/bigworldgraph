@@ -110,3 +110,8 @@ Commenting two lines (219) in nltk/parse/stanford.py when using utf-8 corpus, ot
 user-config.py for pywikibot
 
 Neo4j installation
+
+curl -gX GET http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"
+ MATCH (n)-[r]-(m), (m)-[r2]-(o)
+WHERE n.uid = 'c34b43b3f3f74aa99ae012615b904760' 
+RETURN n, o, m
