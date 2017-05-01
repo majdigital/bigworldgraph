@@ -9,5 +9,5 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 )
 
-__version_info__ = (0, 5, 0)
+__version_info__ = (0, 6, 0)
 __version__ = '.'.join([str(num) for num in __version_info__])

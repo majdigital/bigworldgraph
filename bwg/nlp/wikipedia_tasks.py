@@ -247,7 +247,6 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
 
         for sentence_id, sentence_json in article_data.items():
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
-            self.named_entities += len(nes)
 
             entity_number = 0
             for named_entity, ne_tag in nes:
