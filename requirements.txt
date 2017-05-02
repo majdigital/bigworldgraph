@@ -3,5 +3,5 @@ luigi
 pycorenlp
 pywikibot
 bs4
-neomodel
+neomodel==3.2.3
 eve

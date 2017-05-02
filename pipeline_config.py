@@ -19,7 +19,7 @@ CONFIG_DEPENDENCIES = {
     # Exclude the following parameters from the target config
     "exclude": [
         "CONFIG_DEPENDENCIES",
-        "SUPPORTED_LANGUAGES"
+        "SUPPORTED_LANGUAGES",
         "{language}_LUIGI_DATA_PATH",
         "STANFORD_PATH"
     ],

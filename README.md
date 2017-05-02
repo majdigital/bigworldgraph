@@ -73,43 +73,115 @@ With its standard configuration, the pipeline comprises the following tasks:
 
 ##### Adjusting pipeline_config.py
 
+If you add a new kind of task to the pipeline, make sure to include a description of its necessary parameters in 
+`pipeline_config.py`:
+
+    CONFIG_DEPENDENCIES = {
+        ...
+        # Your task
+        "my_new_task": [
+             "{language}_SPECIFIC_PARAMETER", 
+             "LANGUAGE_INDEPENDENT_PARAMETER"
+        ],
+        ...
+    }
+    
+Then you have to include those declared parameters somewhere in your config file:
+
+    # My config parameters
+    ENGLISH_SPECIFIC_PARAMETER = 42
+    LANGUAGE_INDPENENDENT_PARAMETER = "yada yada"
+    
+If you implement tasks that extend the pipeline to support other language, please add it to the following list:
+
+    SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
+    
+Finally, create a module for your own pipeline (e.g. `nlp/my_pipeline.py) and build the configuration before running the pipeline, using the 
+pre-defined task names in `pipeline_config.py`: 
+
+    import luigi
+    from bwg.nlp.config_management import build_task_config_for_language
+    
+    class MyNewTask(luigi.Task):
+        def requires():
+            # Define task input here
+            
+        def output():
+            # Define task output here
+            
+        def run():
+            # Define what to do during the task here
+            
+    
+    if __name__ == "__main__":
+        task_config = build_task_config_for_language(
+            tasks=[
+                "my_new_task"
+            ],
+            language="english",
+            config_file_path="path/to/pipeline_config.py"
+        )
+        
+        # MyNewTask is the last task of the pipeline
+        luigi.build(
+            [MyNewTask(task_config=task_config)],
+            local_scheduler=True, workers=1, log_level="INFO"
+        )
+
 ##### Preparing
+
+As the last step before running the pipeline, make sure to run the `StanfordCoreNLP` server in case you are using a task
+from the module `nlp/corenlp_server_tasks.py`, using the following command in the directory with the appropriate Stanford
+models (in this case the `-serverProperties` argument is used to tell the Server the language of incoming texts):
+
+    java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -serverProperties StanfordCoreNLP-french.properties 
+    
+You also have to include at least this config parameter:
+
+    STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
+      
+In case you are writing the data into a `Neo4j` database, make sure to include the following parameters
+
+    # Neo4j
+    NEO4J_USER = "neo4j"
+    NEO4J_PASSWORD = "neo4j"
+    NEO4J_NETAG2MODEL = {
+        "I-PER": "Person",
+        "I-LOC": "Location",
+        "I-ORG": "Organization",
+        "DATE": "Date",
+        "I-MISC": "Miscellaneous"
+    }
+    
+and remember to run the server before running the pipeline, either by running `Neo4j`'s [community edition](https://neo4j.com/download/),
+executing the [`neo4j` shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
+or using [docker images](https://neo4j.com/developer/docker/) etc.
+
+In case you are using any task using `bwg/wikidata.py:WikidataAPIMixin`, e.g. `bwg/nlp/wikipedia_tasks.py:PropertiesCompletionTask`,
+please include a `user-config.py` file in your directory for `pywikibot`
+
+    mylang = "wikidata"
+    family = "wikidata"
+    usernames["wikidata"]["wikidata"] = u"BigWorldGraphBot"
 
 ##### Running the pipeline
 
+To execute your pipeline, just run your module:
+
+    python3 bwg/nlp/my_pipeline.py
+
 #### Graph visualization
 
+TODO: How to install and use
+
 #### Server deployment
+
+TODO: How to
 
 ## Warnings
 
 * If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
 pipline, otherwise running the pipeline will result in an exception being thrown.
-
-A description of the project, TODO
-
-TODO: How to install it
-TODO: How to use it
-* How to edit the config
-
-
-* Example Affairs in french wikipedia
-* Download
-* MWDumper (https://www.mediawiki.org/wiki/Manual:MWDumper)
-    * time bzcat frwiki-20161001-pages-articles.xml.bz2 | java -jar mwdumper-1.25.jar --format=xml --filter=titlematch:Affaire.* > affaire_pages.xml
-    * bzip2 fr_affaire_pages.xml 
-    * Wikipedia extractor (https://github.com/bwbaugh/wikipedia-extractor)
-    * bzcat fr_affaire_pages.xml.bz2 | python WikiExtractor.py -cb 250K -o extracted -
-    * find extracted -name '*bz2' -exec bunzip2 -c {} \; > text.xml
-    
-Commenting two lines (219) in nltk/parse/stanford.py when using utf-8 corpus, otherwise dependency parsing breaks.
-
-* Starting CoreNLP Server:
-    * java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -serverProperties StanfordCoreNLP-french.properties 
-
-user-config.py for pywikibot
-
-Neo4j installation
 
 curl -gX GET http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"
  MATCH (n)-[r]-(m), (m)-[r2]-(o)
