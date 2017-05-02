@@ -5,23 +5,22 @@ NLP Pipeline tasks for french texts.
 
 # STD
 import codecs
-import threading
 import re
+import threading
 
 # EXT
 import luigi
 import luigi.format
 
 # PROJECT
-from bwg.misc.helpers import is_collection, time_function
-from bwg.misc.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
-from bwg.nlp.utilities import (
+from bwg.helpers import is_collection, time_function
+from bwg.mixins import ArticleProcessingMixin
+from bwg.utilities import (
     serialize_article,
     get_nes_from_sentence,
     serialize_wikidata_entity
 )
-from bwg.nlp.mixins import ArticleProcessingMixin
-import bwg.nlp.standard_tasks
+from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 
 
 class WikipediaReadingTask(luigi.Task):
@@ -219,7 +218,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     Add attributes from Wikidata to Named Entities.
     """
     def requires(self):
-        return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
+        return bwg.standard_tasks.NERTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
@@ -247,7 +246,6 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
 
         for sentence_id, sentence_json in article_data.items():
             nes = get_nes_from_sentence(sentence_json["data"], default_ne_tag, include_tag=True)
-            self.named_entities += len(nes)
 
             entity_number = 0
             for named_entity, ne_tag in nes:

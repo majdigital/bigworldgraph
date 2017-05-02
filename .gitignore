@@ -11,5 +11,11 @@ data/evaluation/*
 *.ctrl
 *.ipynb
 */apicache/*
+<<<<<<< HEAD
 node_modules/
 .sass-cache/
+=======
+build/*
+dist/*
+bwg.egg-info/*
+>>>>>>> api

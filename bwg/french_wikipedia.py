@@ -7,24 +7,24 @@ NLP Pipeline tasks for french texts.
 import luigi.format
 import nltk
 
+from bwg.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
+from bwg.config_management import build_task_config_for_language
+from bwg.corenlp_server_tasks import (
+    ServerNERTask,
+    ServerDependencyParseTask,
+    ServerPoSTaggingTask,
+    ServerNaiveOpenRelationExtractionTask
+)
 # PROJECT
-from bwg.misc.helpers import download_nltk_resource_if_missing
-from bwg.nlp.standard_tasks import (
+from bwg.helpers import download_nltk_resource_if_missing
+from bwg.standard_tasks import (
     NERTask,
     DependencyParseTask,
     NaiveOpenRelationExtractionTask,
     PoSTaggingTask,
     ParticipationExtractionTask
 )
-from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
-from bwg.nlp.corenlp_server_tasks import (
-    ServerNERTask,
-    ServerDependencyParseTask,
-    ServerPoSTaggingTask,
-    ServerNaiveOpenRelationExtractionTask
-)
-from bwg.nlp.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
-from bwg.nlp.config_management import build_task_config_for_language
+from bwg.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
 
 
 # ---------------------------- Default tasks for french ---------------------------------
@@ -232,7 +232,7 @@ if __name__ == "__main__":
             "relations_database_writing_task"
         ],
         language="french",
-        config_file_path="../../pipeline_config.py"
+        config_file_path="./pipeline_config.py"
     )
     luigi.build(
         [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],

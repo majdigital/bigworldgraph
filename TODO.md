@@ -66,6 +66,7 @@ The versions listed here try to follow [Semantic Versioning](http://semver.or).
 ### v1.0.0
 
 * Release prototype.
+* Register with PyPI
 
 ## Future features
 
