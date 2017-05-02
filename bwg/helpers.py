@@ -9,6 +9,7 @@ import functools
 import sys
 import time
 import types
+import os
 
 # EXT
 import nltk
@@ -77,6 +78,22 @@ def get_config_from_py_file(config_path):
 
     return {
         key: getattr(config, key) for key in dir(config) if key.isupper()
+    }
+
+
+def overwrite_local_config_with_environ(config):
+    """
+    Overwrite a local configuration file's parameters by environment variables, if they exist.
+
+    :param config: Current configuration.
+    :type config: dict
+    :return: New configuration.
+    :rtype: dict
+    """
+    return {
+        key: (value if key not in os.environ else os.environ[key])
+        for key, value in config.items()
+        if key not in os.environ
     }
 
 

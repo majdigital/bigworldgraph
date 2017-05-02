@@ -11,9 +11,13 @@ from eve import Eve
 
 # PROJECT
 import bwg
-from bwg.db.neo4j import Neo4jLayer
+from bwg.neo4j import Neo4jLayer
+from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
 
-api = Eve(data=Neo4jLayer)
+
+api_config = get_config_from_py_file("settings.py")
+api_config = overwrite_local_config_with_environ(api_config)
+api = Eve(data=Neo4jLayer, settings=api_config)
 
 
 @api.route("/version")

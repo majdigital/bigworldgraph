@@ -10,17 +10,17 @@ Currently, accessing the data via the API is faster than the scraper.
 # STD
 import abc
 import re
-import urllib.request
 import urllib.parse
-import requests
+import urllib.request
 
 # EXT
 import bs4
 import pywikibot
+import requests
 from pywikibot.data import api
 
 # PROJECT
-from bwg.misc.helpers import construct_dict_from_source
+from bwg.helpers import construct_dict_from_source
 from bwg.nlp.utilities import retry_with_fallback
 
 

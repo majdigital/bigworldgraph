@@ -8,7 +8,15 @@ import luigi.format
 import nltk
 
 # PROJECT
-from bwg.misc.helpers import download_nltk_resource_if_missing
+from bwg.helpers import download_nltk_resource_if_missing
+from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
+from bwg.nlp.config_management import build_task_config_for_language
+from bwg.nlp.corenlp_server_tasks import (
+    ServerNERTask,
+    ServerDependencyParseTask,
+    ServerPoSTaggingTask,
+    ServerNaiveOpenRelationExtractionTask
+)
 from bwg.nlp.standard_tasks import (
     NERTask,
     DependencyParseTask,
@@ -16,15 +24,7 @@ from bwg.nlp.standard_tasks import (
     PoSTaggingTask,
     ParticipationExtractionTask
 )
-from bwg.nlp.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
-from bwg.nlp.corenlp_server_tasks import (
-    ServerNERTask,
-    ServerDependencyParseTask,
-    ServerPoSTaggingTask,
-    ServerNaiveOpenRelationExtractionTask
-)
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
-from bwg.nlp.config_management import build_task_config_for_language
 
 
 # ---------------------------- Default tasks for french ---------------------------------

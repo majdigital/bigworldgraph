@@ -9,19 +9,19 @@ import collections
 # EXT
 import luigi
 import luigi.format
-from nltk.tokenize.stanford import StanfordTokenizer
-from nltk.tag.stanford import StanfordNERTagger, StanfordPOSTagger
 from nltk.parse.stanford import StanfordDependencyParser
+from nltk.tag.stanford import StanfordNERTagger, StanfordPOSTagger
+from nltk.tokenize.stanford import StanfordTokenizer
 
 # PROJECT
-from bwg.misc.helpers import time_function
+from bwg.helpers import time_function
+from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
     serialize_relation,
     get_nes_from_sentence
 )
-from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
 
 

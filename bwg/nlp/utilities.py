@@ -4,11 +4,11 @@ Utilities for the NLP pipeline.
 """
 
 # STD
-import json
 import functools
+import json
 
 # PROJECT
-from bwg.misc.helpers import filter_dict
+from bwg.helpers import filter_dict
 from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 

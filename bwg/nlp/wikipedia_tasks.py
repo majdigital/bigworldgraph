@@ -5,23 +5,23 @@ NLP Pipeline tasks for french texts.
 
 # STD
 import codecs
-import threading
 import re
+import threading
 
 # EXT
 import luigi
 import luigi.format
 
+import bwg.nlp.standard_tasks
 # PROJECT
-from bwg.misc.helpers import is_collection, time_function
-from bwg.misc.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
+from bwg.helpers import is_collection, time_function
+from bwg.nlp.mixins import ArticleProcessingMixin
 from bwg.nlp.utilities import (
     serialize_article,
     get_nes_from_sentence,
     serialize_wikidata_entity
 )
-from bwg.nlp.mixins import ArticleProcessingMixin
-import bwg.nlp.standard_tasks
+from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 
 
 class WikipediaReadingTask(luigi.Task):

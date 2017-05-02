@@ -11,9 +11,8 @@ import copy
 import luigi
 import pycorenlp
 
-
 # PROJECT
-from bwg.misc.helpers import time_function, flatten_dictlist
+from bwg.helpers import time_function, flatten_dictlist
 from bwg.nlp.utilities import serialize_article, just_dump, deserialize_line
 
 
