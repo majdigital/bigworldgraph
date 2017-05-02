@@ -87,11 +87,11 @@ CONFIG_DEPENDENCIES = {
 SUPPORTED_LANGUAGES = ["FRENCH"]
 
 # --------------------------------- General config --------------------------------------
-STANFORD_CORENLP_MODELS_PATH = "../../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
+STANFORD_CORENLP_MODELS_PATH = "../data/stanford/models/stanford-corenlp-3.7.0-models.jar"
 STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
-STANFORD_POSTAGGER_PATH = "../../data/stanford/models/stanford-postagger.jar"
+STANFORD_POSTAGGER_PATH = "../data/stanford/models/stanford-postagger.jar"
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
-STANFORD_PATH = "../../data/stanford/models/"
+STANFORD_PATH = "../data/stanford/models/"
 VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 DEFAULT_NE_TAG = "O"
@@ -118,8 +118,8 @@ NEO4J_NETAG2MODEL = {
 # ------------------------------- French configurations ---------------------------------
 
 # Paths for Luigi task outputs
-FRENCH_LUIGI_DATA_PATH = "../../data/pipeline_french/"
-FRENCH_CORPORA_PATH = "../../data/corpora_french/"
+FRENCH_LUIGI_DATA_PATH = "../data/pipeline_french/"
+FRENCH_CORPORA_PATH = "../data/corpora_french/"
 FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_nes.json"
 FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_pos.json"
 FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_dependencies.json"

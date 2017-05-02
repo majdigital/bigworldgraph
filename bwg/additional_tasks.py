@@ -13,7 +13,7 @@ import luigi.format
 
 from bwg.helpers import time_function
 from bwg.mixins import ArticleProcessingMixin
-from bwg.neo4j import Neo4jTarget
+from bwg.neo4j_extensions import Neo4jTarget
 # PROJECT
 from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
 from bwg.utilities import serialize_relation, deserialize_line, just_dump

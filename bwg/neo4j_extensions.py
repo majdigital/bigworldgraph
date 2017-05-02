@@ -12,11 +12,9 @@ from eve.io.base import DataLayer
 from eve.exceptions import ConfigException
 import luigi
 import neomodel
-from neomodel.relationship import StructuredRel
-from neomodel.core import StructuredNode
 
 
-class EveCompabilityMixin:
+class EveCompatibilityMixin:
     """
     Extend neomodel classes to make them compatible with Eve API functions.
     """
@@ -30,7 +28,7 @@ class EveCompabilityMixin:
         setattr(self, key, value)
 
 
-class Relation(StructuredRel, EveCompabilityMixin):
+class Relation(neomodel.StructuredRel, EveCompatibilityMixin):
     """
     Node model for relations in the graph.
     """
@@ -38,7 +36,7 @@ class Relation(StructuredRel, EveCompabilityMixin):
     data = neomodel.JSONProperty()
 
 
-class Entity(StructuredNode, EveCompabilityMixin):
+class Entity(neomodel.StructuredNode, EveCompatibilityMixin):
     """
     Node model for entities in the graph.
     """
@@ -49,7 +47,7 @@ class Entity(StructuredNode, EveCompabilityMixin):
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
 
 
-class PipelineRunInfo(StructuredNode):
+class PipelineRunInfo(neomodel.StructuredNode):
     """
     Define a model for pipeline run information.
     """
@@ -223,7 +221,7 @@ class Neo4jDatabase:
         )
 
     @staticmethod
-    def get_node_class(class_name, base_classes=(StructuredNode, EveCompabilityMixin)):
+    def get_node_class(class_name, base_classes=(neomodel.StructuredNode, EveCompatibilityMixin)):
         """
         Get the corresponding node class to a class name. If it isn't found in the current module, create it on the fly.
         
@@ -300,7 +298,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         self.node_base_classes = tuple([
             self.get_node_class(base_class_name)
             for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
-        ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (StructuredNode, EveCompabilityMixin)
+        ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (neomodel.StructuredNode, EveCompatibilityMixin)
         self.node_base_classes_names = [
             node_base_class.__name__ for node_base_class in self.node_base_classes
         ]

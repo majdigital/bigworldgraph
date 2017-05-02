@@ -12,7 +12,7 @@ from eve import Eve
 # PROJECT
 import bwg
 from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
-from bwg.neo4j import Neo4jLayer
+from bwg.neo4j_extensions import Neo4jLayer
 
 
 api_config = get_config_from_py_file("settings.py")
