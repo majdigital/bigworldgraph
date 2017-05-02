@@ -63,6 +63,7 @@ class Neo4jResult:
     """
     relations = []
     relation_ids = set()
+    node_ids = set()
 
     def __init__(self, selection, **kwargs):
         """
@@ -75,6 +76,10 @@ class Neo4jResult:
         """
         self.parsed_request = kwargs.get("parsed_request", None)
         self.selection = selection
+
+        for node in selection:
+            self.node_ids.add(node.uid)
+
         self._clean_selection()
         self._apply_request_parameters()
 
@@ -98,16 +103,24 @@ class Neo4jResult:
         """
         self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
 
-    # TODO (Documentation) [DU 02.05.17]
-    # TODO (Improve): Don't send superfluous relations [DU 02.05.17]
     def _clean_node(self, node):
+        """
+        Clean the node of data that is unserializable and transform it into a structure that is easy to be visualized 
+        later. 
+        
+        :param node: Node to be cleaned.
+        :type node: dict
+        :return: Cleaned node.
+        :rtype: dict
+        """
         for target_node in node.relations:
             relation = node.relations.relationship(target_node)
             relation = self.clean_unserializables(relation)
             relation["source"] = node.uid
             relation["target"] = target_node.uid
 
-            if relation["id"] not in self.relation_ids:
+            if relation["id"] not in self.relation_ids and \
+               node.uid in self.node_ids and target_node.uid in self.node_ids:
                 self.relations.append(relation)
                 self.relation_ids.add(relation["id"])
 
@@ -126,8 +139,15 @@ class Neo4jResult:
             del node["relations"]
         return node
 
-    # TODO (Documentation) [DU 02.05.17]
     def clean_unserializables(self, dictionary):
+        """
+        Remove unserializable fields from a dictionary.
+        
+        :param dictionary: Dictionary to be cleaned from unserializable fields.
+        :type dictionary: dict
+        :return: Cleaned dictionary.
+        :rtype: dict
+        """
         return {
             key: value
             for key, value in vars(dictionary).items()
@@ -250,7 +270,6 @@ class Neo4jDatabase:
         :return: List of nodes matching the criteria.
         :rtype: list
         """
-        # TODO (Improve): Do not always return all nodes. [DU 01.05.17]
         try:
             if req.args:
                 identifier = list(req.args.keys())[0]
@@ -260,9 +279,19 @@ class Neo4jDatabase:
         except node_class.DoesNotExist:
             return []
 
-    # TODO (Documentation) [DU 02.05.17]
     @staticmethod
     def find_friends_of_friends(node_class, identifier, identifier_value):
+        """
+        Find friends and friends of friends of a specific node.
+        
+        :param node_class: Class of target node.
+        :type node_class: neomodel.StructuredNode 
+        :param identifier: Field that should be used to identify the target node.
+        :type identifier: str
+        :param identifier_value: Value that should be used to identify the target node.
+        :type identifier_value: str
+        :return: 
+        """
         results, meta = neomodel.db.cypher_query(
             'MATCH (n)-[r]-(m), (m)-[r2]-(o) WHERE n.{identifier} = "{identifier_value}" RETURN n, o, m'.format(
                 identifier=identifier, identifier_value=identifier_value
