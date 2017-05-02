@@ -4,12 +4,12 @@ Utilities for the NLP pipeline.
 """
 
 # STD
-import json
 import functools
+import json
 
 # PROJECT
-from bwg.misc.helpers import filter_dict
-from pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
+from bwg.helpers import filter_dict
+from bwg.pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
 
 
 def serialize_tagged_sentence(sentence_id, tagged_sentence, state="raw", pretty=False, dump=True):

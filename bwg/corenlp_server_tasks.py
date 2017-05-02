@@ -11,8 +11,9 @@ Also, this approach comes with some other merits as well:
 """
 
 # PROJECT
-from bwg.nlp.mixins import CoreNLPServerMixin
-from bwg.nlp.standard_tasks import (
+from bwg.mixins import CoreNLPServerMixin
+
+from bwg.standard_tasks import (
     NERTask,
     DependencyParseTask,
     PoSTaggingTask,

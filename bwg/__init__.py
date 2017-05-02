@@ -2,12 +2,8 @@
 """
 Version info.
 """
-import sys
-import os
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-)
+__versioninfo__ = (0, 7, 0)
+__version__ = '.'.join([str(num) for num in __versioninfo__])
 
-__version_info__ = (0, 5, 0)
-__version__ = '.'.join([str(num) for num in __version_info__])
+# TODO (Improve): Include demo pipeline [DU 02.05.17]
