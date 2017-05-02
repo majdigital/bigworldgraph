@@ -12,6 +12,8 @@ from eve.io.base import DataLayer
 from eve.exceptions import ConfigException
 import luigi
 import neomodel
+from neomodel.relationship import StructuredRel
+from neomodel.core import StructuredNode
 
 
 class EveCompabilityMixin:
@@ -28,7 +30,7 @@ class EveCompabilityMixin:
         setattr(self, key, value)
 
 
-class Relation(neomodel.StructuredRel, EveCompabilityMixin):
+class Relation(StructuredRel, EveCompabilityMixin):
     """
     Node model for relations in the graph.
     """
@@ -36,7 +38,7 @@ class Relation(neomodel.StructuredRel, EveCompabilityMixin):
     data = neomodel.JSONProperty()
 
 
-class Entity(neomodel.StructuredNode, EveCompabilityMixin):
+class Entity(StructuredNode, EveCompabilityMixin):
     """
     Node model for entities in the graph.
     """
@@ -47,7 +49,7 @@ class Entity(neomodel.StructuredNode, EveCompabilityMixin):
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
 
 
-class PipelineRunInfo(neomodel.StructuredNode):
+class PipelineRunInfo(StructuredNode):
     """
     Define a model for pipeline run information.
     """
@@ -98,6 +100,7 @@ class Neo4jResult:
         """
         self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
 
+    # TODO (Documentation) [DU 02.05.17]
     def _clean_node(self, node):
         for target_node in node.relations:
             relation = node.relations.relationship(target_node)
@@ -124,6 +127,7 @@ class Neo4jResult:
             del node["relations"]
         return node
 
+    # TODO (Documentation) [DU 02.05.17]
     def clean_unserializables(self, dictionary):
         return {
             key: value
@@ -219,7 +223,7 @@ class Neo4jDatabase:
         )
 
     @staticmethod
-    def get_node_class(class_name, base_classes=(neomodel.StructuredNode, EveCompabilityMixin)):
+    def get_node_class(class_name, base_classes=(StructuredNode, EveCompabilityMixin)):
         """
         Get the corresponding node class to a class name. If it isn't found in the current module, create it on the fly.
         
@@ -254,6 +258,18 @@ class Neo4jDatabase:
         except node_class.DoesNotExist:
             return []
 
+    # TODO (Documentation) [DU 02.05.17]
+    @staticmethod
+    def find_friends_of_friends(node_id):
+        results, meta = neomodel.db.cypher_query(
+            """
+            MATCH (n)-[r]-(m), (m)-[r2]-(o)
+            WHERE n.uid = {node_id}  
+            RETURN n, o, m
+            """.format(node_id=node_id)
+        )
+        return [Entity.inflate(row[0]) for row in results]
+
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
@@ -284,7 +300,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         self.node_base_classes = tuple([
             self.get_node_class(base_class_name)
             for base_class_name in app.config.get("NODE_BASE_CLASSES", [])
-        ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (neomodel.StructuredNode, EveCompabilityMixin)
+        ]) if app.config.get("NODE_BASE_CLASSES", []) != [] else (StructuredNode, EveCompabilityMixin)
         self.node_base_classes_names = [
             node_base_class.__name__ for node_base_class in self.node_base_classes
         ]

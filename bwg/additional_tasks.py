@@ -12,12 +12,12 @@ import luigi
 import luigi.format
 
 from bwg.helpers import time_function
+from bwg.mixins import ArticleProcessingMixin
 from bwg.neo4j import Neo4jTarget
-from bwg.nlp.mixins import ArticleProcessingMixin
 # PROJECT
-from bwg.nlp.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
-from bwg.nlp.utilities import serialize_relation, deserialize_line, just_dump
-from bwg.nlp.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
+from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
+from bwg.utilities import serialize_relation, deserialize_line, just_dump
+from bwg.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
 
 
 class RelationMergingTask(luigi.Task, ArticleProcessingMixin):

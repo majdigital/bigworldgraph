@@ -21,7 +21,7 @@ from pywikibot.data import api
 
 # PROJECT
 from bwg.helpers import construct_dict_from_source
-from bwg.nlp.utilities import retry_with_fallback
+from bwg.utilities import retry_with_fallback
 
 
 class AbstractWikidataMixin:

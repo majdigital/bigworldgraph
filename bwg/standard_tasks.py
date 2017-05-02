@@ -15,14 +15,14 @@ from nltk.tokenize.stanford import StanfordTokenizer
 
 # PROJECT
 from bwg.helpers import time_function
-from bwg.nlp.mixins import ArticleProcessingMixin
-from bwg.nlp.utilities import (
+from bwg.mixins import ArticleProcessingMixin
+from bwg.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
     serialize_relation,
     get_nes_from_sentence
 )
-from bwg.nlp.wikipedia_tasks import WikipediaReadingTask
+from bwg.wikipedia_tasks import WikipediaReadingTask
 
 
 class NERTask(luigi.Task, ArticleProcessingMixin):

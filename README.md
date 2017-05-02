@@ -1,5 +1,7 @@
 # README
 
+DISCLAIMER: This project is still in development and hasn't produced a stable version yet.
+
 ## BigWorldGraph
 
 This project is dedicated to make today's political sphere more transparent, visualizing the links between entities in 
@@ -17,6 +19,8 @@ information).
 
 The project is intended to work with all kinds of texts in different languages; however, the prototype was developed to 
 work with a corpus composed of Wikipedia articles of (political) affairs in France since 1996.
+
+To see what future features are planned to be included in this project, check TODO.md.
 
 #### Project description
 
@@ -38,6 +42,7 @@ To install all necessary python packages to run the pipeline, execute the follow
 root directory:
 
     pip3 install -r requirements.txt
+    python3 setup.py install
     
 You also have to have [Neo4j](https://neo4j.com/download/) installed.
 
@@ -56,15 +61,15 @@ For steps involving Natural Languages Processing, appropriate [Stanford NLP](htt
 
 ##### Writing your own pipeline tasks
 
-If you want to modify existing pipeline tasks or write new ones, it is recommended to add a new module to the `nlp` package,
-see e.g. `nlp/french_wikipedia.py` as reference. You can inherit tasks from other modules to solve common problems:
+If you want to modify existing pipeline tasks or write new ones, it is recommended to add a new module to the `bwg` package,
+see e.g. `bwg/french_wikipedia.py` as reference. You can inherit tasks from other modules to solve common problems:
 
-* `nlp/standard_tasks.py`: Standard NLP tasks like PoS tagging, Dependency Parsing etc.
-* `nlp/corenlp_server_tasks.py`: Same standard NLP tasks, but using the `Stanford CoreNLP server` instead to speed up 
+* `bwg/standard_tasks.py`: Standard NLP tasks like PoS tagging, Dependency Parsing etc.
+* `bwg/corenlp_server_tasks.py`: Same standard NLP tasks, but using the `Stanford CoreNLP server` instead to speed up 
 cumbersome and slow tasks.
-* `nlp/wikipedia_tasks.py`: Reading an input file in the shallow `MW-Dumper` XML format; extracting addtional information 
+* `bwg/wikipedia_tasks.py`: Reading an input file in the shallow `MW-Dumper` XML format; extracting addtional information 
 from Wikidata.
-* `nlp/additional_tasks.py`: Creating a file with information about the current pipeline run, writing relationships into 
+* `bwg/additional_tasks.py`: Creating a file with information about the current pipeline run, writing relationships into 
 a graph database and more.
 
 With its standard configuration, the pipeline comprises the following tasks:
@@ -96,7 +101,7 @@ If you implement tasks that extend the pipeline to support other language, pleas
 
     SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
     
-Finally, create a module for your own pipeline (e.g. `nlp/my_pipeline.py) and build the configuration before running the pipeline, using the 
+Finally, create a module for your own pipeline (e.g. `nlp/my_pipeline.py`) and build the configuration before running the pipeline, using the 
 pre-defined task names in `pipeline_config.py`: 
 
     import luigi
@@ -168,7 +173,7 @@ please include a `user-config.py` file in your directory for `pywikibot`
 
 To execute your pipeline, just run your module:
 
-    python3 bwg/nlp/my_pipeline.py
+    python3 bwg/my_pipeline.py
 
 #### Graph visualization
 

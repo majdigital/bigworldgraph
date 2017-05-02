@@ -12,11 +12,10 @@ import threading
 import luigi
 import luigi.format
 
-import bwg.nlp.standard_tasks
 # PROJECT
 from bwg.helpers import is_collection, time_function
-from bwg.nlp.mixins import ArticleProcessingMixin
-from bwg.nlp.utilities import (
+from bwg.mixins import ArticleProcessingMixin
+from bwg.utilities import (
     serialize_article,
     get_nes_from_sentence,
     serialize_wikidata_entity
@@ -219,7 +218,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     Add attributes from Wikidata to Named Entities.
     """
     def requires(self):
-        return bwg.nlp.standard_tasks.NERTask(task_config=self.task_config)
+        return bwg.standard_tasks.NERTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])

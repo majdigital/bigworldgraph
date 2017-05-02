@@ -13,7 +13,7 @@ import pycorenlp
 
 # PROJECT
 from bwg.helpers import time_function, flatten_dictlist
-from bwg.nlp.utilities import serialize_article, just_dump, deserialize_line
+from bwg.utilities import serialize_article, just_dump, deserialize_line
 
 
 class CoreNLPServerMixin:

@@ -11,3 +11,6 @@ data/evaluation/*
 *.ctrl
 *.ipynb
 */apicache/*
+build/*
+dist/*
+bwg.egg-info/*
