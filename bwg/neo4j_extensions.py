@@ -99,6 +99,7 @@ class Neo4jResult:
         self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
 
     # TODO (Documentation) [DU 02.05.17]
+    # TODO (Improve): Don't send superfluous relations [DU 02.05.17]
     def _clean_node(self, node):
         for target_node in node.relations:
             relation = node.relations.relationship(target_node)
@@ -252,8 +253,8 @@ class Neo4jDatabase:
         # TODO (Improve): Do not always return all nodes. [DU 01.05.17]
         try:
             if req.args:
-                if "uid" in req.args:
-                    return self.find_friends_of_friends(node_class, req.args["uid"])
+                identifier = list(req.args.keys())[0]
+                return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
 
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
@@ -261,15 +262,29 @@ class Neo4jDatabase:
 
     # TODO (Documentation) [DU 02.05.17]
     @staticmethod
-    def find_friends_of_friends(node_class, node_id):
+    def find_friends_of_friends(node_class, identifier, identifier_value):
         results, meta = neomodel.db.cypher_query(
-            """
-            MATCH (n)-[r]-(m), (m)-[r2]-(o)
-            WHERE n.uid = {node_id}  
-            RETURN n, o, m
-            """.format(node_id=node_id)
+            'MATCH (n)-[r]-(m), (m)-[r2]-(o) WHERE n.{identifier} = "{identifier_value}" RETURN n, o, m'.format(
+                identifier=identifier, identifier_value=identifier_value
+            )
         )
-        return [node_class.inflate(row[0]) for row in results]
+
+        unique_node_identifiers = set()
+        unique_nodes = []
+
+        for result in results:
+            for row in result:
+                node = node_class.inflate(row)
+
+                if identifier not in vars(node):
+                    continue
+
+                current_identifier = getattr(node, identifier)
+                if current_identifier not in unique_node_identifiers:
+                    unique_nodes.append(node)
+                    unique_node_identifiers.add(current_identifier)
+
+        return unique_nodes
 
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
