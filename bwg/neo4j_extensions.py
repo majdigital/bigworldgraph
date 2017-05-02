@@ -238,8 +238,7 @@ class Neo4jDatabase:
             return type(class_name, base_classes, {})
         return node_class
 
-    @staticmethod
-    def find_nodes(node_class, **constraints):
+    def find_nodes(self, node_class, req, **constraints):
         """
         Find nodes of a certain class given optional constraints.
         
@@ -252,13 +251,17 @@ class Neo4jDatabase:
         """
         # TODO (Improve): Do not always return all nodes. [DU 01.05.17]
         try:
+            if req.args:
+                if "uid" in req.args:
+                    return self.find_friends_of_friends(node_class, req.args["uid"])
+
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
             return []
 
     # TODO (Documentation) [DU 02.05.17]
     @staticmethod
-    def find_friends_of_friends(node_id):
+    def find_friends_of_friends(node_class, node_id):
         results, meta = neomodel.db.cypher_query(
             """
             MATCH (n)-[r]-(m), (m)-[r2]-(o)
@@ -266,7 +269,7 @@ class Neo4jDatabase:
             RETURN n, o, m
             """.format(node_id=node_id)
         )
-        return [Entity.inflate(row[0]) for row in results]
+        return [node_class.inflate(row[0]) for row in results]
 
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):

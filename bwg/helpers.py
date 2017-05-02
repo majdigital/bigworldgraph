@@ -70,7 +70,7 @@ def get_config_from_py_file(config_path):
     config.__file__ = config_path
 
     try:
-        with open(config_path) as config_file:
+        with codecs.open(config_path, "rb", "utf-8") as config_file:
             exec(compile(config_file.read(), config_path, 'exec'),
                  config.__dict__)
     except IOError:
