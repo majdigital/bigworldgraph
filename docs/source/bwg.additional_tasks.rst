@@ -1,5 +1,5 @@
-bwg.additional_tasks module
-===========================
+bwg.additional_tasks
+====================
 
 Module contents
 ---------------

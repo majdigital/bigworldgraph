@@ -1,5 +1,5 @@
-bwg.wikipedia_tasks module
-==========================
+bwg.wikipedia_tasks
+===================
 
 Module contents
 ---------------

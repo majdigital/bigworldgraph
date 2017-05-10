@@ -1,5 +1,5 @@
-bwg.wikidata module
-===================
+bwg.wikidata
+============
 
 Module contents
 ---------------

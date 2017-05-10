@@ -1,5 +1,5 @@
-bwg.helpers module
-==================
+bwg.helpers
+===========
 
 Module contents
 ---------------

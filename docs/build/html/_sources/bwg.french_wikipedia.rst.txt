@@ -1,5 +1,5 @@
-bwg.french_wikipedia module
-===========================
+bwg.french_wikipedia
+====================
 
 Module contents
 ---------------

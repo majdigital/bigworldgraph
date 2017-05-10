@@ -1,5 +1,5 @@
-bwg.neo4j_extensions module
-===========================
+bwg.neo4j_extensions
+====================
 
 Module contents
 ---------------

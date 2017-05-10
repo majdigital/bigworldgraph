@@ -1,5 +1,5 @@
-bwg.mixins module
-=================
+bwg.mixins
+==========
 
 Module contents
 ---------------

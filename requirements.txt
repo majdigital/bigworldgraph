@@ -5,3 +5,5 @@ pywikibot
 bs4
 neomodel==3.2.3
 eve
+sphinx
+sphinx_bootstrap_theme

@@ -1,5 +1,5 @@
-bwg.config_management module
-============================
+bwg.config_management
+=====================
 
 Module contents
 ---------------

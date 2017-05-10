@@ -1,5 +1,5 @@
-bwg.corenlp_server_tasks module
-===============================
+bwg.corenlp_server_tasks
+========================
 
 Module contents
 ---------------

@@ -1,10 +1,10 @@
-bwg package
-===========
+Main project contents
+=====================
 
 Bla bla bla
 
-Subpackages
------------
+Modules
+-------
 
 .. toctree::
 
@@ -15,7 +15,6 @@ Subpackages
     bwg.helpers
     bwg.mixins
     bwg.neo4j_extensions
-    bwg.run
     bwg.standard_tasks
     bwg.utilities
     bwg.wikidata

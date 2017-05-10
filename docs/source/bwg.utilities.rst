@@ -1,5 +1,5 @@
-bwg.utilities module
-====================
+bwg.utilities
+=============
 
 Module contents
 ---------------
