@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.corenlp_server_tasks &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.french_wikipedia" href="bwg.french_wikipedia.html" />
+    <link rel="prev" title="bwg.config_management" href="bwg.config_management.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.corenlp_server_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">bwg.corenlp_server_tasks</a><ul>
+<li><a class="reference internal" href="#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
+<li><a class="reference internal" href="#module-bwg.corenlp_server_tasks">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="bwg.config_management.html" title="Previous Chapter: bwg.config_management"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; bwg.config_management</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.french_wikipedia.html" title="Next Chapter: bwg.french_wikipedia"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.french_wikipedia &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.corenlp_server_tasks.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="bwg-corenlp-server-tasks">
+<h1>bwg.corenlp_server_tasks<a class="headerlink" href="#bwg-corenlp-server-tasks" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-corenlp-server-tasks">
+<h2>Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks<a class="headerlink" href="#using-corenlp-server-tasks" title="Permalink to this headline">¶</a></h2>
+<p>To use <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks, appropriate <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/download.html">Stanford
+NLP</a> models are
+also required. Before running the pipeline, also make sure to run the
+<code class="docutils literal"><span class="pre">StanfordCoreNLP</span></code> server in case you are using a task from the module
+<code class="docutils literal"><span class="pre">nlp/corenlp_server_tasks.py</span></code>, using the following command in the
+directory with the appropriate Stanford models (in this case the
+<code class="docutils literal"><span class="pre">-serverProperties</span></code> argument is used to tell the Server the language
+of incoming texts):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">mx4g</span> <span class="o">-</span><span class="n">cp</span> <span class="s2">&quot;*&quot;</span> <span class="n">edu</span><span class="o">.</span><span class="n">stanford</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">StanfordCoreNLPServer</span> <span class="o">-</span><span class="n">port</span> <span class="mi">9000</span> <span class="o">-</span><span class="n">timeout</span> <span class="mi">15000</span> <span class="o">-</span><span class="n">serverProperties</span> <span class="n">StanfordCoreNLP</span><span class="o">-</span><span class="n">french</span><span class="o">.</span><span class="n">properties</span>
+</pre></div>
+</div>
+<p>For more information about the server itself, please consult the <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/corenlp-server.html">official documentation</a>.</p>
+<p>Finally, you also have to include at least this config parameter in your pipeline config file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">STANFORD_CORENLP_SERVER_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:9000&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-bwg.corenlp_server_tasks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.corenlp_server_tasks" title="Permalink to this headline">¶</a></h2>
+<p>Rewriting standard tasks for the NLP pipeline using the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span></code> server. The main motivation to do this lies
+in the following problem: When the respective Stanford tools are run through their <code class="docutils literal"><span class="pre">NLTK</span></code> wrappers, they load their
+necessary models from scratch every time. This slows down the pipeline quite a load. In contrast, the server loads them
+only once.</p>
+<dl class="docutils">
+<dt>Also, this approach comes with some other merits as well:</dt>
+<dd><ul class="first last simple">
+<li>Reducing the number of necessary Stanford model files</li>
+<li>Avoiding using bulk operations like <code class="docutils literal"><span class="pre">parse_sents()</span></code> which complicate the current architecture of the pipeline.</li>
+</ul>
+</dd>
+</dl>
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerDependencyParseTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.DependencyParseTask" title="bwg.standard_tasks.DependencyParseTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.DependencyParseTask</span></code></a></p>
+<p>Luigi task that dependency-parses sentences in a corpus, but using a Stanford CoreNLP server.</p>
+<dl class="method">
+<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes">
+<code class="descname">edges_to_nodes</code><span class="sig-paren">(</span><em>edges</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a dependency tree representation based on nodes to a representation based on edges.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>edges</strong> (<em>list</em>) &#8211; List of tree edges.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with the root node and a list of all nodes.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerNERTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNERTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNERTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NERTask" title="bwg.standard_tasks.NERTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NERTask</span></code></a></p>
+<p>Luigi task that performs Named Entity Recognition on a corpus, but using a Stanford CoreNLP server.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNaiveOpenRelationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NaiveOpenRelationExtractionTask" title="bwg.standard_tasks.NaiveOpenRelationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NaiveOpenRelationExtractionTask</span></code></a></p>
+<p>Luigi task that performs Open Relation extraction on a corpus. The only adjustment in this case are the requirements
+for this task, this task doesn&#8217;t use the CoreNLP server at all.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerPoSTaggingTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerPoSTaggingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerPoSTaggingTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.PoSTaggingTask" title="bwg.standard_tasks.PoSTaggingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.PoSTaggingTask</span></code></a></p>
+<p>Luigi task that PoS tags a sentence in a corpus, but using a Stanford CoreNLP server.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

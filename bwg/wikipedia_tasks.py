@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP Pipeline tasks for french texts.
+NLP Pipeline tasks connected to resources of the Wikimedia Foundation.
 """
 
 # STD

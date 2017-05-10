@@ -18,9 +18,9 @@ from bwg.utilities import serialize_article, just_dump, deserialize_line
 
 class CoreNLPServerMixin:
     """
-    Communicate with a Stanford CoreNLP server via the pycorenlp wrapper.
+    Communicate with a Stanford CoreNLP server via the ``pycorenlp`` wrapper.
     """
-    task_config = luigi.DictParameter()
+    task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
     _server = None
 
     def process_sentence_with_corenlp_server(self, sentence_data, action, postprocessing_func=None):
@@ -32,7 +32,7 @@ class CoreNLPServerMixin:
         :param action: Action that should be performed on the data.
         :type action: str
         :param postprocessing_func: Function that is applied to output afterwards (None means that there won't be any 
-        function applied to the output).
+            function applied to the output).
         :type postprocessing_func: func, None
         """
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
@@ -77,8 +77,37 @@ class CoreNLPServerMixin:
 class ArticleProcessingMixin:
     """
     Enable Luigi tasks to process single lines as well as articles or other input types.
+    
+    ``Luigi`` tasks inheriting from this Mixin will work the following way:
+    In ``run()`` you usually only define the inputs and outputs of the task and pass them along with some other 
+    arguments to the main function, ``task_workflow()``:
+    ::
+    
+        def run(self):
+            with self.input()[0].open("r") as first_file, self.input()[1].open("r") as second_file:
+                with self.output().open("w") as output_file:
+                for line1, line2 in zip(first_file, second_file):
+                    self.process_articles(
+                        (line1, line2), new_state="done stuff",
+                        serializing_function=serialize_output, output_file=output_file
+                    )
+                    
+    whereby the ``new_state`` denotes a description of the current task which will be included in the results meta data
+    and the ``serializing_function`` being the function used to transform the task's output into a form corresponding to 
+    ``JSON``.
+    
+    Furthermore you can overwrite the ``workflow_resources`` property to initialize any resources before the task starts.
+
+    In ``task_workflow``, you then define the core functionality of the task. This function gets called for every 
+    article in the input and you then iterate trough every sentence in the article in the function. The expected output
+    is a dictionary of key word arguments for the serializing function.
+    
+    You can overwrite ``is_relevant_article`` and ``is_relevant_sentence`` to only include specific tasks results in your
+    output (this however only makes sense (for now) to do on your last tasks, as it might lead to misalignments of 
+    inputs for following tasks). Make sure to also set ``ONLY_INCLUDE_RELEVANT_SENTENCES`` and 
+    ``ONLY_INCLUDE_RELEVANT_ARTICLES`` to ``True`` in your pipeline's config file, correspondingly.
     """
-    task_config = luigi.DictParameter()
+    task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
 
     @abc.abstractmethod
     def task_workflow(self, article, **workflow_kwargs):
@@ -89,17 +118,16 @@ class ArticleProcessingMixin:
 
         The input is considered an article, e.g. some text that consists of a variable number of sentences. Here's a
         proposal how to fit real world media types to this requirement:
-            * Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small
-                                 articles themselves.
-            * Newspaper article: Same intuition as above.
-            * Books: Treat chapters as articles.
-            * Single paragraphs of text: Treat as articles that may not contain a headline.
-            * Single sentence: Treat as single paragraph with only one "data" entry.
-            * Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for
-                                        (written) natural language.
+        
+        * Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small articles themselves.
+        * Newspaper article: Same intuition as above.
+        * Books: Treat chapters as articles.
+        * Single paragraphs of text: Treat as articles that may not contain a headline.
+        * Single sentence: Treat as single paragraph with only one "data" entry.
+        * Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for (written) natural language.
                                         
         :param article: Current article as a dictionary, with the "meta" field providing meta data and the "data" field
-        providing the actual sentence data.
+            providing the actual sentence data.
         :type article: dict
         :param workflow_kwargs: Additional key word arguments for this tasks workflow, e.g. additional resources.
         :type workflow_kwargs: dict
@@ -109,7 +137,7 @@ class ArticleProcessingMixin:
         # Do main work here, e.g. iterating through every sentence in an articles "data" dict, performing a specific
         # task.
         for sentence_id, sentence in article["data"]:
-            # https://www.youtube.com/watch?v=HL1UzIK-flA
+            # Do the https://www.youtube.com/watch?v=HL1UzIK-flA
             pass
 
             # Afterwards, put all the arguments for the corresponding serializing function into a dict and yield it.
@@ -137,10 +165,10 @@ class ArticleProcessingMixin:
         it to the output file.
         
         :param raw_articles: Raw articles (referring to the same article but carrying different kinds of data for their 
-        sentences) read from input file.
+            sentences) read from input file.
         :type raw_articles: list, tuple
         :param new_state: State that describes the kind of processing that is applied to the data in this step. It's 
-        included in the metadata of each article.
+            included in the metadata of each article.
         :type new_state: str
         :param serializing_function: Function that is used afterwards to serialize the data again.
         :type serializing_function: func
@@ -183,7 +211,7 @@ class ArticleProcessingMixin:
         Combine multiple articles into one data structure, if necessary.
         
         :param raw_articles: Raw articles (referring to the same article but carrying different kinds of data for their 
-        sentences) read from input file.
+            sentences) read from input file.
         :type raw_articles: list
         :return: New article with combined data.
         :rtype: dict

@@ -39,7 +39,7 @@ def construct_dict_from_source(fields, source):
     values from a source dictionary.
     
     :param fields: Dictionary with fields in the the target dict as keys and functions to extract their desired value .
-    for these fields from the source dict
+        for these fields from the source dict
     :type fields: dict
     :param source: Source dictionary.
     :type source: dict
@@ -167,12 +167,12 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
     apply it to a ArticleProcessingMixin.
     
     :param out: Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the 
-    output being appended to a file.
+        output being appended to a file.
     :type out: None, str, _io.TextIOWrapper
     :param is_classmethod: Declare the function being decorated a class method.
     :type is_classmethod: bool
     :param return_time: Flag to indicate whether the function's runtime should be returned alongside the decorated 
-    function's return value in an dictionary.
+        function's return value in an dictionary.
     :return: Decorator function.
     :rtype: func
     
