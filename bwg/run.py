@@ -8,6 +8,7 @@ import json
 
 # EXT
 from eve import Eve
+import flask_cors
 
 # PROJECT
 import bwg
@@ -18,6 +19,7 @@ from bwg.neo4j_extensions import Neo4jLayer
 api_config = get_config_from_py_file("settings.py")
 api_config = overwrite_local_config_with_environ(api_config)
 api = Eve(data=Neo4jLayer, settings=api_config)
+flask_cors.CORS(api)
 
 
 @api.route("/version")

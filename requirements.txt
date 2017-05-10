@@ -5,3 +5,4 @@ pywikibot
 bs4
 neomodel==3.2.3
 eve
+flask-cors
