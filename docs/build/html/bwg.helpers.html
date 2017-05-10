@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.helpers module &#8212; BigWorldGraph v0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'v0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.mixins module" href="bwg.mixins.html" />
+    <link rel="prev" title="bwg.french_wikipedia module" href="bwg.french_wikipedia.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bwg-helpers-module">
+<h1>bwg.helpers module<a class="headerlink" href="#bwg-helpers-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bwg.helpers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.helpers" title="Permalink to this headline">¶</a></h2>
+<p>Module for simple helper functions.</p>
+<dl class="function">
+<dt id="bwg.helpers.construct_dict_from_source">
+<code class="descclassname">bwg.helpers.</code><code class="descname">construct_dict_from_source</code><span class="sig-paren">(</span><em>fields</em>, <em>source</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.construct_dict_from_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a new dict from a source dict and catch all KeyErrors, using predefined functions to extract desired 
+values from a source dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fields</strong> &#8211; Dictionary with fields in the the target dict as keys and functions to extract their desired value .</td>
+</tr>
+</tbody>
+</table>
+<p>for these fields from the source dict
+:type fields: dict
+:param source: Source dictionary.
+:type source: dict
+:return: Target dictionary.
+:rtype: dict</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.download_nltk_resource_if_missing">
+<code class="descclassname">bwg.helpers.</code><code class="descname">download_nltk_resource_if_missing</code><span class="sig-paren">(</span><em>resource_path</em>, <em>resource</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.download_nltk_resource_if_missing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a missing resource from the Natural Language Processing Toolkit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resource_path</strong> (<em>str</em>) &#8211; Link / path for NLTK resource.</li>
+<li><strong>resource</strong> (<em>str</em>) &#8211; Identifier / name of resource (will be used to download the resource if its not found).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.filter_dict">
+<code class="descclassname">bwg.helpers.</code><code class="descname">filter_dict</code><span class="sig-paren">(</span><em>dictionary</em>, <em>keep_fields</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.filter_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter a dictionary&#8217;s entries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dictionary</strong> (<em>dict</em>) &#8211; Dictionary that is going to be filtered.</li>
+<li><strong>keep_fields</strong> (<em>dict</em>) &#8211; Dictionary keys that aren&#8217;t going to be filtered.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Filtered dictionary.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.flatten_dictlist">
+<code class="descclassname">bwg.helpers.</code><code class="descname">flatten_dictlist</code><span class="sig-paren">(</span><em>dictlist</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.flatten_dictlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns a list of dictionaries into a single dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dictlist</strong> (<em>list</em>) &#8211; List of dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Flattened dictionary.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dictlist</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flatten_dictlist</span><span class="p">(</span><span class="n">dictlist</span><span class="p">)</span>
+<span class="go">{&quot;a&quot;: 3, &quot;b&quot;: 2, &quot;c&quot;: 4}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.get_config_from_py_file">
+<code class="descclassname">bwg.helpers.</code><code class="descname">get_config_from_py_file</code><span class="sig-paren">(</span><em>config_path</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.get_config_from_py_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a configuration from a .py file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_path</strong> (<em>str</em>) &#8211; Path to configuration file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Configuration parameters as a dictionary.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.is_collection">
+<code class="descclassname">bwg.helpers.</code><code class="descname">is_collection</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.is_collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if an object is iterable collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<em>object</em>) &#8211; Object that is to be checked.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of check.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.overwrite_local_config_with_environ">
+<code class="descclassname">bwg.helpers.</code><code class="descname">overwrite_local_config_with_environ</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.overwrite_local_config_with_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite a local configuration file&#8217;s parameters by environment variables, if they exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<em>dict</em>) &#8211; Current configuration.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New configuration.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.seconds_to_hms">
+<code class="descclassname">bwg.helpers.</code><code class="descname">seconds_to_hms</code><span class="sig-paren">(</span><em>seconds</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.seconds_to_hms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert seconds to hours, minutes and seconds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>seconds</strong> (<em>int</em><em>, </em><em>float</em>) &#8211; Number of seconds to be converted.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Number of seconds as hours, minutes and remaining seconds.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.time_function">
+<code class="descclassname">bwg.helpers.</code><code class="descname">time_function</code><span class="sig-paren">(</span><em>out=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em>is_classmethod=False</em>, <em>return_time=False</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.time_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time run time of a function and write to stdout or a log file. Also has some extra functions in case you want to
+apply it to a ArticleProcessingMixin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>out</strong> &#8211; Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the</td>
+</tr>
+</tbody>
+</table>
+<p>output being appended to a file.
+:type out: None, str, _io.TextIOWrapper
+:param is_classmethod: Declare the function being decorated a class method.
+:type is_classmethod: bool
+:param return_time: Flag to indicate whether the function&#8217;s runtime should be returned alongside the decorated 
+function&#8217;s return value in an dictionary.
+:return: Decorator function.
+:rtype: func</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@time_function</span><span class="p">(</span><span class="n">return_time</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">test_func</span><span class="p">():</span>
+<span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test_func</span><span class="p">()</span>
+<span class="go">{&quot;return&quot;: 3, &quot;runtime&quot;: 3.0994415283203125e-06}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bwg.helpers module</a><ul>
+<li><a class="reference internal" href="#module-bwg.helpers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="bwg.french_wikipedia.html" title="previous chapter">bwg.french_wikipedia module</a></li>
+      <li>Next: <a href="bwg.mixins.html" title="next chapter">bwg.mixins module</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bwg.helpers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Malabalistalicious Unipessoal Lda..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/bwg.helpers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

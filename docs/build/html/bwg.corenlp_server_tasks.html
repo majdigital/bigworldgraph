@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.corenlp_server_tasks module &#8212; BigWorldGraph v0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     'v0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.french_wikipedia module" href="bwg.french_wikipedia.html" />
+    <link rel="prev" title="bwg.config_management module" href="bwg.config_management.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bwg-corenlp-server-tasks-module">
+<h1>bwg.corenlp_server_tasks module<a class="headerlink" href="#bwg-corenlp-server-tasks-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bwg.corenlp_server_tasks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.corenlp_server_tasks" title="Permalink to this headline">¶</a></h2>
+<p>Rewriting standard tasks for the NLP pipeline using the Stanford CoreNLP server. The main motivation to do this lies
+in the following problem: When the respective Stanford tools are run through their NLTK wrappers, they load their
+necessary models from scratch every time. This slows down the pipeline quite a load. In contrast, the server loads them
+only once.</p>
+<dl class="docutils">
+<dt>Also, this approach comes with some other merits as well:</dt>
+<dd><ul class="first last simple">
+<li>Reducing the number of necessary Stanford model files</li>
+<li>Avoiding using bulk operations like &#8220;parse_sents()&#8221; which complicate the current architecture of the pipeline</li>
+</ul>
+</dd>
+</dl>
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerDependencyParseTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.DependencyParseTask" title="bwg.standard_tasks.DependencyParseTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.DependencyParseTask</span></code></a></p>
+<p>Luigi task that dependency-parses sentences in a corpus, but using a Stanford CoreNLP server.</p>
+<dl class="method">
+<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes">
+<code class="descname">edges_to_nodes</code><span class="sig-paren">(</span><em>edges</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a dependency tree representation based on nodes to a representation based on edges.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>edges</strong> (<em>list</em>) &#8211; List of tree edges.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with the root node and a list of all nodes.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerNERTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNERTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNERTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NERTask" title="bwg.standard_tasks.NERTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NERTask</span></code></a></p>
+<p>Luigi task that performs Named Entity Recognition on a corpus, but using a Stanford CoreNLP server.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNaiveOpenRelationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NaiveOpenRelationExtractionTask" title="bwg.standard_tasks.NaiveOpenRelationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NaiveOpenRelationExtractionTask</span></code></a></p>
+<p>Luigi task that performs Open Relation extraction on a corpus. The only adjustment in this case are the requirements
+for this task, this task doesn&#8217;t use the CoreNLP server at all.</p>
+<dl class="method">
+<dt id="bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask.requires">
+<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask.requires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.corenlp_server_tasks.ServerPoSTaggingTask">
+<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerPoSTaggingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerPoSTaggingTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.PoSTaggingTask" title="bwg.standard_tasks.PoSTaggingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.PoSTaggingTask</span></code></a></p>
+<p>Luigi task that PoS tags a sentence in a corpus, but using a Stanford CoreNLP server.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bwg.corenlp_server_tasks module</a><ul>
+<li><a class="reference internal" href="#module-bwg.corenlp_server_tasks">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="bwg.config_management.html" title="previous chapter">bwg.config_management module</a></li>
+      <li>Next: <a href="bwg.french_wikipedia.html" title="next chapter">bwg.french_wikipedia module</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bwg.corenlp_server_tasks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Malabalistalicious Unipessoal Lda..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/bwg.corenlp_server_tasks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
