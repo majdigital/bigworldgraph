@@ -164,7 +164,7 @@ In case you are writing the data into a `Neo4j` database, make sure to include t
     }
     
 and remember to run the server before running the pipeline, either by running `Neo4j`'s [community edition](https://neo4j.com/download/),
-executing the [`neo4j` shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
+executing the [Neo4j shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
 or using [docker images](https://neo4j.com/developer/docker/) etc.
 
 In case you are using any task using `bwg/wikidata.py:WikidataAPIMixin`, e.g. `bwg/nlp/wikipedia_tasks.py:PropertiesCompletionTask`,
@@ -190,9 +190,13 @@ TODO: How to install and use
 
 TODO: How to
 
-## Warnings
+--- 
 
-* If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
-pipline, otherwise running the pipeline will result in an exception being thrown.
+**WARNINGS**
+
+If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
+pipeline, otherwise running the pipeline will result in an exception being thrown.
+
+---
 
 curl -gX GET http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"

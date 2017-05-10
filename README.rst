@@ -222,7 +222,7 @@ include the following parameters
 
 and remember to run the server before running the pipeline, either by
 running ``Neo4j``'s `community edition <https://neo4j.com/download/>`__,
-executing the ```neo4j``
+executing the `Neo4j
 shell <http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html>`__
 in the terminal or using `docker
 images <https://neo4j.com/developer/docker/>`__ etc.
@@ -257,12 +257,15 @@ Server deployment
 
 TODO: How to
 
-Warnings
---------
+--------------
 
--  If you are using the project locally, on MacOS with Python > 3.4, you
-   can only use one worker at a time for the pipline, otherwise running
-   the pipeline will result in an exception being thrown.
+**WARNINGS**
+
+If you are using the project locally, on MacOS with Python > 3.4, you
+can only use one worker at a time for the pipeline, otherwise running
+the pipeline will result in an exception being thrown.
+
+--------------
 
 curl -gX GET
 http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"

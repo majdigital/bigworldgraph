@@ -153,6 +153,30 @@
 <em class="property">class </em><code class="descclassname">bwg.mixins.</code><code class="descname">ArticleProcessingMixin</code><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Enable Luigi tasks to process single lines as well as articles or other input types.</p>
+<p><code class="docutils literal"><span class="pre">Luigi</span></code> tasks inheriting from this Mixin will work the following way:
+In <code class="docutils literal"><span class="pre">run()</span></code> you usually only define the inputs and outputs of the task and pass them along with some other 
+arguments to the main function, <code class="docutils literal"><span class="pre">task_workflow()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">first_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">second_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">()</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">first_file</span><span class="p">,</span> <span class="n">second_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_articles</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">),</span> <span class="n">new_state</span><span class="o">=</span><span class="s2">&quot;done stuff&quot;</span><span class="p">,</span>
+                <span class="n">serializing_function</span><span class="o">=</span><span class="n">serialize_output</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">output_file</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<p>whereby the <code class="docutils literal"><span class="pre">new_state</span></code> denotes a description of the current task which will be included in the results meta data
+and the <code class="docutils literal"><span class="pre">serializing_function</span></code> being the function used to transform the task&#8217;s output into a form corresponding to 
+<code class="docutils literal"><span class="pre">JSON</span></code>.</p>
+<p>Furthermore you can overwrite the <code class="docutils literal"><span class="pre">workflow_resources</span></code> property to initialize any resources before the task starts.</p>
+<p>In <code class="docutils literal"><span class="pre">task_workflow</span></code>, you then define the core functionality of the task. This function gets called for every 
+article in the input and you then iterate trough every sentence in the article in the function. The expected output
+is a dictionary of key word arguments for the serializing function.</p>
+<p>You can overwrite <code class="docutils literal"><span class="pre">is_relevant_article</span></code> and <code class="docutils literal"><span class="pre">is_relevant_sentence</span></code> to only include specific tasks results in your
+output (this however only makes sense (for now) to do on your last tasks, as it might lead to misalignments of 
+inputs for following tasks). Make sure to also set <code class="docutils literal"><span class="pre">ONLY_INCLUDE_RELEVANT_SENTENCES</span></code> and 
+<code class="docutils literal"><span class="pre">ONLY_INCLUDE_RELEVANT_ARTICLES</span></code> to <code class="docutils literal"><span class="pre">True</span></code> in your pipeline&#8217;s config file, correspondingly.</p>
 <dl class="method">
 <dt id="bwg.mixins.ArticleProcessingMixin.is_relevant_article">
 <code class="descname">is_relevant_article</code><span class="sig-paren">(</span><em>article</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.is_relevant_article" title="Permalink to this definition">¶</a></dt>
@@ -270,7 +294,7 @@ providing the actual sentence data.</li>
 <dt id="bwg.mixins.CoreNLPServerMixin">
 <em class="property">class </em><code class="descclassname">bwg.mixins.</code><code class="descname">CoreNLPServerMixin</code><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Communicate with a Stanford CoreNLP server via the pycorenlp wrapper.</p>
+<p>Communicate with a Stanford CoreNLP server via the <code class="docutils literal"><span class="pre">pycorenlp</span></code> wrapper.</p>
 <dl class="method">
 <dt id="bwg.mixins.CoreNLPServerMixin.process_sentence_with_corenlp_server">
 <code class="descname">process_sentence_with_corenlp_server</code><span class="sig-paren">(</span><em>sentence_data</em>, <em>action</em>, <em>postprocessing_func=None</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin.process_sentence_with_corenlp_server" title="Permalink to this definition">¶</a></dt>

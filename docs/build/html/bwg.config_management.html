@@ -93,6 +93,7 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">bwg.config_management</a><ul>
+<li><a class="reference internal" href="#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
 <li><a class="reference internal" href="#module-bwg.config_management">Module contents</a></li>
 </ul>
 </li>
@@ -145,6 +146,87 @@
       
   <div class="section" id="bwg-config-management">
 <h1>bwg.config_management<a class="headerlink" href="#bwg-config-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-your-own-pipeline-configuration">
+<h2>Creating your own pipeline configuration<a class="headerlink" href="#creating-your-own-pipeline-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Every pipeline requires a configuration file with certain parameters. It contains two parts:</p>
+<ol class="arabic simple">
+<li>A kind of &#8220;meta&#8221; configuration, specifying the parameters a task requires. This way is it secured that the pipeline
+is run with all necessary configuration parameters. Otherwise a special exception is thrown. Its is stored in a single
+parameter, called <code class="docutils literal"><span class="pre">CONFIG_DEPENDENCIES</span></code>.</li>
+<li>The &#8220;real&#8221; configuration, just how you know it - config parameters and their corresponding values.</li>
+</ol>
+<p>If you add a new kind of task to the pipeline, make sure to include a
+description of its necessary parameters in your config file&#8217;s (e.g. <code class="docutils literal"><span class="pre">my_pipeline_config.py</span></code>) meta config:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CONFIG_DEPENDENCIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="c1"># Your task</span>
+    <span class="s2">&quot;my_new_task&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="s2">&quot;</span><span class="si">{language}</span><span class="s2">_SPECIFIC_PARAMETER&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;LANGUAGE_INDEPENDENT_PARAMETER&quot;</span>
+    <span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then you have to include those declared parameters somewhere in your
+config file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My config parameters</span>
+<span class="n">ENGLISH_SPECIFIC_PARAMETER</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">LANGUAGE_INDPENENDENT_PARAMETER</span> <span class="o">=</span> <span class="s2">&quot;yada yada&quot;</span>
+</pre></div>
+</div>
+<p>If you implement tasks that extend the pipeline to support other
+language, please add it to the following list:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SUPPORTED_LANGUAGES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FRENCH&quot;</span><span class="p">,</span> <span class="s2">&quot;ENGLISH&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Finally, create a module for your own pipeline (e.g.
+<code class="docutils literal"><span class="pre">my_pipeline.py</span></code>) and build the configuration before running the
+pipeline, using the pre-defined task names in <code class="docutils literal"><span class="pre">my_pipeline_config.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">luigi</span>
+<span class="kn">from</span> <span class="nn">bwg.nlp.config_management</span> <span class="k">import</span> <span class="n">build_task_config_for_language</span>
+
+<span class="k">class</span> <span class="nc">MyNewTask</span><span class="p">(</span><span class="n">luigi</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">requires</span><span class="p">():</span>
+        <span class="c1"># Define task input here</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">():</span>
+        <span class="c1"># Define task output here</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="c1"># Define what to do during the task here</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">task_config</span> <span class="o">=</span> <span class="n">build_task_config_for_language</span><span class="p">(</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;my_new_task&quot;</span>
+        <span class="p">],</span>
+        <span class="n">language</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">,</span>
+        <span class="n">config_file_path</span><span class="o">=</span><span class="s2">&quot;path/to/my_pipeline_config.py&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># MyNewTask is the last task of the pipeline</span>
+    <span class="n">luigi</span><span class="o">.</span><span class="n">build</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">MyNewTask</span><span class="p">(</span><span class="n">task_config</span><span class="o">=</span><span class="n">task_config</span><span class="p">)],</span>
+        <span class="n">local_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">los</span>
+</pre></div>
+</div>
+<p>In case you are writing the data into a <code class="docutils literal"><span class="pre">Neo4j</span></code> database, make sure to
+include the following parameters</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Neo4j</span>
+<span class="n">NEO4J_USER</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
+<span class="n">NEO4J_PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
+<span class="n">NEO4J_NETAG2MODEL</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;I-PER&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-LOC&quot;</span><span class="p">:</span> <span class="s2">&quot;Location&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-ORG&quot;</span><span class="p">:</span> <span class="s2">&quot;Organization&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;Date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-MISC&quot;</span><span class="p">:</span> <span class="s2">&quot;Miscellaneous&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="module-bwg.config_management">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.config_management" title="Permalink to this headline">¶</a></h2>
 <p>Functions concerning the config management of the NLP pipeline.</p>

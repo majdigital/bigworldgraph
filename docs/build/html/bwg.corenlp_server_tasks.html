@@ -93,6 +93,7 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">bwg.corenlp_server_tasks</a><ul>
+<li><a class="reference internal" href="#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
 <li><a class="reference internal" href="#module-bwg.corenlp_server_tasks">Module contents</a></li>
 </ul>
 </li>
@@ -145,17 +146,36 @@
       
   <div class="section" id="bwg-corenlp-server-tasks">
 <h1>bwg.corenlp_server_tasks<a class="headerlink" href="#bwg-corenlp-server-tasks" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-corenlp-server-tasks">
+<h2>Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks<a class="headerlink" href="#using-corenlp-server-tasks" title="Permalink to this headline">¶</a></h2>
+<p>To use <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks, appropriate <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/download.html">Stanford
+NLP</a> models are
+also required. Before running the pipeline, also make sure to run the
+<code class="docutils literal"><span class="pre">StanfordCoreNLP</span></code> server in case you are using a task from the module
+<code class="docutils literal"><span class="pre">nlp/corenlp_server_tasks.py</span></code>, using the following command in the
+directory with the appropriate Stanford models (in this case the
+<code class="docutils literal"><span class="pre">-serverProperties</span></code> argument is used to tell the Server the language
+of incoming texts):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">mx4g</span> <span class="o">-</span><span class="n">cp</span> <span class="s2">&quot;*&quot;</span> <span class="n">edu</span><span class="o">.</span><span class="n">stanford</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">StanfordCoreNLPServer</span> <span class="o">-</span><span class="n">port</span> <span class="mi">9000</span> <span class="o">-</span><span class="n">timeout</span> <span class="mi">15000</span> <span class="o">-</span><span class="n">serverProperties</span> <span class="n">StanfordCoreNLP</span><span class="o">-</span><span class="n">french</span><span class="o">.</span><span class="n">properties</span>
+</pre></div>
+</div>
+<p>For more information about the server itself, please consult the <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/corenlp-server.html">official documentation</a>.</p>
+<p>Finally, you also have to include at least this config parameter in your pipeline config file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">STANFORD_CORENLP_SERVER_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:9000&quot;</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="module-bwg.corenlp_server_tasks">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.corenlp_server_tasks" title="Permalink to this headline">¶</a></h2>
-<p>Rewriting standard tasks for the NLP pipeline using the Stanford CoreNLP server. The main motivation to do this lies
-in the following problem: When the respective Stanford tools are run through their NLTK wrappers, they load their
+<p>Rewriting standard tasks for the NLP pipeline using the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span></code> server. The main motivation to do this lies
+in the following problem: When the respective Stanford tools are run through their <code class="docutils literal"><span class="pre">NLTK</span></code> wrappers, they load their
 necessary models from scratch every time. This slows down the pipeline quite a load. In contrast, the server loads them
 only once.</p>
 <dl class="docutils">
 <dt>Also, this approach comes with some other merits as well:</dt>
 <dd><ul class="first last simple">
 <li>Reducing the number of necessary Stanford model files</li>
-<li>Avoiding using bulk operations like &#8220;parse_sents()&#8221; which complicate the current architecture of the pipeline</li>
+<li>Avoiding using bulk operations like <code class="docutils literal"><span class="pre">parse_sents()</span></code> which complicate the current architecture of the pipeline.</li>
 </ul>
 </dd>
 </dl>

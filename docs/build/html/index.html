@@ -115,7 +115,6 @@
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#warnings">Warnings</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#main-project-contents">Main project contents</a><ul>
@@ -359,8 +358,8 @@ include the following parameters</p>
 </div>
 <p>and remember to run the server before running the pipeline, either by
 running <code class="docutils literal"><span class="pre">Neo4j</span></code>&#8216;s <a class="reference external" href="https://neo4j.com/download/">community edition</a>,
-executing the <code class="docutils literal"><span class="pre">`neo4j</span></code>
-shell &lt;<a class="reference external" href="http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html">http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html</a>&gt;`__
+executing the <a class="reference external" href="http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html">Neo4j
+shell</a>
 in the terminal or using <a class="reference external" href="https://neo4j.com/developer/docker/">docker
 images</a> etc.</p>
 <p>In case you are using any task using
@@ -388,19 +387,17 @@ a <code class="docutils literal"><span class="pre">user-config.py</span></code> 
 <div class="section" id="server-deployment">
 <h4>Server deployment<a class="headerlink" href="#server-deployment" title="Permalink to this headline">¶</a></h4>
 <p>TODO: How to</p>
-</div>
-</div>
-</div>
-<div class="section" id="warnings">
-<h2>Warnings<a class="headerlink" href="#warnings" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>If you are using the project locally, on MacOS with Python &gt; 3.4, you
-can only use one worker at a time for the pipline, otherwise running
-the pipeline will result in an exception being thrown.</li>
-</ul>
+<hr class="docutils" />
+<p><strong>WARNINGS</strong></p>
+<p>If you are using the project locally, on MacOS with Python &gt; 3.4, you
+can only use one worker at a time for the pipeline, otherwise running
+the pipeline will result in an exception being thrown.</p>
+<hr class="docutils" />
 <p>curl -gX GET
 <a class="reference external" href="http://127.0.0.1:5000/entities">http://127.0.0.1:5000/entities</a>?&#8221;uid&#8221;=&#8221;c34b43b3f3f74aa99ae012615b904760&#8221;</p>
 <div class="toctree-wrapper compound">
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -429,14 +426,17 @@ the pipeline will result in an exception being thrown.</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#module-bwg.config_management">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#module-bwg.corenlp_server_tasks">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#backstory">Backstory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#module-bwg.french_wikipedia">Module contents</a></li>
 </ul>
 </li>
@@ -449,10 +449,12 @@ the pipeline will result in an exception being thrown.</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#motivation">Motivation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#module-bwg.neo4j_extensions">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#usage">Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#module-bwg.standard_tasks">Module contents</a></li>
 </ul>
 </li>

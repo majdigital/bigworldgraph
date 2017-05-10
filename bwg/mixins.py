@@ -18,7 +18,7 @@ from bwg.utilities import serialize_article, just_dump, deserialize_line
 
 class CoreNLPServerMixin:
     """
-    Communicate with a Stanford CoreNLP server via the pycorenlp wrapper.
+    Communicate with a Stanford CoreNLP server via the ``pycorenlp`` wrapper.
     """
     task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
     _server = None
@@ -77,6 +77,35 @@ class CoreNLPServerMixin:
 class ArticleProcessingMixin:
     """
     Enable Luigi tasks to process single lines as well as articles or other input types.
+    
+    ``Luigi`` tasks inheriting from this Mixin will work the following way:
+    In ``run()`` you usually only define the inputs and outputs of the task and pass them along with some other 
+    arguments to the main function, ``task_workflow()``:
+    ::
+    
+        def run(self):
+            with self.input()[0].open("r") as first_file, self.input()[1].open("r") as second_file:
+                with self.output().open("w") as output_file:
+                for line1, line2 in zip(first_file, second_file):
+                    self.process_articles(
+                        (line1, line2), new_state="done stuff",
+                        serializing_function=serialize_output, output_file=output_file
+                    )
+                    
+    whereby the ``new_state`` denotes a description of the current task which will be included in the results meta data
+    and the ``serializing_function`` being the function used to transform the task's output into a form corresponding to 
+    ``JSON``.
+    
+    Furthermore you can overwrite the ``workflow_resources`` property to initialize any resources before the task starts.
+
+    In ``task_workflow``, you then define the core functionality of the task. This function gets called for every 
+    article in the input and you then iterate trough every sentence in the article in the function. The expected output
+    is a dictionary of key word arguments for the serializing function.
+    
+    You can overwrite ``is_relevant_article`` and ``is_relevant_sentence`` to only include specific tasks results in your
+    output (this however only makes sense (for now) to do on your last tasks, as it might lead to misalignments of 
+    inputs for following tasks). Make sure to also set ``ONLY_INCLUDE_RELEVANT_SENTENCES`` and 
+    ``ONLY_INCLUDE_RELEVANT_ARTICLES`` to ``True`` in your pipeline's config file, correspondingly.
     """
     task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
 
@@ -108,7 +137,7 @@ class ArticleProcessingMixin:
         # Do main work here, e.g. iterating through every sentence in an articles "data" dict, performing a specific
         # task.
         for sentence_id, sentence in article["data"]:
-            # https://www.youtube.com/watch?v=HL1UzIK-flA
+            # Do the https://www.youtube.com/watch?v=HL1UzIK-flA
             pass
 
             # Afterwards, put all the arguments for the corresponding serializing function into a dict and yield it.

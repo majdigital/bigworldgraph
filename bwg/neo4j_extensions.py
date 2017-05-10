@@ -16,7 +16,7 @@ import neomodel
 
 class EveCompatibilityMixin:
     """
-    Extend neomodel classes to make them compatible with Eve API functions.
+    Extend ``neomodel`` classes to make them compatible with Eve API functions.
     """
     def __contains__(self, item):
         return item in vars(self)
@@ -233,7 +233,7 @@ class Neo4jResult:
 
 class Neo4jDatabase:
     """
-    Wrapper for a Neo4j Graph database, providing an easy way to connect to a database, querying nodes and relations as 
+    Wrapper for a ``Neo4j`` Graph database, providing an easy way to connect to a database, querying nodes and relations as 
     well as creating new Node and Relation classes on the fly.
     """
     def __init__(self, user, password, host, port):
@@ -319,7 +319,7 @@ class Neo4jDatabase:
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
-    This a simple re-implementation for a Neo4j data layer, because flask_neo4j doesn't seem to be maintained anymore, 
+    This a simple re-implementation for a ``Neo4j`` data layer, because flask_neo4j doesn't seem to be maintained anymore, 
     leading eve_neo4j to break.
     
     Docstring are mostly just copied from eve.io.DataLayer.
