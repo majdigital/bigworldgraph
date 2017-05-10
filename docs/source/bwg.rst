@@ -8,7 +8,7 @@ Modules
 
 .. toctree::
 
-    bwg.additional_task
+    bwg.additional_tasks
     bwg.config_management
     bwg.corenlp_server_tasks
     bwg.french_wikipedia

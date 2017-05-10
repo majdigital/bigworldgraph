@@ -68,6 +68,7 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.french_wikipedia</a></li>
@@ -152,11 +153,6 @@
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchDependencyParseTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchDependencyParseTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.DependencyParseTask" title="bwg.standard_tasks.DependencyParseTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.DependencyParseTask</span></code></a></p>
 <p>A luigi task dependency-parsing a sentence, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchDependencyParseTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchDependencyParseTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -164,11 +160,6 @@
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchNERTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchNERTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NERTask" title="bwg.standard_tasks.NERTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NERTask</span></code></a></p>
 <p>A luigi task tagging Named Entities in a sentence, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchNERTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchNERTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -177,11 +168,6 @@
 <dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NaiveOpenRelationExtractionTask" title="bwg.standard_tasks.NaiveOpenRelationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NaiveOpenRelationExtractionTask</span></code></a></p>
 <p>A luigi task performing a naive version of Open Relation Extraction on a sentence, but it&#8217;s specifically for the french
 Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchNaiveOpenRelationExtractionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchNaiveOpenRelationExtractionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -189,11 +175,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchParticipationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchParticipationExtractionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.ParticipationExtractionTask" title="bwg.standard_tasks.ParticipationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.ParticipationExtractionTask</span></code></a></p>
 <p>A luigi Task performing participation extraction, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchParticipationExtractionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchParticipationExtractionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -201,11 +182,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchPipelineRunInfoGenerationTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPipelineRunInfoGenerationTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.additional_tasks.html#bwg.additional_tasks.PipelineRunInfoGenerationTask" title="bwg.additional_tasks.PipelineRunInfoGenerationTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.additional_tasks.PipelineRunInfoGenerationTask</span></code></a></p>
 <p>Generates information about the current run of the pipeline, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchPipelineRunInfoGenerationTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPipelineRunInfoGenerationTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -213,11 +189,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchPoSTaggingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPoSTaggingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.PoSTaggingTask" title="bwg.standard_tasks.PoSTaggingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.PoSTaggingTask</span></code></a></p>
 <p>A luigi task tagging a sentence with PoS tags, but it&#8217;s specifically to the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchPoSTaggingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPoSTaggingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -225,11 +196,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchPropertiesCompletionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPropertiesCompletionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.wikipedia_tasks.html#bwg.wikipedia_tasks.PropertiesCompletionTask" title="bwg.wikipedia_tasks.PropertiesCompletionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikipedia_tasks.PropertiesCompletionTask</span></code></a></p>
 <p>A luigi Task that  adds attributes from Wikidata to Named Entities, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchPropertiesCompletionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchPropertiesCompletionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -237,11 +203,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchRelationMergingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationMergingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.additional_tasks.html#bwg.additional_tasks.RelationMergingTask" title="bwg.additional_tasks.RelationMergingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.additional_tasks.RelationMergingTask</span></code></a></p>
 <p>A luigi Task that merges extracted relations from other tasks, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchRelationMergingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationMergingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -250,11 +211,6 @@ Wikipedia.</p>
 <dd><p>Bases: <a class="reference internal" href="bwg.additional_tasks.html#bwg.additional_tasks.RelationsDatabaseWritingTask" title="bwg.additional_tasks.RelationsDatabaseWritingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.additional_tasks.RelationsDatabaseWritingTask</span></code></a></p>
 <p>Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
 but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -263,11 +219,6 @@ but it&#8217;s specifically for the french Wikipedia.</p>
 <dd><p>Bases: <a class="reference internal" href="bwg.corenlp_server_tasks.html#bwg.corenlp_server_tasks.ServerDependencyParseTask" title="bwg.corenlp_server_tasks.ServerDependencyParseTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.corenlp_server_tasks.ServerDependencyParseTask</span></code></a></p>
 <p>A luigi task dependency-parsing a sentence using a Stanford CoreNLP server, but it&#8217;s specifically for the french
 Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerDependencyParseTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerDependencyParseTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -276,11 +227,6 @@ Wikipedia.</p>
 <dd><p>Bases: <a class="reference internal" href="bwg.corenlp_server_tasks.html#bwg.corenlp_server_tasks.ServerNERTask" title="bwg.corenlp_server_tasks.ServerNERTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.corenlp_server_tasks.ServerNERTask</span></code></a></p>
 <p>A luigi task tagging Named Entities in a sentence using a Stanford CoreNLP server, but it&#8217;s specifically for the
 french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerNERTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerNERTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -289,11 +235,6 @@ french Wikipedia.</p>
 <dd><p>Bases: <a class="reference internal" href="bwg.corenlp_server_tasks.html#bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask" title="bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask</span></code></a></p>
 <p>A luigi task performing a naive version of Open Relation Extraction on a sentence using a Stanford CoreNLP server,
 but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerNaiveOpenRelationExtractionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerNaiveOpenRelationExtractionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -301,11 +242,6 @@ but it&#8217;s specifically for the french Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchServerParticipationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerParticipationExtractionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bwg.french_wikipedia.FrenchParticipationExtractionTask" title="bwg.french_wikipedia.FrenchParticipationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.french_wikipedia.FrenchParticipationExtractionTask</span></code></a></p>
 <p>A luigi Task performing participation extraction, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerParticipationExtractionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerParticipationExtractionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -314,11 +250,6 @@ but it&#8217;s specifically for the french Wikipedia.</p>
 <dd><p>Bases: <a class="reference internal" href="bwg.corenlp_server_tasks.html#bwg.corenlp_server_tasks.ServerPoSTaggingTask" title="bwg.corenlp_server_tasks.ServerPoSTaggingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.corenlp_server_tasks.ServerPoSTaggingTask</span></code></a></p>
 <p>A luigi task tagging a sentence with PoS tags using a Stanford CoreNLP server, but it&#8217;s specifically to the french
 Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerPoSTaggingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerPoSTaggingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -326,11 +257,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchServerPropertiesCompletionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerPropertiesCompletionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bwg.french_wikipedia.FrenchPropertiesCompletionTask" title="bwg.french_wikipedia.FrenchPropertiesCompletionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.french_wikipedia.FrenchPropertiesCompletionTask</span></code></a></p>
 <p>A luigi Task that  adds attributes from Wikidata to Named Entities, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerPropertiesCompletionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerPropertiesCompletionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -338,11 +264,6 @@ Wikipedia.</p>
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchServerRelationMergingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerRelationMergingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.additional_tasks.html#bwg.additional_tasks.RelationMergingTask" title="bwg.additional_tasks.RelationMergingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.additional_tasks.RelationMergingTask</span></code></a></p>
 <p>A luigi Task that merges extracted relations from other tasks, but it&#8217;s specifically for the french Wikipedia.</p>
-<dl class="method">
-<dt id="bwg.french_wikipedia.FrenchServerRelationMergingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchServerRelationMergingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">

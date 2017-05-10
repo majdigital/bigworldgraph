@@ -67,6 +67,7 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
@@ -147,26 +148,6 @@
 <em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">PropertiesCompletionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a>, <a class="reference internal" href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin" title="bwg.wikidata.WikidataAPIMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikidata.WikidataAPIMixin</span></code></a></p>
 <p>Add attributes from Wikidata to Named Entities.</p>
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask.output">
-<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask.task_workflow">
-<code class="descname">task_workflow</code><span class="sig-paren">(</span><em>article</em>, <em>**workflow_resources</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask.task_workflow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -201,21 +182,6 @@
 <em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">WikipediaReadingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
 <p>A luigi task that reads an extracted Wikipedia corpus (see README).</p>
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.WikipediaReadingTask.output">
-<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.WikipediaReadingTask.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bwg.wikipedia_tasks.WikipediaReadingTask.task_config">
-<code class="descname">task_config</code><em class="property"> = &lt;luigi.parameter.DictParameter object&gt;</em><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask.task_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>

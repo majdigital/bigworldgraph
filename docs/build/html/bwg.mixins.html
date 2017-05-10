@@ -68,6 +68,7 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
@@ -200,21 +201,19 @@ it to the output file.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raw_articles</strong> &#8211; Raw articles (referring to the same article but carrying different kinds of data for their</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>raw_articles</strong> (<em>list</em><em>, </em><em>tuple</em>) &#8211; Raw articles (referring to the same article but carrying different kinds of data for their 
+sentences) read from input file.</li>
+<li><strong>new_state</strong> (<em>str</em>) &#8211; State that describes the kind of processing that is applied to the data in this step. It&#8217;s 
+included in the metadata of each article.</li>
+<li><strong>serializing_function</strong> (<em>func</em>) &#8211; Function that is used afterwards to serialize the data again.</li>
+<li><strong>output_file</strong> (<em>_io.TextWrapper</em>) &#8211; Output file the serialized results should be written to.</li>
+<li><strong>pretty</strong> (<em>bool</em>) &#8211; Flag to indicate whether the output should be pretty-printed.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
-<p>sentences) read from input file.
-:type raw_articles: list, tuple
-:param new_state: State that describes the kind of processing that is applied to the data in this step. It&#8217;s 
-included in the metadata of each article.
-:type new_state: str
-:param serializing_function: Function that is used afterwards to serialize the data again.
-:type serializing_function: func
-:param output_file: Output file the serialized results should be written to.
-:type output_file: _io.TextWrapper
-:param pretty: Flag to indicate whether the output should be pretty-printed.
-:type pretty: bool</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -230,38 +229,33 @@ performing the actual task on the sentence and wrapping all the arguments for th
 dictionary, returning it in the end.</p>
 <p>The input is considered an article, e.g. some text that consists of a variable number of sentences. Here&#8217;s a
 proposal how to fit real world media types to this requirement:</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="first docutils">
-<dt>Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small</dt>
-<dd>articles themselves.</dd>
-</dl>
-</li>
+<ul class="simple">
+<li>Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small articles themselves.</li>
 <li>Newspaper article: Same intuition as above.</li>
 <li>Books: Treat chapters as articles.</li>
 <li>Single paragraphs of text: Treat as articles that may not contain a headline.</li>
 <li>Single sentence: Treat as single paragraph with only one &#8220;data&#8221; entry.</li>
-<li><dl class="first docutils">
-<dt>Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for</dt>
-<dd>(written) natural language.</dd>
-</dl>
-</li>
+<li>Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for (written) natural language.</li>
 </ul>
-</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>article</strong> &#8211; Current article as a dictionary, with the &#8220;meta&#8221; field providing meta data and the &#8220;data&#8221; field</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>article</strong> (<em>dict</em>) &#8211; Current article as a dictionary, with the &#8220;meta&#8221; field providing meta data and the &#8220;data&#8221; field
+providing the actual sentence data.</li>
+<li><strong>workflow_kwargs</strong> (<em>dict</em>) &#8211; Additional key word arguments for this tasks workflow, e.g. additional resources.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Yielding all named arguments to serialize this article after processing.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
 </tr>
 </tbody>
 </table>
-<p>providing the actual sentence data.
-:type article: dict
-:param workflow_kwargs: Additional key word arguments for this tasks workflow, e.g. additional resources.
-:type workflow_kwargs: dict
-:return: Yielding all named arguments to serialize this article after processing.
-:rtype: dict</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -288,14 +282,13 @@ proposal how to fit real world media types to this requirement:</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>sentence_data</strong> (<em>dict</em><em>, </em><em>list</em>) &#8211; Sentence data to be processed.</li>
 <li><strong>action</strong> (<em>str</em>) &#8211; Action that should be performed on the data.</li>
-<li><strong>postprocessing_func</strong> &#8211; Function that is applied to output afterwards (None means that there won&#8217;t be any</li>
+<li><strong>postprocessing_func</strong> (<em>func</em><em>, </em><em>None</em>) &#8211; Function that is applied to output afterwards (None means that there won&#8217;t be any 
+function applied to the output).</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>function applied to the output).
-:type postprocessing_func: func, None</p>
 </dd></dl>
 
 <dl class="attribute">

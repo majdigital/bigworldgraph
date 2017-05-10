@@ -68,6 +68,7 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
@@ -156,16 +157,21 @@ values from a source dictionary.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fields</strong> &#8211; Dictionary with fields in the the target dict as keys and functions to extract their desired value .</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fields</strong> (<em>dict</em>) &#8211; Dictionary with fields in the the target dict as keys and functions to extract their desired value .
+for these fields from the source dict</li>
+<li><strong>source</strong> (<em>dict</em>) &#8211; Source dictionary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Target dictionary.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
 </tr>
 </tbody>
 </table>
-<p>for these fields from the source dict
-:type fields: dict
-:param source: Source dictionary.
-:type source: dict
-:return: Target dictionary.
-:rtype: dict</p>
 </dd></dl>
 
 <dl class="function">
@@ -316,23 +322,22 @@ apply it to a ArticleProcessingMixin.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>out</strong> &#8211; Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>out</strong> (<em>None</em><em>, </em><em>str</em><em>, </em><em>_io.TextIOWrapper</em>) &#8211; Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the 
+output being appended to a file.</li>
+<li><strong>is_classmethod</strong> (<em>bool</em>) &#8211; Declare the function being decorated a class method.</li>
+<li><strong>return_time</strong> &#8211; Flag to indicate whether the function&#8217;s runtime should be returned alongside the decorated 
+function&#8217;s return value in an dictionary.</li>
+</ul>
+</td>
 </tr>
-</tbody>
-</table>
-<p>output being appended to a file.
-:type out: None, str, _io.TextIOWrapper
-:param is_classmethod: Declare the function being decorated a class method.
-:type is_classmethod: bool
-:param return_time: Flag to indicate whether the function&#8217;s runtime should be returned alongside the decorated 
-function&#8217;s return value in an dictionary.
-:return: Decorator function.
-:rtype: func</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Decorator function.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">func</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>

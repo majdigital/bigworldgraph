@@ -68,6 +68,7 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
@@ -213,7 +214,10 @@ well as creating new Node and Relation classes on the fly.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of friends and friends of friends.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
 </td>
 </tr>
 </tbody>
@@ -288,8 +292,7 @@ aggregation operations.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; resource being accessed. You should then use
-the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve 
 the db collection/table consumed by the resource.</li>
 <li><strong>pipeline</strong> &#8211; aggregation pipeline to be executed.</li>
 <li><strong>options</strong> &#8211; aggregation options to be considered.</li>
@@ -318,17 +321,12 @@ Consumed when a request hits a collection/document endpoint
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; resource being accessed. You should then use
-the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve both
-the db collection/table and base query (filter), if
-any.</li>
-<li><strong>req</strong> &#8211; an instance of <code class="docutils literal"><span class="pre">eve.utils.ParsedRequest</span></code>. This contains
-all the constraints that must be fulfilled in order to
-satisfy the original request (where and sort parts, paging,
-etc). Be warned that <cite>where</cite> and <cite>sort</cite> expressions will
-need proper parsing, according to the syntax that you want
-to support with your driver. For example <code class="docutils literal"><span class="pre">eve.io.Mongo</span></code>
-supports both Python and Mongo-like query syntaxes.</li>
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve 
+both the db collection/table and base query (filter), if any.</li>
+<li><strong>req</strong> &#8211; an instance of <code class="docutils literal"><span class="pre">eve.utils.ParsedRequest</span></code>. This contains all the constraints that must be fulfilled
+in order to satisfy the original request (where and sort parts, paging, etc). Be warned that <cite>where</cite> and 
+<cite>sort</cite> expressions will need proper parsing, according to the syntax that you want to support with your 
+driver. For example <code class="docutils literal"><span class="pre">eve.io.Mongo</span></code> supports both Python and Mongo-like query syntaxes.</li>
 <li><strong>sub_resource_lookup</strong> &#8211; sub-resource lookup from the endpoint url.</li>
 </ul>
 </td>
@@ -340,26 +338,24 @@ supports both Python and Mongo-like query syntaxes.</li>
 <dl class="method">
 <dt id="bwg.neo4j_extensions.Neo4jLayer.find_list_of_ids">
 <code class="descname">find_list_of_ids</code><span class="sig-paren">(</span><em>resource</em>, <em>ids</em>, <em>client_projection=None</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jLayer.find_list_of_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves a list of documents based on a list of primary keys
-The primary key is the field defined in <cite>ID_FIELD</cite>.
-This is a separate function to allow us to use per-database
-optimizations for this type of query.</p>
+<dd><p>Retrieves a list of documents based on a list of primary keys. The primary key is the field defined in 
+<cite>ID_FIELD</cite>. This is a separate function to allow us to use per-database optimizations for this type of query.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>resource</strong> &#8211; resource name.</li>
-<li><strong>ids</strong> &#8211; a list of ids corresponding to the documents</li>
+<li><strong>ids</strong> &#8211; a list of ids corresponding to the documents to retrieve</li>
+<li><strong>client_projection</strong> &#8211; a specific projection to use</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of documents matching the ids in <cite>ids</cite> from the collection specified in <cite>resource</cite></p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>to retrieve
-:param client_projection: a specific projection to use
-:return: a list of documents matching the ids in <cite>ids</cite> from the
-collection specified in <cite>resource</cite></p>
 </dd></dl>
 
 <dl class="method">
@@ -372,32 +368,26 @@ item endpoint (<cite>/people/id/</cite>).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; resource being accessed. You should then use the
-<code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve both the
-db collection/table and base query (filter), if any.</li>
-<li><strong>req</strong> &#8211; an instance of <code class="docutils literal"><span class="pre">eve.utils.ParsedRequest</span></code>. This contains
-all the constraints that must be fulfilled in order to
-satisfy the original request (where and sort parts, paging,
-etc). As we are going to only look for one document here,
-the only req attribute that you want to process here is
-<code class="docutils literal"><span class="pre">req.projection</span></code>.</li>
-<li><strong>**lookup</strong> &#8211; <p>the lookup fields. This will most likely be a record
-id or, if alternate lookup is supported by the API,
-the corresponding query.</p>
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve  
+both the db collection/table and base query (filter), if any.</li>
+<li><strong>req</strong> &#8211; an instance of <code class="docutils literal"><span class="pre">eve.utils.ParsedRequest</span></code>. This contains all the constraints that must be fulfilled
+in order to satisfy the original request (where and sort parts, paging, etc). As we are going to only look for 
+one document here, the only req attribute that you want to process here is``req.projection``.</li>
+<li><strong>**lookup</strong> &#8211; <p>the lookup fields. This will most likely be a record id or, if alternate lookup is supported by</p>
 </li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
+<p>the API, the corresponding query.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bwg.neo4j_extensions.Neo4jLayer.find_one_raw">
 <code class="descname">find_one_raw</code><span class="sig-paren">(</span><em>resource</em>, <em>_id</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jLayer.find_one_raw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves a single, raw document. No projections or datasource
-filters are being applied here. Just looking up the document by unique
-id.</p>
+<dd><p>Retrieves a single, raw document. No projections or datasource filters are being applied here. Just looking up 
+the document by unique id.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -434,11 +424,9 @@ being assigned to the field given in <cite>field_name</cite>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; resource being accessed. You should then use
-the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve both
-the actual datasource name.</li>
-<li><strong>doc_or_docs</strong> &#8211; json document or list of json documents to be added
-to the database.</li>
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve 
+both the actual datasource name.</li>
+<li><strong>doc_or_docs</strong> &#8211; json document or list of json documents to be added to the database.</li>
 </ul>
 </td>
 </tr>
@@ -460,9 +448,8 @@ the is_empty() check (see eve.io.mongo.mongo.py implementation).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> &#8211; resource being accessed. You should then use
-the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
-the actual datasource name.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve the
+actual datasource name.</td>
 </tr>
 </tbody>
 </table>
@@ -515,13 +502,10 @@ database collection/table.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> &#8211; resource being accessed. You should then use
-the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
-the actual datasource name.</li>
-<li><strong>lookup</strong> &#8211; a dict with the query that documents must match in order
-to qualify for deletion. For single document deletes,
-this is usually the unique id of the document to be
-removed.</li>
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve the
+actual datasource name.</li>
+<li><strong>lookup</strong> &#8211; a dict with the query that documents must match in order to qualify for deletion. For single 
+document deletes, this is usually the unique id of the document to be removed.</li>
 </ul>
 </td>
 </tr>
@@ -532,54 +516,52 @@ removed.</li>
 <dl class="method">
 <dt id="bwg.neo4j_extensions.Neo4jLayer.replace">
 <code class="descname">replace</code><span class="sig-paren">(</span><em>resource</em>, <em>id_</em>, <em>document</em>, <em>original</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jLayer.replace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Replaces a collection/table document/row.
-:param resource: resource being accessed. You should then use</p>
-<blockquote>
-<div>the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
-the actual datasource name.</div></blockquote>
+<dd><p>Replaces a collection/table document/row.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
+the actual datasource name.</li>
 <li><strong>id</strong> &#8211; the unique id of the document.</li>
 <li><strong>document</strong> &#8211; the new json document</li>
-<li><strong>original</strong> &#8211; definition of the json document that should be</li>
+<li><strong>original</strong> &#8211; definition of the json document that should be updated.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OriginalChangedError</strong> &#8211; raised if the database layer notices a change from the supplied <cite>original</cite> 
+parameter.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>updated.
-:raise OriginalChangedError: raised if the database layer notices a
-change from the supplied <cite>original</cite> parameter.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bwg.neo4j_extensions.Neo4jLayer.update">
 <code class="descname">update</code><span class="sig-paren">(</span><em>resource</em>, <em>id_</em>, <em>updates</em>, <em>original</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jLayer.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates a collection/table document/row.
-:param resource: resource being accessed. You should then use</p>
-<blockquote>
-<div>the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
-the actual datasource name.</div></blockquote>
+<dd><p>Updates a collection/table document/row.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>resource</strong> &#8211; resource being accessed. You should then use the <code class="docutils literal"><span class="pre">datasource</span></code> helper function to retrieve
+the actual datasource name.</li>
 <li><strong>id</strong> &#8211; the unique id of the document.</li>
-<li><strong>updates</strong> &#8211; json updates to be performed on the database document
-(or row).</li>
-<li><strong>original</strong> &#8211; definition of the json document that should be</li>
+<li><strong>updates</strong> &#8211; json updates to be performed on the database document (or row).</li>
+<li><strong>original</strong> &#8211; definition of the json document that should be
+updated.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>OriginalChangedError</strong> &#8211; raised if the database layer notices a change from the supplied <cite>original</cite> 
+parameter.</p>
 </td>
 </tr>
 </tbody>
 </table>
-<p>updated.
-:raise OriginalChangedError: raised if the database layer notices a
-change from the supplied <cite>original</cite> parameter.</p>
 </dd></dl>
 
 </dd></dl>
@@ -663,14 +645,13 @@ change from the supplied <cite>original</cite> parameter.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>relation_json</strong> (<em>dict</em>) &#8211; Relation JSON object.</li>
 <li><strong>sentence</strong> (<em>str</em>) &#8211; Sentence the current relation occurs in.</li>
-<li><strong>entity_properties</strong> &#8211; Wikidata properties as dictionary with the entity&#8217;s name as key and the properties as</li>
+<li><strong>entity_properties</strong> (<em>dict</em>) &#8211; Wikidata properties as dictionary with the entity&#8217;s name as key and the properties as 
+value.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-<p>value.
-:type entity_properties: dict</p>
 </dd></dl>
 
 <dl class="method">
@@ -690,11 +671,6 @@ overwritten.</p>
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="bwg.neo4j_extensions.Neo4jTarget.mode">
-<code class="descname">mode</code><em class="property"> = None</em><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jTarget.mode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

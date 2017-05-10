@@ -20,7 +20,7 @@ class CoreNLPServerMixin:
     """
     Communicate with a Stanford CoreNLP server via the pycorenlp wrapper.
     """
-    task_config = luigi.DictParameter()
+    task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
     _server = None
 
     def process_sentence_with_corenlp_server(self, sentence_data, action, postprocessing_func=None):
@@ -32,7 +32,7 @@ class CoreNLPServerMixin:
         :param action: Action that should be performed on the data.
         :type action: str
         :param postprocessing_func: Function that is applied to output afterwards (None means that there won't be any 
-        function applied to the output).
+            function applied to the output).
         :type postprocessing_func: func, None
         """
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
@@ -78,7 +78,7 @@ class ArticleProcessingMixin:
     """
     Enable Luigi tasks to process single lines as well as articles or other input types.
     """
-    task_config = luigi.DictParameter()
+    task_config = luigi.DictParameter()  # Dictionary with config parameters for all pipeline tasks
 
     @abc.abstractmethod
     def task_workflow(self, article, **workflow_kwargs):
@@ -89,17 +89,16 @@ class ArticleProcessingMixin:
 
         The input is considered an article, e.g. some text that consists of a variable number of sentences. Here's a
         proposal how to fit real world media types to this requirement:
-            * Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small
-                                 articles themselves.
-            * Newspaper article: Same intuition as above.
-            * Books: Treat chapters as articles.
-            * Single paragraphs of text: Treat as articles that may not contain a headline.
-            * Single sentence: Treat as single paragraph with only one "data" entry.
-            * Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for
-                                        (written) natural language.
+        
+        * Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small articles themselves.
+        * Newspaper article: Same intuition as above.
+        * Books: Treat chapters as articles.
+        * Single paragraphs of text: Treat as articles that may not contain a headline.
+        * Single sentence: Treat as single paragraph with only one "data" entry.
+        * Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for (written) natural language.
                                         
         :param article: Current article as a dictionary, with the "meta" field providing meta data and the "data" field
-        providing the actual sentence data.
+            providing the actual sentence data.
         :type article: dict
         :param workflow_kwargs: Additional key word arguments for this tasks workflow, e.g. additional resources.
         :type workflow_kwargs: dict
@@ -137,10 +136,10 @@ class ArticleProcessingMixin:
         it to the output file.
         
         :param raw_articles: Raw articles (referring to the same article but carrying different kinds of data for their 
-        sentences) read from input file.
+            sentences) read from input file.
         :type raw_articles: list, tuple
         :param new_state: State that describes the kind of processing that is applied to the data in this step. It's 
-        included in the metadata of each article.
+            included in the metadata of each article.
         :type new_state: str
         :param serializing_function: Function that is used afterwards to serialize the data again.
         :type serializing_function: func
@@ -183,7 +182,7 @@ class ArticleProcessingMixin:
         Combine multiple articles into one data structure, if necessary.
         
         :param raw_articles: Raw articles (referring to the same article but carrying different kinds of data for their 
-        sentences) read from input file.
+            sentences) read from input file.
         :type raw_articles: list
         :return: New article with combined data.
         :rtype: dict

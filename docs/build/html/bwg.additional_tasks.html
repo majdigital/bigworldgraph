@@ -31,6 +31,8 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.config_management" href="bwg.config_management.html" />
+    <link rel="prev" title="Welcome to BigWorldGraph’s documentation!" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -65,7 +67,8 @@
      href="index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul>
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.additional_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
@@ -101,6 +104,14 @@
             
               
                 
+  <li>
+    <a href="index.html" title="Previous Chapter: Welcome to BigWorldGraph’s documentation!"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Welcome to Bi...</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.config_management.html" title="Next Chapter: bwg.config_management"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.config_management &raquo;</span>
+    </a>
+  </li>
               
             
             
@@ -142,26 +153,6 @@
 <em class="property">class </em><code class="descclassname">bwg.additional_tasks.</code><code class="descname">PipelineRunInfoGenerationTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.PipelineRunInfoGenerationTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
 <p>Generates information about the current run of the pipeline.</p>
-<dl class="method">
-<dt id="bwg.additional_tasks.PipelineRunInfoGenerationTask.output">
-<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.PipelineRunInfoGenerationTask.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.PipelineRunInfoGenerationTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.PipelineRunInfoGenerationTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.PipelineRunInfoGenerationTask.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.PipelineRunInfoGenerationTask.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bwg.additional_tasks.PipelineRunInfoGenerationTask.task_config">
-<code class="descname">task_config</code><em class="property"> = &lt;luigi.parameter.DictParameter object&gt;</em><a class="headerlink" href="#bwg.additional_tasks.PipelineRunInfoGenerationTask.task_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -169,26 +160,6 @@
 <em class="property">class </em><code class="descclassname">bwg.additional_tasks.</code><code class="descname">RelationMergingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationMergingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
 <p>Merge relations gained from OpenRelationExtractionTask and ParticipationExtractionTask.</p>
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationMergingTask.output">
-<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationMergingTask.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationMergingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationMergingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationMergingTask.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationMergingTask.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationMergingTask.task_workflow">
-<code class="descname">task_workflow</code><span class="sig-paren">(</span><em>article</em>, <em>**workflow_resources</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationMergingTask.task_workflow" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -196,11 +167,6 @@
 <em class="property">class </em><code class="descclassname">bwg.additional_tasks.</code><code class="descname">RelationsDatabaseWritingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
 <p>Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.</p>
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.output">
-<code class="descname">output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.pipeline_run_info">
 <code class="descname">pipeline_run_info</code><em class="property"> = None</em><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.pipeline_run_info" title="Permalink to this definition">¶</a></dt>
@@ -224,21 +190,6 @@
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.requires">
-<code class="descname">requires</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.requires" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.task_config">
-<code class="descname">task_config</code><em class="property"> = &lt;luigi.parameter.DictParameter object&gt;</em><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.task_config" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
