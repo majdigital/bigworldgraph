@@ -74,7 +74,6 @@ var BigWorldGraph = BigWorldGraph || {};
     };
 
     BigWorldGraph.Graph = function(){
-        console.log('Build a new Graph');
         var _this = this;
         _this.svg = d3.select('svg');
         _this.width = +_this.svg.attr('width');
@@ -83,14 +82,28 @@ var BigWorldGraph = BigWorldGraph || {};
         _this.selected = {};
         _this.graph = {};
         _this.highlighted = null;
+        _this.entry = "http://127.0.0.1:5000/";
+        $.ajax({
+            url:_this.entry,
+            contentType: "text/plain",
+            method:"GET",
+            success:function(response){
+                console.log(response);
+            },
+            error:function(xhr,err,msg){
+                console.log(xhr);
+                console.log(err);
+                console.log(msg);
+            }
+        })
 
 
-        d3.json("tempdata/relations.json", function(error,data){
+        /*d3.json(_this.entry, function(error,data){
             console.log(data)
             if(error)throw error;
             _this.graph.data = data;
             _this.buildGraph();
-        });
+        });*/
 
         _this.buildGraph = function(){
             _this.graph.links = [];
