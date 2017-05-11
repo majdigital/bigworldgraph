@@ -114,11 +114,13 @@ tasks:
 .. figure:: ./img/flowchart.png
    :alt: 
 
-Adjusting pipeline\_config.py
-'''''''''''''''''''''''''''''
+Adjusting your pipeline configuration
+'''''''''''''''''''''''''''''''''''''
 
 If you add a new kind of task to the pipeline, make sure to include a
-description of its necessary parameters in ``pipeline_config.py``:
+description of its necessary parameters in your pipeline configuration
+file. You can use ``bwg/raw_pipeline_config.py`` as a template, which
+provides a minimal example.
 
 ::
 
@@ -149,8 +151,8 @@ language, please add it to the following list:
     SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
 
 Finally, create a module for your own pipeline (e.g.
-``nlp/my_pipeline.py``) and build the configuration before running the
-pipeline, using the pre-defined task names in ``pipeline_config.py``:
+``bwg/my_pipeline.py``) and build the configuration before running the
+pipeline, using the pre-defined task names in your pipeline file:
 
 ::
 
@@ -266,6 +268,3 @@ can only use one worker at a time for the pipeline, otherwise running
 the pipeline will result in an exception being thrown.
 
 --------------
-
-curl -gX GET
-http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"

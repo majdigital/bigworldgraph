@@ -15,6 +15,7 @@ The project contains the following modules:
 * `bwg.wikidata`: Wrappers for Wikidata, using ``pywikibot``.
 * `bwg.wikipedia_tasks`: Tasks involving the Wikidata or processing a Wikipedia corpus.
 * `bwg.run`: Module used to run the API.
+* `bwg.demo_pipeline.py`: Simple example pipeline to process a minimal corpus.
 
 Modules
 -------
@@ -24,12 +25,13 @@ Modules
     bwg.additional_tasks
     bwg.config_management
     bwg.corenlp_server_tasks
+    bwg.demo_pipeline
     bwg.french_wikipedia
     bwg.helpers
     bwg.mixins
     bwg.neo4j_extensions
+    bwg.run
     bwg.standard_tasks
     bwg.utilities
     bwg.wikidata
     bwg.wikipedia_tasks
-    bwg.run

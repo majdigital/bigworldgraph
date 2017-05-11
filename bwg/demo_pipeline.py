@@ -131,6 +131,7 @@ class DemoTask3(luigi.Task, ArticleProcessingMixin):
 
 if __name__ == "__main__":
     demo_task_config = build_task_config_for_language(
+        # List tasks used in this pipeline
         tasks=[
             "simple_reading",
             "demo_task1",
@@ -140,6 +141,8 @@ if __name__ == "__main__":
         language="demo",
         config_file_path="./demo_pipeline_config.py"
     )
+
+    # Run the pipeline
     luigi.build(
         [DemoTask3(task_config=demo_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
