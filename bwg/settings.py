@@ -1,3 +1,10 @@
+# Logging
+import logging
+
+# General config
+DEBUG = False
+
+# API resource config
 # TODO (Improve) Add more methods for resources [DU 28.04.17]
 entities = {
     "item_title": "entity",
@@ -49,4 +56,6 @@ NEO4J_HOST = "localhost"
 
 ITEM_URL = 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")'
 
-
+# Logging config
+LOGGING_PATH = "../logs/api_log.txt"
+LOGGING_LEVEL = logging.DEBUG
