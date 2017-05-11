@@ -124,6 +124,46 @@ def serialize_dependency_parse_tree(sentence_id, parse_trees, state="raw", prett
     return serialized_dependency_parse_tree
 
 
+def serialize_sentence(sentence_id, sentence, state="raw", pretty=False, dump=True):
+    """
+   Serialize a simple sentence.
+
+   :param sentence_id: ID of current sentence.
+   :type sentence_id: int
+   :param sentence: Sentence.
+   :type sentence: str
+   :param state: State that describes the kind of processing that is applied to the data in this step. It's 
+   included in the metadata of each sentence.
+   :type state: str
+   :param pretty: Flag to indicate whether the output should be pretty-printed.
+   :type pretty: bool
+   :param dump: Flag to indicate whether the serialized data should already be dumped.
+   :type dump: bool
+   :return: Serialized (and maybe dumped) data.
+   :rtype: str, dict
+   """
+    options = {"ensure_ascii": False}
+
+    if pretty:
+        options["indent"] = 4
+
+    serialized_sentence = {
+        sentence_id: {
+            "meta": {
+                "id": sentence_id,
+                "state": state,
+                "type": "sentence"
+            },
+            "data": sentence
+        }
+    }
+
+    if dump:
+        return json.dumps(serialized_sentence, **options)
+
+    return serialized_sentence
+
+
 def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", pretty=False, dump=True):
     """
     Serialize an extracted relation.
