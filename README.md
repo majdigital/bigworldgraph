@@ -80,10 +80,10 @@ With its standard configuration, the pipeline comprises the following tasks:
 ![](./img/flowchart.png)
 
 
-##### Adjusting pipeline_config.py
+##### Adjusting your pipeline configuration
 
 If you add a new kind of task to the pipeline, make sure to include a description of its necessary parameters in 
-`pipeline_config.py`:
+your pipeline configuration file. You can use `bwg/raw_pipeline_config.py` as a template, which provides a minimal example.
 
     CONFIG_DEPENDENCIES = {
         ...
@@ -105,8 +105,8 @@ If you implement tasks that extend the pipeline to support other language, pleas
 
     SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
     
-Finally, create a module for your own pipeline (e.g. `nlp/my_pipeline.py`) and build the configuration before running the pipeline, using the 
-pre-defined task names in `pipeline_config.py`: 
+Finally, create a module for your own pipeline (e.g. `bwg/my_pipeline.py`) and build the configuration before running the pipeline, using the 
+pre-defined task names in your pipeline file: 
 
     import luigi
     from bwg.nlp.config_management import build_task_config_for_language
@@ -198,5 +198,3 @@ If you are using the project locally, on MacOS with Python > 3.4, you can only u
 pipeline, otherwise running the pipeline will result in an exception being thrown.
 
 ---
-
-curl -gX GET http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"

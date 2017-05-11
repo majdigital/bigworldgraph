@@ -272,8 +272,9 @@ class Neo4jDatabase:
         """
         try:
             if req.args:
-                identifier = list(req.args.keys())[0]
-                return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
+                if "pretty" not in req.args:
+                    identifier = list(req.args.keys())[0]
+                    return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
 
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
