@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.mixins &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.neo4j_extensions" href="bwg.neo4j_extensions.html" />
+    <link rel="prev" title="bwg.helpers" href="bwg.helpers.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.mixins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">bwg.mixins</a><ul>
+<li><a class="reference internal" href="#module-bwg.mixins">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="bwg.helpers.html" title="Previous Chapter: bwg.helpers"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; bwg.helpers</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.neo4j_extensions.html" title="Next Chapter: bwg.neo4j_extensions"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.neo4j_extensions &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.mixins.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="bwg-mixins">
+<h1>bwg.mixins<a class="headerlink" href="#bwg-mixins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bwg.mixins">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.mixins" title="Permalink to this headline">¶</a></h2>
+<p>Module for different mixins used for the NLP pipeline.</p>
+<dl class="class">
+<dt id="bwg.mixins.ArticleProcessingMixin">
+<em class="property">class </em><code class="descclassname">bwg.mixins.</code><code class="descname">ArticleProcessingMixin</code><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Enable Luigi tasks to process single lines as well as articles or other input types.</p>
+<p><code class="docutils literal"><span class="pre">Luigi</span></code> tasks inheriting from this Mixin will work the following way:
+In <code class="docutils literal"><span class="pre">run()</span></code> you usually only define the inputs and outputs of the task and pass them along with some other 
+arguments to the main function, <code class="docutils literal"><span class="pre">task_workflow()</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">first_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">second_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">()</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">first_file</span><span class="p">,</span> <span class="n">second_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_articles</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">),</span> <span class="n">new_state</span><span class="o">=</span><span class="s2">&quot;done stuff&quot;</span><span class="p">,</span>
+                <span class="n">serializing_function</span><span class="o">=</span><span class="n">serialize_output</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">output_file</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<p>whereby the <code class="docutils literal"><span class="pre">new_state</span></code> denotes a description of the current task which will be included in the results meta data
+and the <code class="docutils literal"><span class="pre">serializing_function</span></code> being the function used to transform the task&#8217;s output into a form corresponding to 
+<code class="docutils literal"><span class="pre">JSON</span></code>.</p>
+<p>Furthermore you can overwrite the <code class="docutils literal"><span class="pre">workflow_resources</span></code> property to initialize any resources before the task starts.</p>
+<p>In <code class="docutils literal"><span class="pre">task_workflow</span></code>, you then define the core functionality of the task. This function gets called for every 
+article in the input and you then iterate trough every sentence in the article in the function. The expected output
+is a dictionary of key word arguments for the serializing function.</p>
+<p>You can overwrite <code class="docutils literal"><span class="pre">is_relevant_article</span></code> and <code class="docutils literal"><span class="pre">is_relevant_sentence</span></code> to only include specific tasks results in your
+output (this however only makes sense (for now) to do on your last tasks, as it might lead to misalignments of 
+inputs for following tasks). Make sure to also set <code class="docutils literal"><span class="pre">ONLY_INCLUDE_RELEVANT_SENTENCES</span></code> and 
+<code class="docutils literal"><span class="pre">ONLY_INCLUDE_RELEVANT_ARTICLES</span></code> to <code class="docutils literal"><span class="pre">True</span></code> in your pipeline&#8217;s config file, correspondingly.</p>
+<dl class="method">
+<dt id="bwg.mixins.ArticleProcessingMixin.is_relevant_article">
+<code class="descname">is_relevant_article</code><span class="sig-paren">(</span><em>article</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.is_relevant_article" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter articles in the output by a relevance criterion that subclasses can define in this function.</p>
+<p>All articles are relevant if the flag is not set; only relevant ones are relevant if the flag is set (duh).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>article</strong> (<em>dict</em>) &#8211; Article.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of check.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.mixins.ArticleProcessingMixin.is_relevant_sentence">
+<code class="descname">is_relevant_sentence</code><span class="sig-paren">(</span><em>sentence</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.is_relevant_sentence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter sentences of an article in the output by a relevance criterion that subclasses can define in this
+function.</p>
+<p>All sentences are relevant if the flag is not set; only relevant ones are relevant if the flag is set (duh).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sentence</strong> (<em>list</em><em> or </em><em>dict</em>) &#8211; Sentence</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of check.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.mixins.ArticleProcessingMixin.process_articles">
+<code class="descname">process_articles</code><span class="sig-paren">(</span><em>raw_articles</em>, <em>new_state</em>, <em>serializing_function</em>, <em>output_file</em>, <em>pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.process_articles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process line from the input and apply this task&#8217;s workflow. Serialize the result afterwards and finally write
+it to the output file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>raw_articles</strong> (<em>list</em><em>, </em><em>tuple</em>) &#8211; Raw articles (referring to the same article but carrying different kinds of data for their 
+sentences) read from input file.</li>
+<li><strong>new_state</strong> (<em>str</em>) &#8211; State that describes the kind of processing that is applied to the data in this step. It&#8217;s 
+included in the metadata of each article.</li>
+<li><strong>serializing_function</strong> (<em>func</em>) &#8211; Function that is used afterwards to serialize the data again.</li>
+<li><strong>output_file</strong> (<em>_io.TextWrapper</em>) &#8211; Output file the serialized results should be written to.</li>
+<li><strong>pretty</strong> (<em>bool</em>) &#8211; Flag to indicate whether the output should be pretty-printed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.mixins.ArticleProcessingMixin.task_config">
+<code class="descname">task_config</code><em class="property"> = &lt;luigi.parameter.DictParameter object&gt;</em><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.task_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bwg.mixins.ArticleProcessingMixin.task_workflow">
+<code class="descname">task_workflow</code><span class="sig-paren">(</span><em>article</em>, <em>**workflow_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.task_workflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the tasks workflow here - it usually includes extracting necessary resources from workflow_kwargs,
+performing the actual task on the sentence and wrapping all the arguments for the serializing function in a
+dictionary, returning it in the end.</p>
+<p>The input is considered an article, e.g. some text that consists of a variable number of sentences. Here&#8217;s a
+proposal how to fit real world media types to this requirement:</p>
+<ul class="simple">
+<li>Wikipedia article: Intuitive. If you want want to work with the articles subsection, treat them as small articles themselves.</li>
+<li>Newspaper article: Same intuition as above.</li>
+<li>Books: Treat chapters as articles.</li>
+<li>Single paragraphs of text: Treat as articles that may not contain a headline.</li>
+<li>Single sentence: Treat as single paragraph with only one &#8220;data&#8221; entry.</li>
+<li>Pictures, tables, movies: Implement another workflow and also another Pipeline? This one is only for (written) natural language.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>article</strong> (<em>dict</em>) &#8211; Current article as a dictionary, with the &#8220;meta&#8221; field providing meta data and the &#8220;data&#8221; field
+providing the actual sentence data.</li>
+<li><strong>workflow_kwargs</strong> (<em>dict</em>) &#8211; Additional key word arguments for this tasks workflow, e.g. additional resources.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Yielding all named arguments to serialize this article after processing.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.mixins.ArticleProcessingMixin.workflow_resources">
+<code class="descname">workflow_resources</code><a class="headerlink" href="#bwg.mixins.ArticleProcessingMixin.workflow_resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property that provides resources necessary to complete the task&#8217;s workflow.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.mixins.CoreNLPServerMixin">
+<em class="property">class </em><code class="descclassname">bwg.mixins.</code><code class="descname">CoreNLPServerMixin</code><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Communicate with a Stanford CoreNLP server via the <code class="docutils literal"><span class="pre">pycorenlp</span></code> wrapper.</p>
+<dl class="method">
+<dt id="bwg.mixins.CoreNLPServerMixin.process_sentence_with_corenlp_server">
+<code class="descname">process_sentence_with_corenlp_server</code><span class="sig-paren">(</span><em>sentence_data</em>, <em>action</em>, <em>postprocessing_func=None</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin.process_sentence_with_corenlp_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotate a sentence using a CoreNLP server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sentence_data</strong> (<em>dict</em><em>, </em><em>list</em>) &#8211; Sentence data to be processed.</li>
+<li><strong>action</strong> (<em>str</em>) &#8211; Action that should be performed on the data.</li>
+<li><strong>postprocessing_func</strong> (<em>func</em><em>, </em><em>None</em>) &#8211; Function that is applied to output afterwards (None means that there won&#8217;t be any 
+function applied to the output).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.mixins.CoreNLPServerMixin.server">
+<code class="descname">server</code><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin.server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an instance of the Stanford CoreNLP server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Stanford CoreNLP server object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pycorenlp.StanfordCoreNLP</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.mixins.CoreNLPServerMixin.task_config">
+<code class="descname">task_config</code><em class="property"> = &lt;luigi.parameter.DictParameter object&gt;</em><a class="headerlink" href="#bwg.mixins.CoreNLPServerMixin.task_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

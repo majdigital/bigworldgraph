@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Rewriting standard tasks for the NLP pipeline using the Stanford CoreNLP server. The main motivation to do this lies
-in the following problem: When the respective Stanford tools are run through their NLTK wrappers, they load their
+Rewriting standard tasks for the NLP pipeline using the ``Stanford CoreNLP`` server. The main motivation to do this lies
+in the following problem: When the respective Stanford tools are run through their ``NLTK`` wrappers, they load their
 necessary models from scratch every time. This slows down the pipeline quite a load. In contrast, the server loads them
 only once.
 
 Also, this approach comes with some other merits as well:
     * Reducing the number of necessary Stanford model files
-    * Avoiding using bulk operations like "parse_sents()" which complicate the current architecture of the pipeline
+    * Avoiding using bulk operations like ``parse_sents()`` which complicate the current architecture of the pipeline.
 """
 
 # PROJECT
@@ -82,7 +82,7 @@ class ServerDependencyParseTask(CoreNLPServerMixin, DependencyParseTask):
     def _postprocess_dependency_parsed(self, result_json):
         """
         Apply a bit of postprocessing to the parsed data (mainly to be consistent with the taggers output if 
-        you don't use CoreNLP server).
+        you don't use the `CoreNLP server``).
 
         :param result_json: Processed sentence data.
         :type result_json: dict

@@ -16,7 +16,7 @@ import neomodel
 
 class EveCompatibilityMixin:
     """
-    Extend neomodel classes to make them compatible with Eve API functions.
+    Extend ``neomodel`` classes to make them compatible with Eve API functions.
     """
     def __contains__(self, item):
         return item in vars(self)
@@ -32,18 +32,18 @@ class Relation(neomodel.StructuredRel, EveCompatibilityMixin):
     """
     Node model for relations in the graph.
     """
-    label = neomodel.StringProperty()
-    data = neomodel.JSONProperty()
+    label = neomodel.StringProperty()   # Text that should be displayed about this edge
+    data = neomodel.JSONProperty()  # Dictionary with more detailed data about this relation
 
 
 class Entity(neomodel.StructuredNode, EveCompatibilityMixin):
     """
     Node model for entities in the graph.
     """
-    uid = neomodel.UniqueIdProperty()
-    category = neomodel.StringProperty()
-    label = neomodel.StringProperty()
-    data = neomodel.JSONProperty()
+    uid = neomodel.UniqueIdProperty()  # Unique ID for this database entry
+    category = neomodel.StringProperty()   # Category of this entity (Person, Organization...)
+    label = neomodel.StringProperty()  # Text that should be displayed about this node
+    data = neomodel.JSONProperty()  # Dictionary with more detailed data about this entity
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
 
 
@@ -51,10 +51,10 @@ class PipelineRunInfo(neomodel.StructuredNode):
     """
     Define a model for pipeline run information.
     """
-    uid = neomodel.UniqueIdProperty()
-    run_id = neomodel.StringProperty()
-    timestamp = neomodel.StringProperty()
-    article_ids = neomodel.ArrayProperty()
+    uid = neomodel.UniqueIdProperty()  # Unique ID for this database entry
+    run_id = neomodel.StringProperty()  # ID for this pipeline run, created with sentence IDs involved in this run
+    timestamp = neomodel.StringProperty()  # Timestamp for the current pipeline run
+    article_ids = neomodel.ArrayProperty()  # List of sentence IDs involved in this pipeline run
 
 
 class Neo4jResult:
@@ -233,7 +233,7 @@ class Neo4jResult:
 
 class Neo4jDatabase:
     """
-    Wrapper for a Neo4j Graph database, providing an easy way to connect to a database, querying nodes and relations as 
+    Wrapper for a ``Neo4j`` Graph database, providing an easy way to connect to a database, querying nodes and relations as 
     well as creating new Node and Relation classes on the fly.
     """
     def __init__(self, user, password, host, port):
@@ -272,8 +272,9 @@ class Neo4jDatabase:
         """
         try:
             if req.args:
-                identifier = list(req.args.keys())[0]
-                return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
+                if "pretty" not in req.args:
+                    identifier = list(req.args.keys())[0]
+                    return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
 
             return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
@@ -290,7 +291,8 @@ class Neo4jDatabase:
         :type identifier: str
         :param identifier_value: Value that should be used to identify the target node.
         :type identifier_value: str
-        :return: 
+        :return: list of friends and friends of friends.
+        :rtype: list
         """
         results, meta = neomodel.db.cypher_query(
             'MATCH (n)-[r]-(m), (m)-[r2]-(o) WHERE n.{identifier} = "{identifier_value}" RETURN n, o, m'.format(
@@ -318,17 +320,17 @@ class Neo4jDatabase:
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
-    This a simple re-implementation for a Neo4j data layer, because flask_neo4j doesn't seem to be maintained anymore, 
+    This a simple re-implementation for a ``Neo4j`` data layer, because flask_neo4j doesn't seem to be maintained anymore, 
     leading eve_neo4j to break.
     
     Docstring are mostly just copied from eve.io.DataLayer.
     """
-    node_base_classes = None
-    node_base_classes_names = None
-    node_types = None
-    relation_types = None
-    relation_base_classes = None
-    relation_base_classes_names = None
+    node_base_classes = None  # List of base classes for nodes
+    node_base_classes_names = None  # List of names of node base classes
+    node_types = None  # List of base types for nodes
+    relation_types = None  # List of base types for relations
+    relation_base_classes = None  # List of base classes for relations
+    relation_base_classes_names = None  # List of names of relation base classes
 
     def init_app(self, app):
         self.app = app
@@ -356,17 +358,12 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Consumed when a request hits a collection/document endpoint
         (`/people/`).
 
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve both
-                         the db collection/table and base query (filter), if
-                         any.
-        :param req: an instance of ``eve.utils.ParsedRequest``. This contains
-                    all the constraints that must be fulfilled in order to
-                    satisfy the original request (where and sort parts, paging,
-                    etc). Be warned that `where` and `sort` expressions will
-                    need proper parsing, according to the syntax that you want
-                    to support with your driver. For example ``eve.io.Mongo``
-                    supports both Python and Mongo-like query syntaxes.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve 
+            both the db collection/table and base query (filter), if any.
+        :param req: an instance of ``eve.utils.ParsedRequest``. This contains all the constraints that must be fulfilled
+            in order to satisfy the original request (where and sort parts, paging, etc). Be warned that `where` and 
+            `sort` expressions will need proper parsing, according to the syntax that you want to support with your 
+            driver. For example ``eve.io.Mongo`` supports both Python and Mongo-like query syntaxes.
         :param sub_resource_lookup: sub-resource lookup from the endpoint url.
         """
         item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
@@ -388,9 +385,8 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         the result. Only implement this if the underlying db engine supports
         aggregation operations.
 
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve
-                         the db collection/table consumed by the resource.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve 
+            the db collection/table consumed by the resource.
         :param pipeline: aggregation pipeline to be executed.
         :param options: aggregation options to be considered.
         """
@@ -402,28 +398,22 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Retrieves a single document/record. Consumed when a request hits an
         item endpoint (`/people/id/`).
 
-        :param resource: resource being accessed. You should then use the
-                         ``datasource`` helper function to retrieve both the
-                         db collection/table and base query (filter), if any.
-        :param req: an instance of ``eve.utils.ParsedRequest``. This contains
-                    all the constraints that must be fulfilled in order to
-                    satisfy the original request (where and sort parts, paging,
-                    etc). As we are going to only look for one document here,
-                    the only req attribute that you want to process here is
-                    ``req.projection``.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve  
+            both the db collection/table and base query (filter), if any.
+        :param req: an instance of ``eve.utils.ParsedRequest``. This contains all the constraints that must be fulfilled
+            in order to satisfy the original request (where and sort parts, paging, etc). As we are going to only look for 
+            one document here, the only req attribute that you want to process here is``req.projection``.
 
-        :param **lookup: the lookup fields. This will most likely be a record
-                         id or, if alternate lookup is supported by the API,
-                         the corresponding query.
+        :param **lookup: the lookup fields. This will most likely be a record id or, if alternate lookup is supported by
+        the API, the corresponding query.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
 
     def find_one_raw(self, resource, _id):
         """ 
-        Retrieves a single, raw document. No projections or datasource
-        filters are being applied here. Just looking up the document by unique
-        id.
+        Retrieves a single, raw document. No projections or datasource filters are being applied here. Just looking up 
+        the document by unique id.
 
         :param resource: resource name.
         :param _id: unique id.
@@ -433,17 +423,13 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
 
     def find_list_of_ids(self, resource, ids, client_projection=None):
         """
-        Retrieves a list of documents based on a list of primary keys
-        The primary key is the field defined in `ID_FIELD`.
-        This is a separate function to allow us to use per-database
-        optimizations for this type of query.
+        Retrieves a list of documents based on a list of primary keys. The primary key is the field defined in 
+        `ID_FIELD`. This is a separate function to allow us to use per-database optimizations for this type of query.
 
         :param resource: resource name.
-        :param ids: a list of ids corresponding to the documents
-        to retrieve
+        :param ids: a list of ids corresponding to the documents to retrieve
         :param client_projection: a specific projection to use
-        :return: a list of documents matching the ids in `ids` from the
-        collection specified in `resource` 
+        :return: a list of documents matching the ids in `ids` from the collection specified in `resource` 
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -452,11 +438,9 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         """
         Inserts a document into a resource collection/table.
 
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve both
-                         the actual datasource name.
-        :param doc_or_docs: json document or list of json documents to be added
-                            to the database.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve 
+            both the actual datasource name.
+        :param doc_or_docs: json document or list of json documents to be added to the database.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -464,16 +448,15 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     def update(self, resource, id_, updates, original):
         """
         Updates a collection/table document/row.
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve
-                         the actual datasource name.
+        
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve
+            the actual datasource name.
         :param id_: the unique id of the document.
-        :param updates: json updates to be performed on the database document
-                        (or row).
+        :param updates: json updates to be performed on the database document (or row).
         :param original: definition of the json document that should be
-        updated.
-        :raise OriginalChangedError: raised if the database layer notices a
-        change from the supplied `original` parameter.
+            updated.
+        :raise OriginalChangedError: raised if the database layer notices a change from the supplied `original` 
+            parameter.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -481,15 +464,14 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     def replace(self, resource, id_, document, original):
         """
         Replaces a collection/table document/row.
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve
-                         the actual datasource name.
+        
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve
+            the actual datasource name.
         :param id_: the unique id of the document.
         :param document: the new json document
-        :param original: definition of the json document that should be
-        updated.
-        :raise OriginalChangedError: raised if the database layer notices a
-        change from the supplied `original` parameter.
+        :param original: definition of the json document that should be updated.
+        :raise OriginalChangedError: raised if the database layer notices a change from the supplied `original` 
+            parameter.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -499,13 +481,10 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Removes a document/row or an entire set of documents/rows from a
         database collection/table.
 
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve
-                         the actual datasource name.
-        :param lookup: a dict with the query that documents must match in order
-                       to qualify for deletion. For single document deletes,
-                       this is usually the unique id of the document to be
-                       removed.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve the
+            actual datasource name.
+        :param lookup: a dict with the query that documents must match in order to qualify for deletion. For single 
+            document deletes, this is usually the unique id of the document to be removed.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -547,9 +526,8 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         the case, it will have to be taken into consideration when performing
         the is_empty() check (see eve.io.mongo.mongo.py implementation).
 
-        :param resource: resource being accessed. You should then use
-                         the ``datasource`` helper function to retrieve
-                         the actual datasource name.
+        :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve the
+            actual datasource name.
         """
         # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
@@ -559,7 +537,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     """
     Additional luigi target to write a tasks output into a neo4j graph database.
     """
-    mode = None
     _exists = True
 
     def __init__(self, pipeline_run_info, user, password, host="localhost", port=7687, ne_tag_to_model={}):
@@ -567,7 +544,7 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         Initialize a Neo4j graph database target.
         
         :param pipeline_run_info: Info about the current run of the database. Is used to determine whether this task has
-         to be run.
+        to be run.
         :type pipeline_run_info: dict
         :param user: Username to access database.
         :type user: str
@@ -611,7 +588,7 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :param sentence: Sentence the current relation occurs in.
         :type sentence: str
         :param entity_properties: Wikidata properties as dictionary with the entity's name as key and the properties as 
-        value.
+            value.
         :type entity_properties: dict
         """
         relation_meta, relation_data = relation_json["meta"], relation_json["data"]

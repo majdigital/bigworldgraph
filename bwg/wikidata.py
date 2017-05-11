@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 This module provides two different way to access Wikidata:
-    * Through the Wikimedia API with Pywikibot as a wrapper
-    * Over a scraper using BeautifulSoup4
+    * Through the Wikimedia API with ``Pywikibot`` as a wrapper
+    * Over a scraper using ``BeautifulSoup4``
     
 Currently, accessing the data via the API is faster than the scraper.
 """

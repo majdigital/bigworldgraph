@@ -6,11 +6,13 @@ data/stanford/*
 data/pipeline_*/*
 python_sudo.sh
 __pycache__
-data/corpora_*/*
-data/evaluation/*
+data/*
+!data/corpora_demo
+!data/pipeline_demo
 *.ctrl
 *.ipynb
 */apicache/*
 build/*
 dist/*
 bwg.egg-info/*
+logs/*

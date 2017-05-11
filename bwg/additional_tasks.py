@@ -172,7 +172,7 @@ class RelationsDatabaseWritingTask(luigi.Task):
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.
     """
     task_config = luigi.DictParameter()
-    pipeline_run_info = None
+    pipeline_run_info = None  # Information about current pipeline run, containing processed sentences, timestamp etc.
 
     def requires(self):
         return RelationMergingTask(task_config=self.task_config),\
