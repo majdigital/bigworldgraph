@@ -2,7 +2,7 @@
 import logging
 
 # General config
-DEBUG = False
+DEBUG = True
 
 # API resource config
 # TODO (Improve) Add more methods for resources [DU 28.04.17]

@@ -14,6 +14,7 @@ The project contains the following modules:
 * `bwg.utilities`: Mostly serializing functions used in pipeline tasks.
 * `bwg.wikidata`: Wrappers for Wikidata, using ``pywikibot``.
 * `bwg.wikipedia_tasks`: Tasks involving the Wikidata or processing a Wikipedia corpus.
+* `bwg.run`: Module used to run the API.
 
 Modules
 -------
@@ -31,3 +32,4 @@ Modules
     bwg.utilities
     bwg.wikidata
     bwg.wikipedia_tasks
+    bwg.run
