@@ -14,3 +14,4 @@ data/evaluation/*
 build/*
 dist/*
 bwg.egg-info/*
+logs/*
