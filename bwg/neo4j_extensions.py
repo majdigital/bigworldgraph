@@ -620,11 +620,14 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :param node_data: Data of the current node.
         :type node_data: dict
         """
-        if "claims" in node_data:
-            for claim, claim_data in node_data["claims"].items():
+        # Pick first sense; if faulty, correct manually later
+        sense_dates = node_data.get("senses", [])
+        sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
+        if "claims" in sense_data:
+            for claim, claim_data in sense_data["claims"].items():
                 target, implies_relation = claim_data["target"], claim_data["implies_relation"]
 
-                if implies_relation and target != node_data["label"]:
+                if implies_relation and target != sense_data["label"]:
                     obj_node = self._get_or_create_node(label=target, data={})
                     self._get_or_create_connection(node, obj_node, label=claim, data={})
 
@@ -642,7 +645,10 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         try:
             return Entity.nodes.get(label=label)
         except Entity.DoesNotExist:
-            entity_class_string = self.ne_tag_to_model.get(data.get("type", "Entity"), "Miscellaneous")
+            # Pick first sense; if faulty, correct manually later
+            sense_dates = data.get("senses", [])
+            sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
+            entity_class_string = self.ne_tag_to_model.get(sense_data.get("type", "Entity"), "Miscellaneous")
             entity_class = self.get_node_class(entity_class_string, (Entity, ))
             entity = entity_class(category=entity_class_string, label=label, data=data)
             entity.save()

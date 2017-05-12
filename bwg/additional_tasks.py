@@ -6,6 +6,7 @@ Defining additional tasks for the NLP pipeline.
 # STD
 import datetime
 import time
+import copy
 
 # EXT
 import luigi
@@ -259,20 +260,12 @@ class RelationsDatabaseWritingTask(luigi.Task):
             for entity_id, entity_json in sentence_data["entities"].items():
                 entity_meta, entity_data = entity_json["meta"], entity_json["data"]
 
-                if entity_meta["type"] == "Ambiguous Wikidata entity":
-                    new_entity_data = {
-                        "ambiguous": True,
-                        "senses": [self._convert_entity_sense(entity_sense) for entity_sense in entity_data]
-                    }
+                new_entity_data = {
+                    "ambiguous": entity_meta["type"] == "Ambiguous Wikidata entity",
+                    "senses": [self._convert_entity_sense(entity_sense) for entity_sense in entity_data]
+                }
 
-                    for entity_sense in new_entity_data["senses"]:
-                        entity_properties = self._add_entity_data_to_properties_dict(entity_sense, entity_properties)
-
-                else:
-                    new_entity_data = self._convert_entity_sense(entity_data[0])
-                    new_entity_data["ambiguous"] = False
-
-                    entity_properties = self._add_entity_data_to_properties_dict(new_entity_data, entity_properties)
+                entity_properties = self._add_entity_data_to_properties_dict(new_entity_data, entity_properties)
 
         return entity_properties
 
@@ -288,19 +281,22 @@ class RelationsDatabaseWritingTask(luigi.Task):
         :return: Properties dictionary with new entry.
         :rtype: dict
         """
-        if "label" not in entity_data:
-            return entity_properties
+        for sense_data in entity_data["senses"]:
+            if "label" not in sense_data:
+                continue
 
-        entity_properties[entity_data["label"]] = entity_data
+            entity_properties[sense_data["label"]] = entity_data
 
-        if "aliases" in entity_data:
-            for alias in entity_data["aliases"]:
-                # Adjust label and aliases appropriatly
-                alias_entity_data = dict(entity_data)
-                alias_entity_data["label"] = alias
-                alias_entity_data["aliases"].remove(alias)
-                alias_entity_data["aliases"].append(entity_data["label"])
-                entity_properties[alias] = alias_entity_data
+            if "aliases" in sense_data:
+                for alias in sense_data["aliases"]:
+                    # Adjust label and aliases appropriately
+                    alias_sense_data = copy.deepcopy(sense_data)
+                    alias_sense_data["label"] = alias
+                    alias_sense_data["aliases"].remove(alias)
+                    alias_sense_data["aliases"].append(sense_data["label"])
+                    alias_entity_data = copy.deepcopy(entity_data)
+                    alias_entity_data["senses"][entity_data["senses"].index(sense_data)] = alias_sense_data
+                    entity_properties[alias] = alias_entity_data
 
         return entity_properties
 
