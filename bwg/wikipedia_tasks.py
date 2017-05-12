@@ -20,6 +20,7 @@ from bwg.utilities import (
     get_nes_from_sentence,
     serialize_wikidata_entity
 )
+import bwg.standard_tasks
 from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 
 
