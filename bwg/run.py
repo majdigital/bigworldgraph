@@ -7,6 +7,7 @@ Module to run the API that connects the graph database to the frontend.
 import json
 import logging
 import traceback
+import os
 
 # EXT
 from eve import Eve
@@ -36,6 +37,12 @@ def set_up_api():
     # Init configuration
     api_config = get_config_from_py_file("settings.py")
     api_config = overwrite_local_config_with_environ(api_config)
+
+    # Create logging directory
+    logging_file = api_config["LOGGING_PATH"]
+    logging_path = "/".join(logging_file.split("/")[:-1])
+    if not os.path.exists(logging_path):
+        os.makedirs(logging_path)
 
     # Init logger
     logging.basicConfig(
