@@ -1,0 +1,466 @@
+{
+    "nodes": {
+        "Myriel":{
+            "id": "Myriel",
+            "group": 1,
+            "depends": [],
+            "dependedOnBy": ["Napoleon", "Mlle.Baptistine", "Mme.Magloire", "CountessdeLo", "Geborand", "Champtercier", "Cravatte", "OldMan", "Valjean"]
+        },
+        "Napoleon":{
+            "id": "Napoleon",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Mlle.Baptistine":{
+            "id": "Mlle.Baptistine",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":["Mme.Magloire","Valjean"]
+        },
+        "Mme.Magloire":{
+            "id": "Mme.Magloire",
+            "group": 1,
+            "depends":["Myriel","Mlle.Baptistine"],
+            "dependedOnBy":["Valjean"]
+        },
+        "CountessdeLo":{
+            "id": "CountessdeLo",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Geborand":{
+            "id": "Geborand",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Champtercier":{
+            "id": "Champtercier",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Cravette":{
+            "id": "Cravatte",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Count":{
+            "id": "Count",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "OldMan":{
+            "id": "OldMan",
+            "group": 1,
+            "depends":["Myriel"],
+            "dependedOnBy":[]
+        },
+        "Labarre":{
+            "id": "Labarre",
+            "group": 2,
+            "depends":[],
+            "dependedOnBy":["Valjean"]
+        },
+        "Valjean":{
+            "id": "Valjean",
+            "group": 2,
+            "depends":["Labarre","Mme.Magloire","Mlle.Baptistine","Myriel"],
+            "dependedOnBy":["Fauchelevent","Marguerite","Mme.deR","Isabeau","Gervais","Fantine","Mme.Thenardier","Gueulemer","Babet","Claquesous","Montparnasse","Cosette","Javert","Bamatabois","Simplice","Scaufflaire","Woman1","Judge","Champmathieu","Brevet","Chenildieu","Cochepaille","Woman2","MotherInnocent","Gavroche","Gillenormand","Mlle.Gillenormand","Marius","Enjolras","Bossuet","Toussaint"]
+        },
+        "Marguerite":{
+            "id": "Marguerite",
+            "group": 3,
+            "depends":["Valjean"],
+            "dependedOnBy":["Fantine"]
+        },
+        "Mme.deR":{
+            "id": "Mme.deR",
+            "group": 2,
+            "depends":["Valjean"],
+            "dependedOnBy":[]
+        },
+        "Isabeau":{
+            "id": "Isabeau",
+            "group": 2,
+            "depends":["Valjean"],
+            "dependedOnBy":[]
+        },
+        "Gervais":{
+            "id": "Gervais",
+            "group": 2,
+            "depends":["Valjean"],
+            "dependedOnBy":[]
+        },
+        "Tholomyes":{
+            "id": "Tholomyes",
+            "group": 3,
+            "depends":[],
+            "dependedOnBy":["Listolier","Fameuil","Blacheville","Favourite","Dahlia","Zephine","Fantine","Cosette","Marius"]
+        },
+        "Listolier":{
+            "id": "Listolier",
+            "group": 3,
+            "depends":["Tholomyes"],
+            "dependedOnBy":["Fameuil","Blacheville","Favourite","Dahlia","Zephine","Fantine"]
+        },
+        "Fameuil":{
+            "id": "Fameuil",
+            "group": 3,
+            "depends":["Tholomyes","Listolier"],
+            "dependedOnBy":["Blacheville","Favourite","Dahlia","Zephine","Fantine"]
+        },
+        "Blacheville":{
+            "id": "Blacheville",
+            "group": 3,
+            "depends":["Tholomyes","Listolier","Fameuil"],
+            "dependedOnBy":["Favourite","Dahlia","Zephine","Fantine"]
+        },
+        "Favourite":{
+            "id": "Favourite",
+            "group": 3,
+            "depends":["Tholomyes","Listolier","Fameuil","Blacheville"],
+            "dependedOnBy":["Dahlia","Zephine","Fantine"]
+        },
+        "Dahlia":{
+            "id": "Dahlia",
+            "group": 3,
+            "depends":["Tholomyes","Listolier","Fameuil","Blacheville","Favourite"],
+            "dependedOnBy":["Zephine","Fantine"]
+        },
+        "Zephine":{
+            "id": "Zephine",
+            "group": 3,
+            "depends":["Tholomyes","Listolier","Fameuil","Blacheville","Favourite","Dahlia"],
+            "dependedOnBy":["Fantine"]
+        },
+        "Fantine":{
+            "id": "Fantine",
+            "group": 3,
+            "depends":["Tholomyes","Listolier","Fameuil","Blacheville","Favourite","Dahlia","Zephine","Marguerite","Valjean"],
+            "dependedOnBy":["Mme.Thenardier","Thenardier","Javert","Bamatabois","Perpetue","Simplice"]
+        },
+        "Mme.Thenardier":{
+            "id": "Mme.Thenardier",
+            "group": 4,
+            "depends":["Fantine","Valjean"],
+            "dependedOnBy":["Thenardier","Gueulemer","Babet","Claquesous","Cosette","Javert","Eponine","Anzelma","Magnon"]
+        },
+        "Thenardier":{
+            "id": "Thenardier",
+            "group": 4,
+            "depends":["Mme.Thenardier","Fantine","Valjean"],
+            "dependedOnBy":["Gueulemer","Babet","Claquesous","Montparnasse","Cosette","Javert","Pontmercy","Boulatruelle","Eponine","Anzelma","Gavroche","Marius","Brujon"]
+        },
+        "Cosette":{
+            "id": "Cosette",
+            "group": 5,
+            "depends":["Mme.Thenardier","Valjean","Tholomyes","Thenardier"],
+            "dependedOnBy":["Javert","Woman2","Gillenormand","Mlle.Gillenormand","Lt.Gillenormand","Marius","Toussaint"]
+        },
+        "Javert":{
+            "id": "Javert",
+            "group": 4,
+            "depends":["Valjean","Fantine","Thenardier","Mme.Thenardier","Cosette"],
+            "dependedOnBy":["Fauchelevent","Gueulemer","Babet","Claquesous","Montparnasse","Bamatabois","Simplice","Woman1","Woman2","Gavroche","Enjolras","Toussaint"]
+        },
+        "Fauchelevent":{
+            "id": "Fauchelevent",
+            "group": 0,
+            "depends":["Valjean","Javert"],
+            "dependedOnBy":["MotherInnocent","Gribier"]
+        },
+        "Bamatabois":{
+            "id": "Bamatabois",
+            "group": 2,
+            "depends":["Fantine","Javert","Valjean"],
+            "dependedOnBy":["Judge","Champmathieu","Brevet","Chenildieu","Cochepaille"]
+        },
+        "Perpetue":{
+            "id": "Perpetue",
+            "group": 3,
+            "depends":["Fantine"],
+            "dependedOnBy":["Simplice"]
+        },
+        "Simplice":{
+            "id": "Simplice",
+            "group": 2,
+            "depends":["Perpetue","Valjean","Fantine","Javert"],
+            "dependedOnBy":[]
+        },
+        "Scaufflaire":{
+            "id": "Scaufflaire",
+            "group": 2,
+            "depends":["Valjean"],
+            "dependedOnBy":[]
+        },
+        "Woman1":{
+            "id": "Woman1",
+            "group": 2,
+            "depends":["Valjean","Javert"],
+            "dependedOnBy":[]
+        },
+        "Judge":{
+            "id": "Judge",
+            "group": 2,
+            "depends":["Valjean","Bamatabois"],
+            "dependedOnBy":["Champmathieu","Brevet","Chenildieu","Cochepaille"]
+        },
+        "Champmathieu":{
+            "id": "Champmathieu",
+            "group": 2,
+            "depends":["Valjean","Judge","Bamatabois"],
+            "dependedOnBy":["Brevet","Chenildieu","Cochepaille"]
+        },
+        "Brevet":{
+            "id": "Brevet",
+            "group": 2,
+            "depends":["Judge","Champmathieu","Valjean","Bamatabois"],
+            "dependedOnBy":["Chenildieu","Cochepaille"]
+        },
+        "Chenildieu":{
+            "id": "Chenildieu",
+            "group": 2,
+            "depends":["Judge","Champmathieu","Brevet","Valjean","Bamatabois"],
+            "dependedOnBy":["Cochepaille"]
+        },
+        "Cochepaille":{
+            "id": "Cochepaille",
+            "group": 2,
+            "depends":["Judge","Champmathieu","Brevet","Chenildieu","Valjean","Bamatabois"],
+            "dependedOnBy":[]
+        },
+        "Pontmercy":{
+            "id": "Pontmercy",
+            "group": 4,
+            "depends":["Thenardier"],
+            "dependedOnBy":["Mme.Pontmercy","Marius"]
+        },
+        "Boulatruelle":{
+            "id": "Boulatruelle",
+            "group": 6,
+            "depends":["Thenardier"],
+            "dependedOnBy":[]
+        },
+        "Eponine":{
+            "id": "Eponine",
+            "group": 4,
+            "depends":["Mme.Thenardier","Thenardier"],
+            "dependedOnBy":["Gueulemer","Babet","Claquesous","Montparnasse","Anzelma","Marius","Mabeuf","Courfeyrac","Brujon"]
+        },
+        "Anzelma":{
+            "id": "Anzelma",
+            "group": 4,
+            "depends":["Eponine","Thenardier","Mme.Thenardier"],
+            "dependedOnBy":[]
+        },
+        "Woman2":{
+            "id": "Woman2",
+            "group": 5,
+            "depends":["Valjean","Cosette","Javert"],
+            "dependedOnBy":[]
+        },
+        "MotherInnocent":{
+            "id": "MotherInnocent",
+            "group": 0,
+            "depends":["Fauchelevent", "Valjean"],
+            "dependedOnBy":[]
+        },
+        "Gribier":{
+            "id": "Gribier",
+            "group": 0,
+            "depends":["Fauchelevent"],
+            "dependedOnBy":[]
+        },
+        "Jondrette":{
+            "id": "Jondrette",
+            "group": 7,
+            "depends": [],
+            "dependedOnBy": ["Mme.Burgon"]
+        },
+        "Mme.Burgon":{
+            "id": "Mme.Burgon",
+            "group": 7,
+            "depends": ["Jondrette"],
+            "dependedOnBy": ["Gavroche"]
+        },
+        "Gavroche":{
+            "id": "Gavroche",
+            "group": 8,
+            "depends": ["Mme.Burgon", "Thenardier", "Javert", "Valjean"],
+            "dependedOnBy": ["Gueulemer", "Babet","Montparnasse","Marius","Mabeuf","Enjolras","Combeferre","Prouvaire","Feuilly","Courfeyrac","Bahorel","Joly","Grantaire","Child1","Child2","Brujon","Mme.Hucheloup"]
+        },
+        "Gillenormand":{
+            "id": "Gillenormand",
+            "group": 5,
+            "depends":["Cosette","Valjean"],
+            "dependedOnBy":["Magnon","Mlle.Gillenormand","Lt.Gillenormand","Marius","BaronessT"]
+        },
+        "Magnon":{
+            "id": "Magnon",
+            "group": 5,
+            "depends":["Gillenormand","Mme.Thenardier"],
+            "dependedOnBy":[]
+        },
+        "Mlle.Gillenormand":{
+            "id": "Mlle.Gillenormand",
+            "group": 5,
+            "depends":["Gillenormand","Cosette","Valjean"],
+            "dependedOnBy":["Mme.Pontmercy","Mlle.Vaubois","Lt.Gillenormand","Marius"]
+        },
+        "Mme.Pontmercy":{
+            "id": "Mme.Pontmercy",
+            "group": 5,
+            "depends":["Mlle.Gillenormand","Pontmercy"],
+            "dependedOnBy":[]
+        },
+        "Mlle.Vaubois":{
+            "id": "Mlle.Vaubois",
+            "group": 5,
+            "depends":["Mlle.Gillenormand"],
+            "dependedOnBy":[]
+        },
+        "Lt.Gillenormand":{
+            "id": "Lt.Gillenormand",
+            "group": 5,
+            "depends":["Mlle.Gillenormand","Gillenormand","Cosette"],
+            "dependedOnBy":["Marius"]
+        },
+        "Marius":{
+            "id": "Marius",
+            "group": 8,
+            "depends":["Mlle.Gillenormand","Gillenormand","Pontmercy","Lt.Gillenormand","Cosette","Valjean","Tholomyes","Thenardier","Eponine","Gavroche"],
+            "dependedOnBy":["BaronessT","Mabeuf","Enjolras","Combeferre","Feuilly","Courfeyrac","Bahorel","Bossuet","Joly"]
+        },
+        "BaronessT":{
+            "id": "BaronessT",
+            "group": 5,
+            "depends":["Gillenormand","Marius"],
+            "dependedOnBy":[]
+        },
+        "Mabeuf":{
+            "id": "Mabeuf",
+            "group": 8,
+            "depends":["Marius","Eponine","Gavroche"],
+            "dependedOnBy":["Enjolras","Combeferre","Feuilly","Courfeyrac","Bahorel","Bossuet","Joly","MotherPlutarch"]
+        },
+        "Enjolras":{
+            "id": "Enjolras",
+            "group": 8,
+            "depends":["Marius","Gavroche","Javert","Mabeuf","Valjean"],
+            "dependedOnBy":["Claquesous","Combeferre","Prouvaire","Feuilly","Courfeyrac","Bahorel","Bossuet","Joly","Grantaire","Mme.Hucheloup"]
+        },
+        "Combeferre":{
+            "id": "Combeferre",
+            "group": 8,
+            "depends":["Enjolras","Marius","Gavroche","Mabeuf"],
+            "dependedOnBy":["Prouvaire","Feuilly","Courfeyrac","Bahorel","Bossuet","Joly","Grantaire"]
+        },
+        "Prouvaire":{
+            "id": "Prouvaire",
+            "group": 8,
+            "depends":["Gavroche","Enjolras","Combeferre"],
+            "dependedOnBy":["Feuilly","Courfeyrac","Bahorel","Bossuet","Joly","Grantaire"]
+        },
+        "Feuilly":{
+            "id": "Feuilly",
+            "group": 8,
+            "depends":["Gavroche","Enjolras","Prouvaire","Combeferre","Mabeuf","Marius"],
+            "dependedOnBy":["Courfeyrac","Bahorel","Bossuet","Joly","Grantaire"]
+        },
+        "Courfeyrac":{
+            "id": "Courfeyrac",
+            "group": 8,
+            "depends":["Marius","Enjolras","Combeferre","Gavroche","Mabeuf","Eponine","Feuilly","Prouvaire"],
+            "dependedOnBy":["Bahorel","Bossuet","Joly","Grantaire","Mme.Hucheloup"]
+        },
+        "Bahorel":{
+            "id": "Bahorel",
+            "group": 8,
+            "depends":["Combeferre","Gavroche","Courfeyrac","Mabeuf","Enjolras","Feuilly","Prouvaire","Marius"],
+            "dependedOnBy":["Bossuet","Joly","Grantaire","Mme.Hucheloup"]
+        },
+        "Bossuet":{
+            "id": "Bossuet",
+            "group": 8,
+            "depends":["Marius","Courfeyrac","Gavroche","Bahorel","Enjolras","Feuilly","Prouvaire","Combeferre","Mabeuf","Valjean"],
+            "dependedOnBy":["Joly","Grantaire","Mme.Hucheloup"]
+        },
+        "Joly":{
+            "id": "Joly",
+            "group": 8,
+            "depends":["Bahorel","Bossuet","Gavroche","Courfeyrac","Enjolras","Feuilly","Prouvaire","Combeferre","Mabeuf","Marius"],
+            "dependedOnBy":["Grantaire","Mme.Hucheloup"]
+        },
+        "Grantaire":{
+            "id": "Grantaire",
+            "group": 8,
+            "depends":["Bossuet","Enjolras","Combeferre","Courfeyrac","Joly","Gavroche","Bahorel","Feuilly","Prouvaire"],
+            "dependedOnBy":["Mme.Hucheloup"]
+        },
+        "MotherPlutarch":{
+            "id": "MotherPlutarch",
+            "group": 9,
+            "depends":["Mabeuf"],
+            "dependedOnBy":[]
+        },
+        "Gueulemer":{
+            "id": "Gueulemer",
+            "group": 4,
+            "depends":["Thenardier","Valjean","Mme.Thenardier","Javert","Gavroche","Eponine"],
+            "dependedOnBy":["Babet","Claquesous","Montparnasse","Brujon"]
+        },
+        "Babet":{
+            "id": "Babet",
+            "group": 4,
+            "depends":["Thenardier","Gueulemer","Valjean","Mme.Thenardier","Javert","Gavroche","Eponine"],
+            "dependedOnBy":["Claquesous","Montparnasse","Brujon"]
+        },
+        "Claquesous":{
+            "id": "Claquesous",
+            "group": 4,
+            "depends":["Thenardier","Babet","Gueulemer","Valjean","Mme.Thenardier","Javert","Eponine","Enjolras"],
+            "dependedOnBy":["Montparnasse","Brujon"]
+        },
+        "Montparnasse":{
+            "id": "Montparnasse",
+            "group": 4,
+            "depends":["Javert","Babet","Gueulemer","Claquesous","Valjean","Gavroche","Eponine","Thenardier"],
+            "dependedOnBy":["Brujon"]
+        },
+        "Toussaint":{
+            "id": "Toussaint",
+            "group": 5,
+            "depends":["Cosette","Javert","Valjean"],
+            "dependedOnBy":[]
+        },
+        "Child1":{
+            "id": "Child1",
+            "group": 10,
+            "depends":["Gavroche"],
+            "dependedOnBy":["Child2"]
+        },
+        "Child2":{
+            "id": "Child2",
+            "group": 10,
+            "depends":["Gavroche","Child1"],
+            "dependedOnBy":[]
+        },
+        "Brujon":{
+            "id": "Brujon",
+            "group": 4,
+            "depends":["Babet","Gueulemer","Thenardier","Gavroche","Eponine","Claquesous","Montparnasse"],
+            "dependedOnBy":[]
+        },
+        "Mme.Hucheloup":{
+            "id": "Mme.Hucheloup",
+            "group": 8,
+            "depends":["Bossuet","Joly","Grantaire","Bahorel","Courfeyrac","Gavroche","Enjolras"],
+            "dependedOnBy":[]
+        }
+    }
+}
