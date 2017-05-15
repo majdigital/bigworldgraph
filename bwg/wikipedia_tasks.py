@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP Pipeline tasks for french texts.
+NLP Pipeline tasks connected to resources of the Wikimedia Foundation.
 """
 
 # STD
@@ -20,6 +20,7 @@ from bwg.utilities import (
     get_nes_from_sentence,
     serialize_wikidata_entity
 )
+import bwg.standard_tasks
 from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 
 

@@ -11,6 +11,7 @@ Processing](https://en.wikipedia.org/wiki/Natural_language_processing) and enric
 
 The data can then be inspected afterwards using an interactive graph.
 
+
 ### General information
 
 The prototype of this project was developed during an internship at [MAJ // Digital](http://maj.digital/) in Lisbon in 2017. 
@@ -46,6 +47,7 @@ root directory:
     
 You also have to have [Neo4j](https://neo4j.com/download/) installed.
 
+
 ##### Data
 
 Theoretically, the data can be any kind of text. The only prerequisite is to provide the data in a shallow XML format, e.g.
@@ -58,6 +60,7 @@ You could start with creating your own corpus from Wikipedia, downloading a [Wik
 and following the instructions of the [MW-Dumper](https://www.mediawiki.org/wiki/Manual:MWDumper).
 
 For steps involving Natural Languages Processing, appropriate [Stanford NLP](https://stanfordnlp.github.io/CoreNLP/download.html) models are also required.
+
 
 ##### Writing your own pipeline tasks
 
@@ -74,12 +77,13 @@ a graph database and more.
 
 With its standard configuration, the pipeline comprises the following tasks:
 
-![](img/flowchart.png)
+![](./img/flowchart.png)
 
-##### Adjusting pipeline_config.py
+
+##### Adjusting your pipeline configuration
 
 If you add a new kind of task to the pipeline, make sure to include a description of its necessary parameters in 
-`pipeline_config.py`:
+your pipeline configuration file. You can use `bwg/raw_pipeline_config.py` as a template, which provides a minimal example.
 
     CONFIG_DEPENDENCIES = {
         ...
@@ -101,8 +105,8 @@ If you implement tasks that extend the pipeline to support other language, pleas
 
     SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
     
-Finally, create a module for your own pipeline (e.g. `nlp/my_pipeline.py`) and build the configuration before running the pipeline, using the 
-pre-defined task names in `pipeline_config.py`: 
+Finally, create a module for your own pipeline (e.g. `bwg/my_pipeline.py`) and build the configuration before running the pipeline, using the 
+pre-defined task names in your pipeline file: 
 
     import luigi
     from bwg.nlp.config_management import build_task_config_for_language
@@ -133,6 +137,7 @@ pre-defined task names in `pipeline_config.py`:
             local_scheduler=True, workers=1, log_level="INFO"
         )
 
+
 ##### Preparing
 
 As the last step before running the pipeline, make sure to run the `StanfordCoreNLP` server in case you are using a task
@@ -159,7 +164,7 @@ In case you are writing the data into a `Neo4j` database, make sure to include t
     }
     
 and remember to run the server before running the pipeline, either by running `Neo4j`'s [community edition](https://neo4j.com/download/),
-executing the [`neo4j` shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
+executing the [Neo4j shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
 or using [docker images](https://neo4j.com/developer/docker/) etc.
 
 In case you are using any task using `bwg/wikidata.py:WikidataAPIMixin`, e.g. `bwg/nlp/wikipedia_tasks.py:PropertiesCompletionTask`,
@@ -169,11 +174,13 @@ please include a `user-config.py` file in your directory for `pywikibot`
     family = "wikidata"
     usernames["wikidata"]["wikidata"] = u"BigWorldGraphBot"
 
+
 ##### Running the pipeline
 
 To execute your pipeline, just run your module:
 
     python3 bwg/my_pipeline.py
+
 
 #### Graph visualization
 
@@ -183,12 +190,11 @@ TODO: How to install and use
 
 TODO: How to
 
-## Warnings
+--- 
 
-* If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
-pipline, otherwise running the pipeline will result in an exception being thrown.
+**WARNINGS**
 
-curl -gX GET http://127.0.0.1:5000/entities?"uid"="c34b43b3f3f74aa99ae012615b904760"
- MATCH (n)-[r]-(m), (m)-[r2]-(o)
-WHERE n.uid = 'c34b43b3f3f74aa99ae012615b904760' 
-RETURN n, o, m
+If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
+pipeline, otherwise running the pipeline will result in an exception being thrown.
+
+---
