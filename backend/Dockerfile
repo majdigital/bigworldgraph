@@ -3,12 +3,15 @@ MAINTAINER Kaleidophon (https://github.com/Kaleidophon)
 
 RUN mkdir -p /data/src/app
 WORKDIR /data/src/app
-COPY ./bwg/run.py ./bwg/run.py
-COPY ./bwg/settings.py ./bwg/settings.py
+
+# Copy necessary modules
+COPY ./bwg/run_api.py ./bwg/run_api.py
+COPY ./bwg/api_config.py ./bwg/api_config.py
 COPY ./bwg/neo4j_extensions.py ./bwg/neo4j_extensions.py
 COPY ./bwg/helpers.py ./bwg/helpers.py
 COPY ./requirements.txt .
 COPY ./setup.py .
+
 RUN ls -lah
 RUN ls -lah ./bwg
 
@@ -19,4 +22,4 @@ RUN python3 setup.py install
 
 WORKDIR /data/src/app/bwg
 
-CMD ["python3", "./run.py"]
+CMD ["python3", "./run_api.py"]

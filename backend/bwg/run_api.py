@@ -13,6 +13,7 @@ import os
 from eve import Eve
 
 # PROJECT
+import bwg
 from bwg.neo4j_extensions import Neo4jLayer
 from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
 
@@ -33,8 +34,8 @@ def set_up_api():
     :rtype: eve.Eve
     """
     # Init configuration
-    print(os.path.exists("./settings.py"))
-    api_config = get_config_from_py_file("./settings.py")
+    print(os.path.exists("./api_config.py"))
+    api_config = get_config_from_py_file("./api_config.py")
     print(api_config)
     api_config = overwrite_local_config_with_environ(api_config)
     print(api_config)

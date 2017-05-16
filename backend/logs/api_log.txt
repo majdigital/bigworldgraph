@@ -1,5 +1,5 @@
-16.05.2017 10:16:54 INFO:API is being run now!
-16.05.2017 10:16:54 DEBUG:API is going to run with the following settings:
+16.05.2017 03:01:08 INFO:API is being run now!
+16.05.2017 03:01:08 DEBUG:API is going to run with the following settings:
 	DEBUG: True
 	TESTING: False
 	PROPAGATE_EXCEPTIONS: None
@@ -144,8 +144,8 @@
 	NEO4J_PORT: 7687
 	NEO4J_USER: neo4j
 	NODE_BASE_CLASSES: ('Entity',)
-	NODE_TYPES: {'locations', 'organizations', 'people', 'misc', 'dates'}
+	NODE_TYPES: {'misc', 'dates', 'locations', 'organizations', 'people'}
 	RELATION_TYPES: {'relations'}
 	URLS: {'entities': 'entities', 'people': 'people', 'locations': 'locations', 'organizations': 'organizations', 'dates': 'dates', 'misc': 'misc'}
 	SOURCES: {'entities': {'source': 'entities', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'people': {'source': 'people', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'locations': {'source': 'locations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'organizations': {'source': 'organizations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'dates': {'source': 'dates', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'misc': {'source': 'misc', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}
-16.05.2017 10:16:54 INFO: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+16.05.2017 03:01:08 INFO: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)

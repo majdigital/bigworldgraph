@@ -16,5 +16,5 @@ data/*
 build/*
 dist/*
 bwg.egg-info/*
-logs/*
+backend/logs/*
 *.egg
