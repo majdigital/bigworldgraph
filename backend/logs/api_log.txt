@@ -1,0 +1,151 @@
+16.05.2017 10:16:54 INFO:API is being run now!
+16.05.2017 10:16:54 DEBUG:API is going to run with the following settings:
+	DEBUG: True
+	TESTING: False
+	PROPAGATE_EXCEPTIONS: None
+	PRESERVE_CONTEXT_ON_EXCEPTION: None
+	SECRET_KEY: None
+	PERMANENT_SESSION_LIFETIME: 31 days, 0:00:00
+	USE_X_SENDFILE: False
+	LOGGER_NAME: eve
+	LOGGER_HANDLER_POLICY: always
+	SERVER_NAME: None
+	APPLICATION_ROOT: None
+	SESSION_COOKIE_NAME: session
+	SESSION_COOKIE_DOMAIN: None
+	SESSION_COOKIE_PATH: None
+	SESSION_COOKIE_HTTPONLY: True
+	SESSION_COOKIE_SECURE: False
+	SESSION_REFRESH_EACH_REQUEST: True
+	MAX_CONTENT_LENGTH: None
+	SEND_FILE_MAX_AGE_DEFAULT: 12:00:00
+	TRAP_BAD_REQUEST_ERRORS: False
+	TRAP_HTTP_EXCEPTIONS: False
+	EXPLAIN_TEMPLATE_LOADING: False
+	PREFERRED_URL_SCHEME: http
+	JSON_AS_ASCII: True
+	JSON_SORT_KEYS: False
+	JSONIFY_PRETTYPRINT_REGULAR: True
+	JSONIFY_MIMETYPE: application/json
+	TEMPLATES_AUTO_RELOAD: None
+	ALLOWED_FILTERS: ['*']
+	ALLOWED_ITEM_READ_ROLES: []
+	ALLOWED_ITEM_ROLES: []
+	ALLOWED_ITEM_WRITE_ROLES: []
+	ALLOWED_READ_ROLES: []
+	ALLOWED_ROLES: []
+	ALLOWED_WRITE_ROLES: []
+	ALLOW_OVERRIDE_HTTP_METHOD: True
+	ALLOW_UNKNOWN: False
+	API_VERSION: 
+	AUTH_FIELD: None
+	AUTO_COLLAPSE_MULTI_KEYS: False
+	AUTO_CREATE_LISTS: False
+	BANDWIDTH_SAVER: True
+	BULK_ENABLED: True
+	CACHE_CONTROL: 
+	CACHE_EXPIRES: 0
+	DATE_CREATED: _created
+	DATE_FORMAT: %a, %d %b %Y %H:%M:%S GMT
+	DELETED: _deleted
+	EMBEDDING: True
+	ENFORCE_IF_MATCH: True
+	ERROR: _error
+	ETAG: _etag
+	EXTENDED_MEDIA_INFO: []
+	EXTRA_RESPONSE_FIELDS: []
+	HATEOAS: True
+	HEADER_TOTAL_COUNT: X-Total-Count
+	ID_FIELD: _id
+	IF_MATCH: True
+	INFO: None
+	INTERNAL_RESOURCE: False
+	ISSUES: _issues
+	ITEMS: _items
+	ITEM_CACHE_CONTROL: 
+	ITEM_LOOKUP: True
+	ITEM_LOOKUP_FIELD: _id
+	ITEM_METHODS: ['GET']
+	ITEM_URL: regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+	JSONP_ARGUMENT: None
+	LAST_UPDATED: _updated
+	LATEST_VERSION: _latest_version
+	LINKS: _links
+	MEDIA_BASE_URL: None
+	MEDIA_ENDPOINT: media
+	MEDIA_URL: regex("[a-f0-9]{24}")
+	META: _meta
+	MONGO_CONNECT: True
+	MONGO_HOST: localhost
+	MONGO_OPTIONS: {'connect': True}
+	MONGO_PORT: 27017
+	MONGO_QUERY_BLACKLIST: ['$where', '$regex']
+	MONGO_WRITE_CONCERN: {'w': 1}
+	MULTIPART_FORM_FIELDS_AS_JSON: False
+	OPLOG: False
+	OPLOG_AUDIT: True
+	OPLOG_CHANGE_METHODS: ['DELETE', 'PATCH', 'PUT']
+	OPLOG_ENDPOINT: None
+	OPLOG_METHODS: ['DELETE', 'POST', 'PATCH', 'PUT']
+	OPLOG_NAME: oplog
+	OPLOG_RETURN_EXTRA_FIELD: False
+	OPTIMIZE_PAGINATION_FOR_SPEED: False
+	PAGINATION: True
+	PAGINATION_DEFAULT: 25
+	PAGINATION_LIMIT: 50
+	PROJECTION: True
+	PUBLIC_ITEM_METHODS: []
+	PUBLIC_METHODS: []
+	QUERY_AGGREGATION: aggregate
+	QUERY_EMBEDDED: embedded
+	QUERY_MAX_RESULTS: max_results
+	QUERY_PAGE: page
+	QUERY_PROJECTION: projection
+	QUERY_SORT: sort
+	QUERY_WHERE: where
+	RATE_LIMIT_DELETE: None
+	RATE_LIMIT_GET: None
+	RATE_LIMIT_PATCH: None
+	RATE_LIMIT_POST: None
+	RESOURCE_METHODS: ['GET']
+	RETURN_MEDIA_AS_BASE64_STRING: True
+	RETURN_MEDIA_AS_URL: False
+	SCHEMA_ENDPOINT: None
+	SHOW_DELETED_PARAM: show_deleted
+	SOFT_DELETE: False
+	SORTING: True
+	STANDARD_ERRORS: [400, 401, 404, 405, 406, 409, 410, 412, 422, 428]
+	STATUS: _status
+	STATUS_ERR: ERR
+	STATUS_OK: OK
+	TRANSPARENT_SCHEMA_RULES: False
+	UPSERT_ON_PUT: True
+	URL_PREFIX: 
+	VALIDATE_FILTERS: False
+	VALIDATION_ERROR_AS_LIST: False
+	VALIDATION_ERROR_STATUS: 422
+	VERSION: _version
+	VERSIONING: False
+	VERSIONS: _versions
+	VERSION_DIFF_INCLUDE: []
+	VERSION_ID_SUFFIX: _document
+	VERSION_PARAM: version
+	X_ALLOW_CREDENTIALS: None
+	X_DOMAINS: None
+	X_DOMAINS_RE: None
+	X_EXPOSE_HEADERS: None
+	X_HEADERS: None
+	X_MAX_AGE: 21600
+	DOMAIN: {'entities': {'item_title': 'entity', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'entities', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'entities', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'entities', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}, 'people': {'item_title': 'person', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'people', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'people', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'people', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}, 'locations': {'item_title': 'location', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'locations', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'locations', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'locations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}, 'organizations': {'item_title': 'organization', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'organizations', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'organizations', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'organizations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}, 'dates': {'item_title': 'date', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'dates', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'dates', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'dates', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}, 'misc': {'item_title': 'misc', 'resource_methods': ['GET'], 'item_methods': ['GET'], 'url': 'misc', 'public_methods': [], 'allowed_roles': [], 'allowed_read_roles': [], 'allowed_write_roles': [], 'cache_control': '', 'cache_expires': 0, 'id_field': '_id', 'item_lookup_field': '_id', 'item_url': 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")', 'resource_title': 'misc', 'item_lookup': True, 'public_item_methods': [], 'allowed_item_roles': [], 'allowed_item_read_roles': [], 'allowed_item_write_roles': [], 'allowed_filters': ['*'], 'sorting': True, 'embedding': True, 'embedded_fields': [], 'pagination': True, 'projection': True, 'versioning': False, 'soft_delete': False, 'bulk_enabled': True, 'internal_resource': False, 'etag_ignore_fields': None, 'auth_field': None, 'allow_unknown': False, 'transparent_schema_rules': False, 'extra_response_fields': [], 'mongo_write_concern': {'w': 1}, 'mongo_indexes': {}, 'hateoas': True, 'authentication': None, 'schema': {'_id': {'type': 'objectid'}}, 'defaults': {}, '_media': [], 'datasource': {'source': 'misc', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}}
+	LOGGING_LEVEL: 10
+	LOGGING_PATH: ../logs/api_log.txt
+	NEO4J_HOST: localhost
+	NEO4J_PASSWORD: neo4jj
+	NEO4J_PORT: 7687
+	NEO4J_USER: neo4j
+	NODE_BASE_CLASSES: ('Entity',)
+	NODE_TYPES: {'locations', 'organizations', 'people', 'misc', 'dates'}
+	RELATION_TYPES: {'relations'}
+	URLS: {'entities': 'entities', 'people': 'people', 'locations': 'locations', 'organizations': 'organizations', 'dates': 'dates', 'misc': 'misc'}
+	SOURCES: {'entities': {'source': 'entities', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'people': {'source': 'people', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'locations': {'source': 'locations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'organizations': {'source': 'organizations', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'dates': {'source': 'dates', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}, 'misc': {'source': 'misc', 'filter': None, 'default_sort': None, 'projection': {'_id': 1, '_updated': 1, '_created': 1, '_etag': 1}, 'aggregation': None}}
+16.05.2017 10:16:54 INFO: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)

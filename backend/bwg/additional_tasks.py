@@ -4,21 +4,19 @@ Defining additional tasks for the NLP pipeline.
 """
 
 # STD
+import copy
 import datetime
 import time
-import copy
 
-# EXT
 import luigi
 import luigi.format
 
-from bwg.helpers import time_function
 from bwg.mixins import ArticleProcessingMixin
-from bwg.neo4j_extensions import Neo4jTarget
-# PROJECT
 from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
-from bwg.utilities import serialize_relation, deserialize_line, just_dump
+from bwg.neo4j_extensions import Neo4jTarget
 from bwg.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
+from bwg.utilities import serialize_relation, deserialize_line, just_dump
+from bwg.helpers import time_function
 
 
 class RelationMergingTask(luigi.Task, ArticleProcessingMixin):

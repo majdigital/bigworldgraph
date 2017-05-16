@@ -2,13 +2,14 @@
 ./vscode/*
 .idea/*
 __pycache__/*
-data/stanford/*
-data/pipeline_*/*
+backend/data/stanford/*
+backend/data/pipeline_*/*
+backend/data/*
 python_sudo.sh
 __pycache__
 data/*
-!data/corpora_demo
-!data/pipeline_demo
+!backend/data/corpora_demo
+!backend/data/pipeline_demo
 *.ctrl
 *.ipynb
 */apicache/*
@@ -16,3 +17,4 @@ build/*
 dist/*
 bwg.egg-info/*
 logs/*
+*.egg

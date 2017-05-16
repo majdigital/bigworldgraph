@@ -13,15 +13,14 @@ import luigi
 import luigi.format
 
 # PROJECT
-from bwg.helpers import is_collection, time_function
 from bwg.mixins import ArticleProcessingMixin
+from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
+from bwg.helpers import is_collection, time_function
 from bwg.utilities import (
     serialize_article,
     get_nes_from_sentence,
     serialize_wikidata_entity
 )
-import bwg.standard_tasks
-from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
 
 
 class WikipediaReadingTask(luigi.Task):
@@ -219,7 +218,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
     Add attributes from Wikidata to Named Entities.
     """
     def requires(self):
-        return bwg.standard_tasks.NERTask(task_config=self.task_config)
+        return backend.bwg.standard_tasks.NERTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])

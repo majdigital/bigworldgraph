@@ -7,11 +7,11 @@ Demo pipeline to demonstrate configuration management and the way ``Luigi`` pipe
 import luigi
 
 # PROJECT
-from bwg.helpers import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.standard_tasks import SimpleReadingTask
-from bwg.utilities import serialize_sentence
 from bwg.config_management import build_task_config_for_language
+from bwg.utilities import serialize_sentence
+from bwg.helpers import time_function
 
 
 class DemoTask1(luigi.Task, ArticleProcessingMixin):

@@ -7,13 +7,11 @@ Module for different mixins used for the NLP pipeline.
 import abc
 import copy
 
-# EXT
 import luigi
 import pycorenlp
 
-# PROJECT
-from bwg.helpers import time_function, flatten_dictlist
 from bwg.utilities import serialize_article, just_dump, deserialize_line
+from bwg.helpers import time_function, flatten_dictlist
 
 
 class CoreNLPServerMixin:

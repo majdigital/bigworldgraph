@@ -16,8 +16,8 @@ from nltk.tag.stanford import StanfordNERTagger, StanfordPOSTagger
 from nltk.tokenize.stanford import StanfordTokenizer
 
 # PROJECT
-from bwg.helpers import time_function
 from bwg.mixins import ArticleProcessingMixin
+from bwg.wikipedia_tasks import WikipediaReadingTask
 from bwg.utilities import (
     serialize_dependency_parse_tree,
     serialize_tagged_sentence,
@@ -25,7 +25,7 @@ from bwg.utilities import (
     get_nes_from_sentence,
     serialize_article
 )
-from bwg.wikipedia_tasks import WikipediaReadingTask
+from bwg.helpers import time_function
 
 
 class SimpleReadingTask(luigi.Task):

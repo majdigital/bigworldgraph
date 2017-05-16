@@ -7,16 +7,7 @@ NLP Pipeline tasks for french texts.
 import luigi.format
 import nltk
 
-from bwg.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
-from bwg.config_management import build_task_config_for_language
-from bwg.corenlp_server_tasks import (
-    ServerNERTask,
-    ServerDependencyParseTask,
-    ServerPoSTaggingTask,
-    ServerNaiveOpenRelationExtractionTask
-)
 # PROJECT
-from bwg.helpers import download_nltk_resource_if_missing
 from bwg.standard_tasks import (
     NERTask,
     DependencyParseTask,
@@ -24,7 +15,16 @@ from bwg.standard_tasks import (
     PoSTaggingTask,
     ParticipationExtractionTask
 )
+from bwg.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
+from bwg.corenlp_server_tasks import (
+    ServerNERTask,
+    ServerDependencyParseTask,
+    ServerPoSTaggingTask,
+    ServerNaiveOpenRelationExtractionTask
+)
 from bwg.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
+from bwg.config_management import build_task_config_for_language
+from bwg.helpers import download_nltk_resource_if_missing
 
 
 # ---------------------------- Default tasks for french ---------------------------------
