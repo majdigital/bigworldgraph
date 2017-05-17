@@ -539,7 +539,8 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     """
     _exists = True
 
-    def __init__(self, pipeline_run_info, user, password, host="localhost", port=7687, ne_tag_to_model={}):
+    def __init__(self, pipeline_run_info, user, password, host="localhost", port=7687, ne_tag_to_model={},
+                 node_relevance_function=lambda label, node_data: True):
         """
         Initialize a Neo4j graph database target.
         
@@ -556,10 +557,15 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :type port: str
         :param ne_tag_to_model: Defines how entities with certain named entity tags are mapped to Neo4j node classes.
         :type ne_tag_to_model: dict
+        :param node_relevance_function: Function where the user can define a relevance function for new nodes in the
+        database. It takes the future nodes data. By default, all nodes are relevant. Connections will only be added if
+        both nodes involved are relevant.
+        :type node_relevance_function: func
         """
         self.pipeline_run_info = pipeline_run_info
         Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
         self.ne_tag_to_model = ne_tag_to_model
+        self.node_relevance_function = node_relevance_function
 
     def exists(self):
         """
@@ -596,20 +602,27 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
                                         relation_data["object_phrase"]
         subj_data = entity_properties.get(subj_phrase, {})
         obj_data = entity_properties.get(subj_phrase, {})
-        subj_node = self._get_or_create_node(label=subj_phrase, data=subj_data)
-        obj_node = self._get_or_create_node(label=obj_phrase, data=obj_data)
-        self._add_wikidata_relations(subj_node, subj_data)
-        self._add_wikidata_relations(obj_node, obj_data)
+        subj_node_is_relevant = self.node_relevance_function(subj_phrase, subj_data)
+        obj_node_is_relevant = self.node_relevance_function(obj_phrase, obj_data)
 
-        self._get_or_create_connection(
-            subj_node,
-            obj_node,
-            label=verb,
-            data={
-                "sentence": sentence,
-                "relation_id": relation_meta["id"]
-            }
-        )
+        if subj_node_is_relevant:
+            subj_node = self._get_or_create_node(label=subj_phrase, data=subj_data)
+            self._add_wikidata_relations(subj_node, subj_data)
+
+        if obj_node_is_relevant:
+            obj_node = self._get_or_create_node(label=obj_phrase, data=obj_data)
+            self._add_wikidata_relations(obj_node, obj_data)
+
+        if subj_node_is_relevant and obj_node_is_relevant:
+            self._get_or_create_connection(
+                subj_node,
+                obj_node,
+                label=verb,
+                data={
+                    "sentence": sentence,
+                    "relation_id": relation_meta["id"]
+                }
+            )
 
     def _add_wikidata_relations(self, node, node_data):
         """

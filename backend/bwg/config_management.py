@@ -6,7 +6,7 @@ Functions concerning the config management of the NLP pipeline.
 # STD
 import os
 
-from backend.bwg import get_config_from_py_file
+from bwg.helpers import get_config_from_py_file
 
 
 class MissingConfigParameterException(Exception):

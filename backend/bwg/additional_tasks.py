@@ -16,7 +16,7 @@ from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExt
 from bwg.neo4j_extensions import Neo4jTarget
 from bwg.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
 from bwg.utilities import serialize_relation, deserialize_line, just_dump
-from bwg.helpers import time_function
+from bwg.helpers import time_function, fast_copy
 
 
 class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
@@ -182,7 +182,12 @@ class RelationsDatabaseWritingTask(luigi.Task):
         ne_tag_to_model = self.task_config["NEO4J_NETAG2MODEL"]
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
-        return Neo4jTarget(self.pipeline_run_info, user, password, ne_tag_to_model=ne_tag_to_model)
+
+        return Neo4jTarget(
+            self.pipeline_run_info, user, password,
+            ne_tag_to_model=ne_tag_to_model,
+            node_relevance_function=self.is_relevant_node
+        )
 
     @time_function(is_classmethod=True)
     def run(self):
@@ -288,11 +293,11 @@ class RelationsDatabaseWritingTask(luigi.Task):
             if "aliases" in sense_data:
                 for alias in sense_data["aliases"]:
                     # Adjust label and aliases appropriately
-                    alias_sense_data = copy.deepcopy(sense_data)
+                    alias_sense_data = fast_copy(sense_data)
                     alias_sense_data["label"] = alias
                     alias_sense_data["aliases"].remove(alias)
                     alias_sense_data["aliases"].append(sense_data["label"])
-                    alias_entity_data = copy.deepcopy(entity_data)
+                    alias_entity_data = fast_copy(entity_data)
                     alias_entity_data["senses"][entity_data["senses"].index(sense_data)] = alias_sense_data
                     entity_properties[alias] = alias_entity_data
 
@@ -345,3 +350,16 @@ class RelationsDatabaseWritingTask(luigi.Task):
         for line in pri_file:
             self.pipeline_run_info = deserialize_line(line, encoding)
             break
+
+    def is_relevant_node(self, label, node_data):
+        """
+        Determine whether a node is relevant and should be written to the database.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Result of check.
+        :rtype: bool
+        """
+        return True

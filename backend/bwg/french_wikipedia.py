@@ -24,7 +24,7 @@ from bwg.corenlp_server_tasks import (
 )
 from bwg.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
 from bwg.config_management import build_task_config_for_language
-from bwg.helpers import download_nltk_resource_if_missing
+from bwg.helpers import download_nltk_resource_if_missing, get_if_exists
 
 
 # ---------------------------- Default tasks for french ---------------------------------
@@ -68,6 +68,44 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         return FrenchServerRelationMergingTask(task_config=self.task_config),\
                FrenchServerPropertiesCompletionTask(task_config=self.task_config),\
                FrenchPipelineRunInfoGenerationTask(task_config=self.task_config)
+
+    def is_relevant_node(self, label, node_data):
+        # Include affair nodes
+        if "senses" not in node_data:
+            return False
+
+        if "affair" in label or "Affair" in label:
+            return True
+
+        # Include politicians
+        if any([
+            "personnalité politique" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include business people
+        if any([
+            "d'affaires" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include companies
+        if any([
+            "enterprise" in get_if_exists(sense, "description", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include people
+        if any([
+            "I-PERS" == get_if_exists(sense, "type", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        return False
 
 
 class FrenchNERTask(NERTask):
