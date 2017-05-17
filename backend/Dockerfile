@@ -12,14 +12,11 @@ COPY ./bwg/helpers.py ./bwg/helpers.py
 COPY ./requirements.txt .
 COPY ./setup.py .
 
-RUN ls -lah
-RUN ls -lah ./bwg
-
-EXPOSE 5000
-
 RUN pip3 install -r ./requirements.txt
 RUN python3 setup.py install
 
 WORKDIR /data/src/app/bwg
+
+EXPOSE 5000
 
 CMD ["python3", "./run_api.py"]

@@ -55,6 +55,7 @@ NEO4J_PORT = 7687
 NEO4J_HOST = "localhost"
 
 ITEM_URL = 'regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")'
+API_HOST = "localhost"
 
 # Logging config
 LOGGING_PATH = "../logs/api_log.txt"

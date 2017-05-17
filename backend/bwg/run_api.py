@@ -11,6 +11,7 @@ import os
 
 # EXT
 from eve import Eve
+from flask_cors import CORS
 
 # PROJECT
 import bwg
@@ -34,11 +35,8 @@ def set_up_api():
     :rtype: eve.Eve
     """
     # Init configuration
-    print(os.path.exists("./api_config.py"))
     api_config = get_config_from_py_file("./api_config.py")
-    print(api_config)
     api_config = overwrite_local_config_with_environ(api_config)
-    print(api_config)
 
     # Create logging directory
     logging_file = api_config["LOGGING_PATH"]
@@ -176,10 +174,11 @@ def add_logger_to_app(app):
 
 if __name__ == "__main__":
     api = set_up_api()
+    CORS(api)
     logging.info("API is being run now!")
     logging.debug(
         "API is going to run with the following settings:\n\t{}".format("\n\t".join(
             ["{}: {}".format(key, value) for key, value in api.config.items()]
         ))
     )
-    api.run(use_reloader=False)
+    api.run(use_reloader=False, host=api.config["API_HOST"])

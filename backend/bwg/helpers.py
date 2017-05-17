@@ -93,7 +93,6 @@ def overwrite_local_config_with_environ(config):
     return {
         key: (value if key not in os.environ else os.environ[key])
         for key, value in config.items()
-        if key not in os.environ
     }
 
 

@@ -1,11 +1,28 @@
 version: '3'
+networks:
+  app-tier:
+    driver: bridge
+
 services:
   backend:
     build: ./backend/
     ports:
       - "5000:5000"
-  db:
-    build: ./db
+    depends_on:
+      - neo4j
+    environment:
+      - NEO4J_PORT=7474
+      - API_HOST=0.0.0.0
+      - NEO4J_HOST=neo4j
+      - NEO4J_PASSWORD=neo4jj
+    networks:
+      - app-tier
+  neo4j:
+    environment:
+      - NEO4j_AUTH=neo4j/neo4jj
+    image: neo4j:3.0
     ports:
       - "6060:7474"
-
+      - "6070:7687"
+    networks:
+      - app-tier
