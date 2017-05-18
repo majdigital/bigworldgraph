@@ -80,8 +80,7 @@ CONFIG_DEPENDENCIES = {
     ],
     "relations_database_writing_task": [
         "NEO4J_USER",
-        "NEO4J_PASSWORD",
-        "NEO4J_NETAG2MODEL"
+        "NEO4J_PASSWORD"
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -107,13 +106,6 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # Neo4j
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "neo4jj"
-NEO4J_NETAG2MODEL = {
-    "I-PER": "Person",
-    "I-LOC": "Location",
-    "I-ORG": "Organization",
-    "DATE": "Date",
-    "I-MISC": "Miscellaneous"
-}
 
 # ------------------------------- French configurations ---------------------------------
 
@@ -172,4 +164,10 @@ FRENCH_RELEVANT_WIKIDATA_PROPERTIES = {
     ],
     "I-MISC": []
 }
-FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = ["P463", "P108", "P102", "P1416", "P17", "P335"]
+FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = {
+    "P463": "Organization",
+    "P108": "Company",
+    "P102": "Party",
+    "P1416": "Party",
+    "P335": "Company"
+}

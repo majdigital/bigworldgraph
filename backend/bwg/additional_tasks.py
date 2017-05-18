@@ -179,14 +179,13 @@ class RelationsDatabaseWritingTask(luigi.Task):
                PipelineRunInfoGenerationTask(task_config=self.task_config)
 
     def output(self):
-        ne_tag_to_model = self.task_config["NEO4J_NETAG2MODEL"]
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
 
         return Neo4jTarget(
             self.pipeline_run_info, user, password,
-            ne_tag_to_model=ne_tag_to_model,
-            node_relevance_function=self.is_relevant_node
+            node_relevance_function=self.is_relevant_node,
+            categorization_function=self.categorize_node
         )
 
     @time_function(is_classmethod=True)
@@ -353,7 +352,8 @@ class RelationsDatabaseWritingTask(luigi.Task):
 
     def is_relevant_node(self, label, node_data):
         """
-        Determine whether a node is relevant and should be written to the database.
+        Determine whether a node is relevant and should be written to the database. This function can be overwritten by
+        tasks inheriting from this tasks.
 
         :param label: Node label
         :tyoe label: str
@@ -363,3 +363,32 @@ class RelationsDatabaseWritingTask(luigi.Task):
         :rtype: bool
         """
         return True
+
+    def categorize_node(self, label, node_data):
+        """
+        Assign a node a category out of a pre-defined set of categories. This function can be overwritten by tasks
+        inheriting from this tasks.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Category for node.
+        :rtype: str
+        """
+        if "senses" not in node_data:
+            return "miscellaneous"
+
+        # Pick the first sense for now
+        sense = node_data["senses"][0]
+        ne_tag = sense["type"]
+
+        ne_tags_to_model = {
+            "I-PER": "Person",
+            "I-LOC": "Location",
+            "I-ORG": "Organization",
+            "DATE": "Date",
+            "I-MISC": "Miscellaneous"
+        }
+
+        return "Entity" if ne_tag not in ne_tags_to_model else ne_tags_to_model[ne_tag]

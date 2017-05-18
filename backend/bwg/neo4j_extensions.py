@@ -539,8 +539,9 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     """
     _exists = True
 
-    def __init__(self, pipeline_run_info, user, password, host="localhost", port=7687, ne_tag_to_model={},
-                 node_relevance_function=lambda label, node_data: True):
+    def __init__(self, pipeline_run_info, user, password, host="localhost", port=7687,
+                 node_relevance_function=lambda label, node_data: True,
+                 categorization_function=lambda label, node_data: "Entity"):
         """
         Initialize a Neo4j graph database target.
         
@@ -555,17 +556,17 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :type host: str
         :param port: Port of database.
         :type port: str
-        :param ne_tag_to_model: Defines how entities with certain named entity tags are mapped to Neo4j node classes.
-        :type ne_tag_to_model: dict
         :param node_relevance_function: Function where the user can define a relevance function for new nodes in the
         database. It takes the future nodes data. By default, all nodes are relevant. Connections will only be added if
         both nodes involved are relevant.
         :type node_relevance_function: func
+        :param categorization_function: Function that assigns nodes to a specific category.
+        :type categorization_function: func
         """
         self.pipeline_run_info = pipeline_run_info
         Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
-        self.ne_tag_to_model = ne_tag_to_model
         self.node_relevance_function = node_relevance_function
+        self.categorize_node = categorization_function
 
     def exists(self):
         """
@@ -638,13 +639,14 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
         if "claims" in sense_data:
             for claim, claim_data in sense_data["claims"].items():
-                target, implies_relation = claim_data["target"], claim_data["implies_relation"]
+                target, implies_relation, entity_class = claim_data["target"], claim_data["implies_relation"], \
+                                                         claim_data["entity_class"]
 
                 if implies_relation and target != sense_data["label"]:
-                    obj_node = self._get_or_create_node(label=target, data={})
+                    obj_node = self._get_or_create_node(label=target, data={}, entity_class=entity_class)
                     self._get_or_create_connection(node, obj_node, label=claim, data={})
 
-    def _get_or_create_node(self, label, data):
+    def _get_or_create_node(self, label, data, entity_class=None):
         """
         Retrieve a node with a specific label from the database, or, if it doesn't exist, create it.
         
@@ -652,17 +654,26 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :type label: str
         :param data: Data of target node.
         :type data: dict
+        :param entity_class: Entity class of node if given. Otherwise it will be determined by the categorization
+        function.
+        :type entity_class: Entity
         :return: Target node.
         :rtype: Entity
         """
         try:
             return Entity.nodes.get(label=label)
         except Entity.DoesNotExist:
-            # Pick first sense; if faulty, correct manually later
-            sense_dates = data.get("senses", [])
-            sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
-            entity_class_string = self.ne_tag_to_model.get(sense_data.get("type", "Entity"), "Miscellaneous")
-            entity_class = self.get_node_class(entity_class_string, (Entity, ))
+            implied_entity_class_string = entity_class
+            categorized_entity_class_string = self.categorize_node(label, data)
+
+            # Define which class should be preferred in different cases
+            if implied_entity_class_string is not None and categorized_entity_class_string == "Miscellaneous":
+                entity_class = self.get_node_class(implied_entity_class_string, (Entity, ))
+                entity_class_string = implied_entity_class_string
+            else:
+                entity_class = self.get_node_class(categorized_entity_class_string, (Entity,))
+                entity_class_string = categorized_entity_class_string
+
             entity = entity_class(category=entity_class_string, label=label, data=data)
             entity.save()
             return entity

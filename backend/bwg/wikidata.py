@@ -12,6 +12,7 @@ import abc
 import re
 import urllib.parse
 import urllib.request
+import threading
 
 # EXT
 import bs4
@@ -22,6 +23,65 @@ from pywikibot.data import api
 # PROJECT
 from bwg.helpers import construct_dict_from_source
 from bwg.utilities import retry_with_fallback
+
+
+class RequestCache:
+    """
+    Special class used as a Cache, so that requests being made don't have to be repeated if they occurred in the past.
+    """
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.cache = {}
+        self.requested = set()
+        self.number_of_requests = 0
+        self.number_of_avoided_requests = 0
+
+    def __contains__(self, item):
+        return item in self.requested
+
+    def __delitem__(self, key):
+        del self.cache[key]
+        self.requested.remove(key)
+
+    def __getitem__(self, key):
+        return self.cache[key]
+
+    def __setitem__(self, key, value):
+        self.cache[key] = value
+        self.requested.add(key)
+
+    def __enter__(self):
+        self.lock.acquire()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.lock.release()
+
+    def __len__(self):
+        return len(self.requested)
+
+    def request(self, key, request_func, *request_args, **request_kwargs):
+        """
+        Make a request, but make a lookup to the cache first to see if you may be able to avoid it.
+
+        :param key: Key that should be used to cache the request.
+        :type key: str, int
+        :param request_func: Function to do the request.
+        :type request_func: func
+        :param request_args: Arguments for request.
+        :type request_args: tuple
+        :param request_kwargs: Key word arguments for request.
+        :type request_kwargs: dict
+        """
+        if key in self:
+            self.number_of_avoided_requests += 1
+            return self[key]
+
+        request_result = request_func(*request_args, **request_kwargs)
+        self.number_of_requests += 1
+
+        self[key] = request_result
+
+        return request_result
 
 
 class AbstractWikidataMixin:
@@ -306,6 +366,8 @@ class WikidataAPIMixin(AbstractWikidataMixin):
     Access Wikidata information via Wikimedia's API.
     """
     wikidata_site = pywikibot.Site("wikidata", "wikidata")
+    request_cache = RequestCache()
+    match_cache = RequestCache()
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
     def get_matches(self, name, language):
@@ -345,7 +407,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         ]
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
-    def get_entity(self, wikidata_id, language, relevant_properties, properties_implying_relations):
+    def get_entity(self, wikidata_id, language, relevant_properties, properties_implying_relations, recursively=True):
         """
         Get Wikidata information about an entity based on its identifier.
         
@@ -355,9 +417,12 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :type language: str
         :param relevant_properties: Types of claims that should be included.
         :type relevant_properties: list
-        :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
-        imply other relations that should later be shown in the graph.
-        :type properties_implying_relations: list, set
+        :param properties_implying_relations: Dict of property IDs for properties that are not mere characteristics, but
+        imply other relations that should later be shown in the graph. The properties are the keys and the entity node
+        class they're implying are the values.
+        :type properties_implying_relations: dict
+        :param recursively: Request data for fof nodes recursively.
+        :type recursively: bool
         :return: Wikidata entity as dictionary
         :rtype: dict
         """
@@ -381,7 +446,8 @@ class WikidataAPIMixin(AbstractWikidataMixin):
                     "claims": lambda source: self.resolve_claims(
                         source["claims"], language=language,
                         relevant_properties=relevant_properties,
-                        properties_implying_relations=properties_implying_relations
+                        properties_implying_relations=properties_implying_relations,
+                        recursively=recursively
                     )
                 },
                 entity
@@ -390,7 +456,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         ][0]
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
-    def resolve_claims(self, claims, language, relevant_properties, properties_implying_relations):
+    def resolve_claims(self, claims, language, relevant_properties, properties_implying_relations, recursively=True):
         """
         Resolve the claims (~ claimed facts) about a wikidata entity. 
         
@@ -403,16 +469,45 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         :param properties_implying_relations: Set of property IDs for properties that are not mere characteristics, but 
         imply other relations that should later be shown in the graph.
         :type properties_implying_relations: list, set
+        :param recursively: Request data for fof nodes recursively.
+        :type recursively: bool
         :return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
+        :rtype: list
         """
-        return {
-            self.get_property_name(property_id, language=language): {
-                "target": self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language),
-                "implies_relation": property_id in properties_implying_relations
-            }
-            for property_id, claim in claims.items()
-            if property_id in relevant_properties
-        }
+        properties = {}
+
+        for property_id, claim in claims.items():
+            if property_id in relevant_properties:
+                property_name = self.get_property_name(property_id, language=language)
+                target = self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
+
+                property_data = {
+                    "target": target,
+                    "implies_relation": property_id in properties_implying_relations,
+                    "entity_class": properties_implying_relations.get(property_id, None),
+                }
+
+                if property_id in properties_implying_relations or not recursively:
+                    target_senses = self.match_cache.request(
+                        target, self.get_matches, target, language=language
+                    )
+
+                    property_data["target_data"] = [
+                        self.request_cache.request(
+                            target_sense["id"], self.get_entity,
+                            target_sense["id"], language=language,
+                            relevant_properties=relevant_properties,
+                            properties_implying_relations=properties_implying_relations,
+                            recursively=False
+                        )
+                        for target_sense in target_senses
+                    ]
+                else:
+                    property_data["target_data"] = {}
+
+                properties[property_name] = property_data
+
+        return properties
 
     @retry_with_fallback(triggering_error=KeyError, language="en")
     def get_property_name(self, property_id, language):
