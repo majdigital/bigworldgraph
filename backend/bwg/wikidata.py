@@ -448,7 +448,7 @@ class WikidataAPIMixin(AbstractWikidataMixin):
                         relevant_properties=relevant_properties,
                         properties_implying_relations=properties_implying_relations,
                         recursively=recursively
-                    )
+                    ) if recursively else {}
                 },
                 entity
             )
@@ -487,7 +487,8 @@ class WikidataAPIMixin(AbstractWikidataMixin):
                     "entity_class": properties_implying_relations.get(property_id, None),
                 }
 
-                if property_id in properties_implying_relations or not recursively:
+                if property_id in properties_implying_relations:
+
                     target_senses = self.match_cache.request(
                         target, self.get_matches, target, language=language
                     )

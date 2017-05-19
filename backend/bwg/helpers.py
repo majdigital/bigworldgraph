@@ -235,7 +235,7 @@ def fast_copy(obj):
     :return: Copy.
     :rtype: object
     """
-    return pickle.loads(pickle.dumps(obj, -1))
+    return pickle.loads(pickle.dumps(obj, -1), encoding="utf-8")
 
 
 def get_if_exists(dictionary, *keys, default=None):

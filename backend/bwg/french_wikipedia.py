@@ -113,7 +113,7 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         if any([
             any([
                 media_term in get_if_exists(sense, "description", default="")
-                for media_term in ["radio", "blog", "télévision", "journal", "magazine"]
+                for media_term in ["radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur"]
             ])
             for sense in node_data["senses"]
         ]):
@@ -158,7 +158,7 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         if any([
             any([
                 media_term in get_if_exists(sense, "description", default="")
-                for media_term in ["radio", "blog", "télévision", "journal", "magazine"]
+                for media_term in ["radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur"]
             ])
             for sense in node_data["senses"]
         ]):

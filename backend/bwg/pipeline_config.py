@@ -80,7 +80,8 @@ CONFIG_DEPENDENCIES = {
     ],
     "relations_database_writing_task": [
         "NEO4J_USER",
-        "NEO4J_PASSWORD"
+        "NEO4J_PASSWORD",
+        "{language}_DATABASE_CATEGORIES"  # Categories of nodes in the database with their level of detail as int
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -121,7 +122,7 @@ FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.jso
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
 FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france_sample.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
@@ -170,4 +171,18 @@ FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = {
     "P102": "Party",
     "P1416": "Party",
     "P335": "Company"
+}
+
+FRENCH_DATABASE_CATEGORIES = {
+    "Entity": 0,
+    "Organization": 2,
+    "Company": 3,
+    "Party": 3,
+    "Miscellaneous": 1,
+    "Affair": 6,
+    "Politician": 3,
+    "Person": 2,
+    "Businessperson": 3,
+    "Media": 4,
+    "Location": 1
 }

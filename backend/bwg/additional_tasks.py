@@ -181,11 +181,13 @@ class RelationsDatabaseWritingTask(luigi.Task):
     def output(self):
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
+        categories = self.task_config["DATABASE_CATEGORIES"]
 
         return Neo4jTarget(
             self.pipeline_run_info, user, password,
             node_relevance_function=self.is_relevant_node,
-            categorization_function=self.categorize_node
+            categorization_function=self.categorize_node,
+            categories=categories
         )
 
     @time_function(is_classmethod=True)
@@ -302,18 +304,32 @@ class RelationsDatabaseWritingTask(luigi.Task):
 
         return entity_properties
 
-    def _convert_entity_sense(self, entity_data):
+    def _convert_entity_sense(self, entity_data, recursively=True):
         """
         Rename some fields for clarity.
         
         :param entity_data: Data with fields to be renamed.
         :type entity_data: dict
+        :param recursively: Process data of related nodes too.
+        :type recursively: bool
         :return: Data with renamed fields.
         :rtype: dict
         """
         new_entity_data = dict(entity_data)
         new_entity_data = self._rename_field("modified", "wikidata_last_modified", new_entity_data)
         new_entity_data = self._rename_field("id", "wikidata_id", new_entity_data)
+
+        # Apply transformation to related Wikidata notes
+        if recursively:
+            for claim_name, claim_data in new_entity_data.get("claims", {}).items():
+                claim_data["target_data"] = {
+                    "ambiguous": len(claim_data["target_data"]) > 1,
+                    "senses": [
+                        self._convert_entity_sense(entity_sense, recursively=False)
+                        if claim_data["target_data"] != {} else []
+                        for entity_sense in claim_data["target_data"]
+                    ]
+                }
 
         return new_entity_data
 
@@ -381,7 +397,7 @@ class RelationsDatabaseWritingTask(luigi.Task):
 
         # Pick the first sense for now
         sense = node_data["senses"][0]
-        ne_tag = sense["type"]
+        ne_tag = sense.get("type", "I-MISC")
 
         ne_tags_to_model = {
             "I-PER": "Person",
