@@ -152,18 +152,23 @@ FRENCH_RELEVANT_WIKIDATA_PROPERTIES = {
         "P108",   # Employer
         "P39",    # Position held
         "P102",   # Member of political party
-        "P1416"   # Affiliation
+        "P1416",   # Affiliation
+        "P18"   # Picture
     ],
     "I-LOC": [
         "P30",    # Continent
-        "P17"     # Country
+        "P17",    # Country
+        "P18"   # Picture
     ],
     "I-ORG": [
         "P1384",  # Political alignment
         "P335",   # Subsidiary
-        "P159"    # Headquarters location
+        "P159",    # Headquarters location
+        "P18"  # Picture
     ],
-    "I-MISC": []
+    "I-MISC": [
+        "P18"   # Picture
+    ]
 }
 FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = {
     "P463": "Organization",
