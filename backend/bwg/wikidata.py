@@ -9,6 +9,7 @@ Currently, accessing the data via the API is faster than the scraper.
 
 # STD
 import abc
+import hashlib
 import re
 import urllib.parse
 import urllib.request
@@ -479,7 +480,12 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         for property_id, claim in claims.items():
             if property_id in relevant_properties:
                 property_name = self.get_property_name(property_id, language=language)
-                target = self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
+
+                if property_id != "P18":
+                    target = self.get_entity_name(claim[0]["mainsnak"]["datavalue"]["value"]["id"], language=language)
+                else:
+                    # Handle images differently
+                    target = self.get_image_url(claim[0]["mainsnak"]["datavalue"]["value"])
 
                 property_data = {
                     "target": target,
@@ -579,3 +585,23 @@ class WikidataAPIMixin(AbstractWikidataMixin):
         request_parameters.update(additional_request_parameters)
         request = api.Request(**request_parameters)
         return request.submit()
+
+    @staticmethod
+    def get_image_url(image_name):
+        """
+        Generate Wikidata URL for a Wikidata image.
+
+        :param image_name: Name of image as given by the API request.
+        :type image_name: str
+        :return: Link to image.
+        :rtype: str
+        """
+        # See http://stackoverflow.com/questions/34393884/how-to-get-image-url-property-from-wikidata-item-by-api
+        # for explanation
+        image_name = image_name.replace(" ", "_")
+
+        md5_sum = hashlib.md5(image_name.encode('utf-8')).hexdigest()
+
+        return "https://upload.wikimedia.org/wikipedia/commons/{a}/{ab}/{image_name}".format(
+            image_name=image_name, a=md5_sum[0], ab=md5_sum[0:2]
+        )
