@@ -64,6 +64,11 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
     but it's specifically for the french Wikipedia.
     """
+    MEDIA_TYPES = [
+        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire",
+
+    ]
+
     def requires(self):
         return FrenchServerRelationMergingTask(task_config=self.task_config),\
                FrenchServerPropertiesCompletionTask(task_config=self.task_config),\
@@ -113,7 +118,7 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         if any([
             any([
                 media_term in get_if_exists(sense, "description", default="")
-                for media_term in ["radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur"]
+                for media_term in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
@@ -158,7 +163,7 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         if any([
             any([
                 media_term in get_if_exists(sense, "description", default="")
-                for media_term in ["radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur"]
+                for media_term in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
