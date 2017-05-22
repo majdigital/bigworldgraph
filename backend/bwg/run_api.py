@@ -11,18 +11,18 @@ import os
 
 # EXT
 from eve import Eve
-from flask_cors import CORS
+import flask_cors
 
 # PROJECT
 import bwg
-from bwg.neo4j_extensions import Neo4jLayer
 from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
+from bwg.neo4j_extensions import Neo4jLayer
 
 
 def set_up_api():
     """
     Set up the API using the following steps:
-    
+
     1. Read the configuration file.
     2. Overwrite configuration parameters if corresponding environment variables exist.
     3. Initialize the logger.
@@ -30,7 +30,7 @@ def set_up_api():
     5. Add error handlers to the API.
     6. Add additional endpoints to the API.
     7. Connect the API to the logger.
-    
+
     :return: Completely set up API.
     :rtype: eve.Eve
     """
@@ -74,7 +74,7 @@ def set_up_api():
 def add_error_handlers(api):
     """
     Add error handlers to the current API.
-    
+
     :param api: Current api.
     :type api: eve.Eve
     :return: API with additional error handlers.
@@ -84,7 +84,7 @@ def add_error_handlers(api):
     def handle_api_error(error):
         """
         Handle an error without shutting the API down.
-        
+
         :param error: Error that was thrown during the execution of the API.
         :type error: Exception
         :return: Friendly error message if DEBUG is false in API config.
@@ -121,7 +121,7 @@ def add_additional_endpoints(api):
     def version():
         """
         Return the version and some legal info about the API.
-        
+
         :return: Information about the version as serialized response.
         :type: dict
         """
@@ -139,7 +139,7 @@ def add_additional_endpoints(api):
 def log_request(resource, request, payload):
     """
     Log a request on an endpoint.
-    
+
     :param resource: Resource being called.
     :type resource: str
     :param request: Request information.
@@ -153,7 +153,7 @@ def log_request(resource, request, payload):
 def add_logger_to_app(app):
     """
     Add logger to the current app.
-    
+
     :param app: Current app.
     :type app: eve.Eve
     :return: App with logger.
@@ -174,7 +174,7 @@ def add_logger_to_app(app):
 
 if __name__ == "__main__":
     api = set_up_api()
-    CORS(api)
+    flask_cors.CORS(api)
     logging.info("API is being run now!")
     logging.debug(
         "API is going to run with the following settings:\n\t{}".format("\n\t".join(

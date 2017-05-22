@@ -16,7 +16,7 @@ from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExt
 from bwg.neo4j_extensions import Neo4jTarget
 from bwg.wikipedia_tasks import PropertiesCompletionTask, WikipediaReadingTask
 from bwg.utilities import serialize_relation, deserialize_line, just_dump
-from bwg.helpers import time_function
+from bwg.helpers import time_function, fast_copy
 
 
 class RelationMergingTask(luigi.Task, ArticleProcessingMixin):
@@ -179,10 +179,16 @@ class RelationsDatabaseWritingTask(luigi.Task):
                PipelineRunInfoGenerationTask(task_config=self.task_config)
 
     def output(self):
-        ne_tag_to_model = self.task_config["NEO4J_NETAG2MODEL"]
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
-        return Neo4jTarget(self.pipeline_run_info, user, password, ne_tag_to_model=ne_tag_to_model)
+        categories = self.task_config["DATABASE_CATEGORIES"]
+
+        return Neo4jTarget(
+            self.pipeline_run_info, user, password,
+            node_relevance_function=self.is_relevant_node,
+            categorization_function=self.categorize_node,
+            categories=categories
+        )
 
     @time_function(is_classmethod=True)
     def run(self):
@@ -288,28 +294,42 @@ class RelationsDatabaseWritingTask(luigi.Task):
             if "aliases" in sense_data:
                 for alias in sense_data["aliases"]:
                     # Adjust label and aliases appropriately
-                    alias_sense_data = copy.deepcopy(sense_data)
+                    alias_sense_data = fast_copy(sense_data)
                     alias_sense_data["label"] = alias
                     alias_sense_data["aliases"].remove(alias)
                     alias_sense_data["aliases"].append(sense_data["label"])
-                    alias_entity_data = copy.deepcopy(entity_data)
+                    alias_entity_data = fast_copy(entity_data)
                     alias_entity_data["senses"][entity_data["senses"].index(sense_data)] = alias_sense_data
                     entity_properties[alias] = alias_entity_data
 
         return entity_properties
 
-    def _convert_entity_sense(self, entity_data):
+    def _convert_entity_sense(self, entity_data, recursively=True):
         """
         Rename some fields for clarity.
         
         :param entity_data: Data with fields to be renamed.
         :type entity_data: dict
+        :param recursively: Process data of related nodes too.
+        :type recursively: bool
         :return: Data with renamed fields.
         :rtype: dict
         """
         new_entity_data = dict(entity_data)
         new_entity_data = self._rename_field("modified", "wikidata_last_modified", new_entity_data)
         new_entity_data = self._rename_field("id", "wikidata_id", new_entity_data)
+
+        # Apply transformation to related Wikidata notes
+        if recursively:
+            for claim_name, claim_data in new_entity_data.get("claims", {}).items():
+                claim_data["target_data"] = {
+                    "ambiguous": len(claim_data["target_data"]) > 1,
+                    "senses": [
+                        self._convert_entity_sense(entity_sense, recursively=False)
+                        if claim_data["target_data"] != {} else []
+                        for entity_sense in claim_data["target_data"]
+                    ]
+                }
 
         return new_entity_data
 
@@ -345,3 +365,46 @@ class RelationsDatabaseWritingTask(luigi.Task):
         for line in pri_file:
             self.pipeline_run_info = deserialize_line(line, encoding)
             break
+
+    def is_relevant_node(self, label, node_data):
+        """
+        Determine whether a node is relevant and should be written to the database. This function can be overwritten by
+        tasks inheriting from this tasks.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Result of check.
+        :rtype: bool
+        """
+        return True
+
+    def categorize_node(self, label, node_data):
+        """
+        Assign a node a category out of a pre-defined set of categories. This function can be overwritten by tasks
+        inheriting from this tasks.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Category for node.
+        :rtype: str
+        """
+        if "senses" not in node_data:
+            return "miscellaneous"
+
+        # Pick the first sense for now
+        sense = node_data["senses"][0]
+        ne_tag = sense.get("type", "I-MISC")
+
+        ne_tags_to_model = {
+            "I-PER": "Person",
+            "I-LOC": "Location",
+            "I-ORG": "Organization",
+            "DATE": "Date",
+            "I-MISC": "Miscellaneous"
+        }
+
+        return "Entity" if ne_tag not in ne_tags_to_model else ne_tags_to_model[ne_tag]

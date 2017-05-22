@@ -13,8 +13,9 @@ import luigi
 import luigi.format
 
 # PROJECT
+import bwg
 from bwg.mixins import ArticleProcessingMixin
-from bwg.wikidata import WikidataAPIMixin  # , WikidataScraperMixin
+from bwg.wikidata import WikidataAPIMixin, RequestCache  # , WikidataScraperMixin
 from bwg.helpers import is_collection, time_function
 from bwg.utilities import (
     serialize_article,
@@ -154,71 +155,12 @@ class WikipediaReadingTask(luigi.Task):
         return groups
 
 
-class RequestCache:
-    """
-    Special class used as a Cache, so that requests being made don't have to be repeated if they occurred in the past.
-    """
-    def __init__(self):
-        self.lock = threading.Lock()
-        self.cache = {}
-        self.requested = set()
-        self.number_of_requests = 0
-        self.number_of_avoided_requests = 0
-
-    def __contains__(self, item):
-        return item in self.requested
-
-    def __delitem__(self, key):
-        del self.cache[key]
-        self.requested.remove(key)
-
-    def __getitem__(self, key):
-        return self.cache[key]
-
-    def __setitem__(self, key, value):
-        self.cache[key] = value
-        self.requested.add(key)
-
-    def __enter__(self):
-        self.lock.acquire()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.lock.release()
-
-    def __len__(self):
-        return len(self.requested)
-
-    def request(self, key, request_func, *request_args, **request_kwargs):
-        """
-        Make a request, but make a lookup to the cache first to see if you may be able to avoid it.
-
-        :param key: Key that should be used to cache the request.
-        :type key: str, int
-        :param request_func: Function to do the request.
-        :type request_func: func
-        :param request_args: Arguments for request.
-        :type request_args: tuple
-        :param request_kwargs: Key word arguments for request.
-        :type request_kwargs: dict
-        """
-        if key in self:
-            self.number_of_avoided_requests += 1
-            return self[key]
-
-        request_result = request_func(*request_args, **request_kwargs)
-        self.number_of_requests += 1
-
-        self[key] = request_result
-
-        return request_result
-
-
 class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):
     """
     Add attributes from Wikidata to Named Entities.
     """
     def requires(self):
-        return backend.bwg.standard_tasks.NERTask(task_config=self.task_config)
+        return bwg.standard_tasks.NERTask(task_config=self.task_config)
 
     def output(self):
         text_format = luigi.format.TextFormat(self.task_config["CORPUS_ENCODING"])
@@ -238,10 +180,8 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
         article_meta, article_data = article["meta"], article["data"]
         language_abbreviation = self.task_config["LANGUAGE_ABBREVIATION"]
         relevant_properties_all = self.task_config["RELEVANT_WIKIDATA_PROPERTIES"]
-        properties_implying_relations = set(self.task_config["WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"])
+        properties_implying_relations = self.task_config["WIKIDATA_PROPERTIES_IMPLYING_RELATIONS"]
         default_ne_tag = self.task_config["DEFAULT_NE_TAG"]
-        request_cache = RequestCache()
-        match_cache = RequestCache()
         wikidata_entities = []
 
         for sentence_id, sentence_json in article_data.items():
@@ -249,7 +189,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
 
             entity_number = 0
             for named_entity, ne_tag in nes:
-                entity_senses = match_cache.request(
+                entity_senses = self.match_cache.request(
                     named_entity, self.get_matches, named_entity, language=language_abbreviation
                 )
                 relevant_properties = relevant_properties_all.get(ne_tag, [])
@@ -263,7 +203,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                     ambiguous_entities = []
 
                     for entity_sense in entity_senses:
-                        wikidata_entity = request_cache.request(
+                        wikidata_entity = self.request_cache.request(
                             entity_sense["id"], self.get_entity,
                             entity_sense["id"], language=language_abbreviation,
                             relevant_properties=relevant_properties,
@@ -278,7 +218,7 @@ class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMi
                 # One match - lucky!
                 else:
                     entity_sense = entity_senses[0]
-                    wikidata_entity = request_cache.request(
+                    wikidata_entity = self.request_cache.request(
                         entity_sense["id"], self.get_entity,
                         entity_sense["id"], language=language_abbreviation,
                         relevant_properties=relevant_properties,

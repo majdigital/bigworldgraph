@@ -10,6 +10,7 @@ import sys
 import time
 import types
 import os
+import pickle
 
 # EXT
 import nltk
@@ -223,3 +224,41 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
         return func_wrapper
 
     return time_decorator
+
+
+def fast_copy(obj):
+    """
+    Create a fast copy of a object.
+
+    :param obj: Object to be copied.
+    :type obj: object
+    :return: Copy.
+    :rtype: object
+    """
+    return pickle.loads(pickle.dumps(obj, -1), encoding="utf-8")
+
+
+def get_if_exists(dictionary, *keys, default=None):
+    """
+    Get a value from a nested dictionary without raising a ``KeyError``, but returning a default value instead.
+
+    :param dictionary: Dictionary in question.
+    :type dictionary: dict
+    :param keys: Keys that lead to the desired value within the nested dictionary.
+    :type keys: list
+    :param default: Default value that should be returned instead of raising a ``KeyError``.
+    :type default: None
+    :return: Desired target value
+    :rtype: None or other
+    """
+    value = default
+
+    for key in keys:
+        try:
+            value = dictionary[key]
+            # In case there's another key to be looked up
+            dictionary = value
+        except (KeyError, TypeError):
+            return default
+
+    return value

@@ -81,7 +81,7 @@ CONFIG_DEPENDENCIES = {
     "relations_database_writing_task": [
         "NEO4J_USER",
         "NEO4J_PASSWORD",
-        "NEO4J_NETAG2MODEL"
+        "{language}_DATABASE_CATEGORIES"  # Categories of nodes in the database with their level of detail as int
     ]
 }
 SUPPORTED_LANGUAGES = ["FRENCH"]
@@ -107,13 +107,6 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # Neo4j
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "neo4jj"
-NEO4J_NETAG2MODEL = {
-    "I-PER": "Person",
-    "I-LOC": "Location",
-    "I-ORG": "Organization",
-    "DATE": "Date",
-    "I-MISC": "Miscellaneous"
-}
 
 # ------------------------------- French configurations ---------------------------------
 
@@ -129,7 +122,7 @@ FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.jso
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
 FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france_sample.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
@@ -159,17 +152,42 @@ FRENCH_RELEVANT_WIKIDATA_PROPERTIES = {
         "P108",   # Employer
         "P39",    # Position held
         "P102",   # Member of political party
-        "P1416"   # Affiliation
+        "P1416",   # Affiliation
+        "P18"   # Picture
     ],
     "I-LOC": [
         "P30",    # Continent
-        "P17"     # Country
+        "P17",    # Country
+        "P18"   # Picture
     ],
     "I-ORG": [
         "P1384",  # Political alignment
         "P335",   # Subsidiary
-        "P159"    # Headquarters location
+        "P159",    # Headquarters location
+        "P18"  # Picture
     ],
-    "I-MISC": []
+    "I-MISC": [
+        "P18"   # Picture
+    ]
 }
-FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = ["P463", "P108", "P102", "P1416", "P17", "P335"]
+FRENCH_WIKIDATA_PROPERTIES_IMPLYING_RELATIONS = {
+    "P463": "Organization",
+    "P108": "Company",
+    "P102": "Party",
+    "P1416": "Party",
+    "P335": "Company"
+}
+
+FRENCH_DATABASE_CATEGORIES = {
+    "Entity": 0,
+    "Organization": 2,
+    "Company": 3,
+    "Party": 3,
+    "Miscellaneous": 1,
+    "Affair": 6,
+    "Politician": 3,
+    "Person": 2,
+    "Businessperson": 3,
+    "Media": 4,
+    "Location": 1
+}

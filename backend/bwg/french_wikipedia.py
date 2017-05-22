@@ -24,7 +24,7 @@ from bwg.corenlp_server_tasks import (
 )
 from bwg.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
 from bwg.config_management import build_task_config_for_language
-from bwg.helpers import download_nltk_resource_if_missing
+from bwg.helpers import download_nltk_resource_if_missing, get_if_exists
 
 
 # ---------------------------- Default tasks for french ---------------------------------
@@ -64,10 +64,112 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
     but it's specifically for the french Wikipedia.
     """
+    MEDIA_TYPES = [
+        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire",
+
+    ]
+
     def requires(self):
         return FrenchServerRelationMergingTask(task_config=self.task_config),\
                FrenchServerPropertiesCompletionTask(task_config=self.task_config),\
                FrenchPipelineRunInfoGenerationTask(task_config=self.task_config)
+
+    def is_relevant_node(self, label, node_data):
+        """
+        Determine whether a node is relevant and should be written to the database. Overwritten from superclass to
+        exactly suit this project.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Result of check.
+        :rtype: bool
+        """
+        if "senses" not in node_data:
+            return False
+
+        # Include affairs
+        if "affair" in label or "Affair" in label:
+            return True
+
+        # Include politicians
+        if any([
+            "personnalité politique" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include business people
+        if any([
+            "d'affaires" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include companies
+        if any([
+            "enterprise" in get_if_exists(sense, "description", default="")
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        # Include media
+        if any([
+            any([
+                media_term in get_if_exists(sense, "description", default="")
+                for media_term in self.MEDIA_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return True
+
+        return False
+
+    def categorize_node(self, label, node_data):
+        """
+        Assign a node a category out of a pre-defined set of categories. Overwritten from superclass to exactly suit
+        this project.
+
+        :param label: Node label
+        :tyoe label: str
+        :param node_data: Node's data.
+        :type node_data: dict
+        :return: Category for node.
+        :rtype: str
+        """
+        if "senses" not in node_data:
+            return "Miscellaneous"
+
+        # Assign affair category
+        if "affair" in label or "Affair" in label:
+            return "Affair"
+
+        # Assign politician category
+        if any([
+            "personnalité politique" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return "Politician"
+
+        # Assign businessperson category
+        if any([
+            "d'affaires" in get_if_exists(sense, "claims", "occupation", "target", default="")
+            for sense in node_data["senses"]
+        ]):
+            return "Businessperson"
+
+        # Assign media category
+        if any([
+            any([
+                media_term in get_if_exists(sense, "description", default="")
+                for media_term in self.MEDIA_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return "Media"
+
+        return super().categorize_node(label, node_data)
 
 
 class FrenchNERTask(NERTask):
