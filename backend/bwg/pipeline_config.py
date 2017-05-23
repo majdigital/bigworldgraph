@@ -122,7 +122,7 @@ FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.jso
 FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
 FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
 FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france_sample.xml"
+FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
