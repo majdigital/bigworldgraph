@@ -1,13 +1,20 @@
-bwg.run
-=======
+bwg.run_api
+===========
 
 Usage
 -----
 
-This module contains the API. To run the API, just run this module:
+This module contains the API. To run the API, just this command in the source root folder:
 ::
 
-   python3 bwg/run.py
+   docker-compose build && docker-compose up
+
+So fill the database connected to the API with data, use
+::
+
+   sh ./run_pipeline.sh
+
+This requires you to provide a corpus file in a directory specified in your pipeline's config file.
 
 Features
 --------
@@ -93,7 +100,7 @@ This will return the target node as well as its **friends** and its **friends of
 Module contents
 ---------------
 
-.. automodule:: bwg.run
+.. automodule:: bwg.run_api
    :members:
    :undoc-members:
    :show-inheritance:

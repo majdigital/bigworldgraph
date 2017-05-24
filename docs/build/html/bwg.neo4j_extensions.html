@@ -31,7 +31,7 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="bwg.run" href="bwg.run.html" />
+    <link rel="next" title="bwg.run_api" href="bwg.run_api.html" />
     <link rel="prev" title="bwg.mixins" href="bwg.mixins.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -76,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -112,7 +112,7 @@
     </a>
   </li>
   <li>
-    <a href="bwg.run.html" title="Next Chapter: bwg.run"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.run &raquo;</span>
+    <a href="bwg.run_api.html" title="Next Chapter: bwg.run_api"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.run_api &raquo;</span>
     </a>
   </li>
               
@@ -648,7 +648,7 @@ parameter.</p>
 
 <dl class="class">
 <dt id="bwg.neo4j_extensions.Neo4jTarget">
-<em class="property">class </em><code class="descclassname">bwg.neo4j_extensions.</code><code class="descname">Neo4jTarget</code><span class="sig-paren">(</span><em>pipeline_run_info</em>, <em>user</em>, <em>password</em>, <em>host='localhost'</em>, <em>port=7687</em>, <em>ne_tag_to_model={}</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jTarget" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bwg.neo4j_extensions.</code><code class="descname">Neo4jTarget</code><span class="sig-paren">(</span><em>pipeline_run_info</em>, <em>user</em>, <em>password</em>, <em>host='localhost'</em>, <em>port=7687</em>, <em>categories={'Entity': 0}</em>, <em>node_relevance_function=&lt;function Neo4jTarget.&lt;lambda&gt;&gt;</em>, <em>categorization_function=&lt;function Neo4jTarget.&lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.neo4j_extensions.Neo4jTarget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.target.Target</span></code>, <a class="reference internal" href="#bwg.neo4j_extensions.Neo4jDatabase" title="bwg.neo4j_extensions.Neo4jDatabase"><code class="xref py py-class docutils literal"><span class="pre">bwg.neo4j_extensions.Neo4jDatabase</span></code></a></p>
 <p>Additional luigi target to write a tasks output into a neo4j graph database.</p>
 <dl class="method">
@@ -757,7 +757,7 @@ overwritten.</p>
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

@@ -75,7 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -157,11 +157,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bwg.wikidata.html#bwg.wikidata.AbstractWikidataMixin">AbstractWikidataMixin (class in bwg.wikidata)</a>
 </li>
-      <li><a href="bwg.run.html#bwg.run.add_additional_endpoints">add_additional_endpoints() (in module bwg.run)</a>
+      <li><a href="bwg.run_api.html#bwg.run_api.add_additional_endpoints">add_additional_endpoints() (in module bwg.run_api)</a>
 </li>
-      <li><a href="bwg.run.html#bwg.run.add_error_handlers">add_error_handlers() (in module bwg.run)</a>
+      <li><a href="bwg.run_api.html#bwg.run_api.add_error_handlers">add_error_handlers() (in module bwg.run_api)</a>
 </li>
-      <li><a href="bwg.run.html#bwg.run.add_logger_to_app">add_logger_to_app() (in module bwg.run)</a>
+      <li><a href="bwg.run_api.html#bwg.run_api.add_logger_to_app">add_logger_to_app() (in module bwg.run_api)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -199,7 +199,7 @@
 </li>
       <li><a href="bwg.neo4j_extensions.html#module-bwg.neo4j_extensions">bwg.neo4j_extensions (module)</a>
 </li>
-      <li><a href="bwg.run.html#module-bwg.run">bwg.run (module)</a>
+      <li><a href="bwg.run_api.html#module-bwg.run_api">bwg.run_api (module)</a>
 </li>
       <li><a href="bwg.standard_tasks.html#module-bwg.standard_tasks">bwg.standard_tasks (module)</a>
 </li>
@@ -215,14 +215,20 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bwg.additional_tasks.html#bwg.additional_tasks.RelationsDatabaseWritingTask.categorize_node">categorize_node() (bwg.additional_tasks.RelationsDatabaseWritingTask method)</a>
+
+      <ul>
+        <li><a href="bwg.french_wikipedia.html#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.categorize_node">(bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask method)</a>
+</li>
+      </ul></li>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Entity.category">category (bwg.neo4j_extensions.Entity attribute)</a>
 </li>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jResult.clean_unserializables">clean_unserializables() (bwg.neo4j_extensions.Neo4jResult method)</a>
 </li>
-      <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jLayer.combine_queries">combine_queries() (bwg.neo4j_extensions.Neo4jLayer method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jLayer.combine_queries">combine_queries() (bwg.neo4j_extensions.Neo4jLayer method)</a>
+</li>
       <li><a href="bwg.helpers.html#bwg.helpers.construct_dict_from_source">construct_dict_from_source() (in module bwg.helpers)</a>
 </li>
       <li><a href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin">CoreNLPServerMixin (class in bwg.mixins)</a>
@@ -281,6 +287,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bwg.helpers.html#bwg.helpers.fast_copy">fast_copy() (in module bwg.helpers)</a>
+</li>
       <li><a href="bwg.helpers.html#bwg.helpers.filter_dict">filter_dict() (in module bwg.helpers)</a>
 </li>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jLayer.find">find() (bwg.neo4j_extensions.Neo4jLayer method)</a>
@@ -355,6 +363,12 @@
       </ul></li>
       <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin.get_entity_name">get_entity_name() (bwg.wikidata.WikidataAPIMixin method)</a>
 </li>
+      <li><a href="bwg.helpers.html#bwg.helpers.get_if_exists">get_if_exists() (in module bwg.helpers)</a>
+</li>
+      <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin.get_image_url">get_image_url() (bwg.wikidata.WikidataAPIMixin static method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bwg.wikidata.html#bwg.wikidata.AbstractWikidataMixin.get_matches">get_matches() (bwg.wikidata.AbstractWikidataMixin method)</a>
 
       <ul>
@@ -363,8 +377,6 @@
         <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataScraperMixin.get_matches">(bwg.wikidata.WikidataScraperMixin method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bwg.utilities.html#bwg.utilities.get_nes_from_sentence">get_nes_from_sentence() (in module bwg.utilities)</a>
 </li>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jDatabase.get_node_class">get_node_class() (bwg.neo4j_extensions.Neo4jDatabase static method)</a>
@@ -385,14 +397,20 @@
 </li>
       <li><a href="bwg.helpers.html#bwg.helpers.is_collection">is_collection() (in module bwg.helpers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jLayer.is_empty">is_empty() (bwg.neo4j_extensions.Neo4jLayer method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jResult.is_json_serializable">is_json_serializable() (bwg.neo4j_extensions.Neo4jResult static method)</a>
 </li>
       <li><a href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin.is_relevant_article">is_relevant_article() (bwg.mixins.ArticleProcessingMixin method)</a>
 </li>
+      <li><a href="bwg.additional_tasks.html#bwg.additional_tasks.RelationsDatabaseWritingTask.is_relevant_node">is_relevant_node() (bwg.additional_tasks.RelationsDatabaseWritingTask method)</a>
+
+      <ul>
+        <li><a href="bwg.french_wikipedia.html#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.is_relevant_node">(bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask method)</a>
+</li>
+      </ul></li>
       <li><a href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin.is_relevant_sentence">is_relevant_sentence() (bwg.mixins.ArticleProcessingMixin method)</a>
 </li>
   </ul></td>
@@ -417,7 +435,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="bwg.run.html#bwg.run.log_request">log_request() (in module bwg.run)</a>
+      <li><a href="bwg.run_api.html#bwg.run_api.log_request">log_request() (in module bwg.run_api)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -425,6 +443,12 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin.match_cache">match_cache (bwg.wikidata.WikidataAPIMixin attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="bwg.french_wikipedia.html#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.MEDIA_TYPES">MEDIA_TYPES (bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask attribute)</a>
+</li>
       <li><a href="bwg.config_management.html#bwg.config_management.MissingConfigParameterException">MissingConfigParameterException</a>
 </li>
   </ul></td>
@@ -531,9 +555,11 @@
 </li>
       <li><a href="bwg.neo4j_extensions.html#bwg.neo4j_extensions.Neo4jLayer.replace">replace() (bwg.neo4j_extensions.Neo4jLayer method)</a>
 </li>
-      <li><a href="bwg.wikipedia_tasks.html#bwg.wikipedia_tasks.RequestCache.request">request() (bwg.wikipedia_tasks.RequestCache method)</a>
+      <li><a href="bwg.wikidata.html#bwg.wikidata.RequestCache.request">request() (bwg.wikidata.RequestCache method)</a>
 </li>
-      <li><a href="bwg.wikipedia_tasks.html#bwg.wikipedia_tasks.RequestCache">RequestCache (class in bwg.wikipedia_tasks)</a>
+      <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin.request_cache">request_cache (bwg.wikidata.WikidataAPIMixin attribute)</a>
+</li>
+      <li><a href="bwg.wikidata.html#bwg.wikidata.RequestCache">RequestCache (class in bwg.wikidata)</a>
 </li>
       <li><a href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin.resolve_claims">resolve_claims() (bwg.wikidata.WikidataAPIMixin method)</a>
 </li>
@@ -573,7 +599,7 @@
 </li>
       <li><a href="bwg.corenlp_server_tasks.html#bwg.corenlp_server_tasks.ServerPoSTaggingTask">ServerPoSTaggingTask (class in bwg.corenlp_server_tasks)</a>
 </li>
-      <li><a href="bwg.run.html#bwg.run.set_up_api">set_up_api() (in module bwg.run)</a>
+      <li><a href="bwg.run_api.html#bwg.run_api.set_up_api">set_up_api() (in module bwg.run_api)</a>
 </li>
       <li><a href="bwg.standard_tasks.html#bwg.standard_tasks.SimpleReadingTask">SimpleReadingTask (class in bwg.standard_tasks)</a>
 </li>
@@ -658,7 +684,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

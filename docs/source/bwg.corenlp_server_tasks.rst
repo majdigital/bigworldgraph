@@ -6,26 +6,12 @@ Using ``CoreNLP Server`` tasks
 
 To use ``CoreNLP Server`` tasks, appropriate `Stanford
 NLP <https://stanfordnlp.github.io/CoreNLP/download.html>`__ models are
-also required. Before running the pipeline, also make sure to run the
-``StanfordCoreNLP`` server in case you are using a task from the module
-``nlp/corenlp_server_tasks.py``, using the following command in the
-directory with the appropriate Stanford models (in this case the
-``-serverProperties`` argument is used to tell the Server the language
-of incoming texts):
+also required. For french, those are downloaded from a MAJ // Digital server when ``docker-compose.yml`` is called.
 
-::
-
-    java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -serverProperties StanfordCoreNLP-french.properties
-
-For more information about the server itself, please consult the `official documentation <https://stanfordnlp.github.io/CoreNLP/corenlp-server.html>`__.
-
-Finally, you also have to include at least this config parameter in your pipeline config file:
-
-::
-
-    STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
-
-
+In case you are running the project on a non-french corpus, you can adjust the command that runs the server in its
+corresponding dockerfile at ``backend/data/stanford/Dockerfile`` to fit the current language. Do this by adjusting the
+``-serverProperties`` argument appropriately (consult the  `official documentation <https://stanfordnlp.github.io/CoreNLP/corenlp-server.html>`__
+for more help).
 
 Module contents
 ---------------

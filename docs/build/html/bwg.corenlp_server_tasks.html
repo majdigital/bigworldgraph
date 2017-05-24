@@ -76,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -152,20 +152,11 @@
 <h2>Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks<a class="headerlink" href="#using-corenlp-server-tasks" title="Permalink to this headline">¶</a></h2>
 <p>To use <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks, appropriate <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/download.html">Stanford
 NLP</a> models are
-also required. Before running the pipeline, also make sure to run the
-<code class="docutils literal"><span class="pre">StanfordCoreNLP</span></code> server in case you are using a task from the module
-<code class="docutils literal"><span class="pre">nlp/corenlp_server_tasks.py</span></code>, using the following command in the
-directory with the appropriate Stanford models (in this case the
-<code class="docutils literal"><span class="pre">-serverProperties</span></code> argument is used to tell the Server the language
-of incoming texts):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">mx4g</span> <span class="o">-</span><span class="n">cp</span> <span class="s2">&quot;*&quot;</span> <span class="n">edu</span><span class="o">.</span><span class="n">stanford</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">StanfordCoreNLPServer</span> <span class="o">-</span><span class="n">port</span> <span class="mi">9000</span> <span class="o">-</span><span class="n">timeout</span> <span class="mi">15000</span> <span class="o">-</span><span class="n">serverProperties</span> <span class="n">StanfordCoreNLP</span><span class="o">-</span><span class="n">french</span><span class="o">.</span><span class="n">properties</span>
-</pre></div>
-</div>
-<p>For more information about the server itself, please consult the <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/corenlp-server.html">official documentation</a>.</p>
-<p>Finally, you also have to include at least this config parameter in your pipeline config file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">STANFORD_CORENLP_SERVER_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:9000&quot;</span>
-</pre></div>
-</div>
+also required. For french, those are downloaded from a MAJ // Digital server when <code class="docutils literal"><span class="pre">docker-compose.yml</span></code> is called.</p>
+<p>In case you are running the project on a non-french corpus, you can adjust the command that runs the server in its
+corresponding dockerfile at <code class="docutils literal"><span class="pre">backend/data/stanford/Dockerfile</span></code> to fit the current language. Do this by adjusting the
+<code class="docutils literal"><span class="pre">-serverProperties</span></code> argument appropriately (consult the  <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/corenlp-server.html">official documentation</a>
+for more help).</p>
 </div>
 <div class="section" id="module-bwg.corenlp_server_tasks">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.corenlp_server_tasks" title="Permalink to this headline">¶</a></h2>
@@ -244,7 +235,7 @@ for this task, this task doesn&#8217;t use the CoreNLP server at all.</p>
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

@@ -1,13 +1,6 @@
 bwg.standard_tasks
 ==================
 
-Usage
------
-
-Please be aware that for almost all of these tasks, appropriate `Stanford
-NLP <https://stanfordnlp.github.io/CoreNLP/download.html>`__ models are
-also required. Check ``CONFIG_DEPENDENCIES`` in your pipeline's config file to see which.
-
 Module contents
 ---------------
 
