@@ -6,7 +6,7 @@ Functions concerning the config management of the NLP pipeline.
 # STD
 import os
 
-from bwg.helpers import get_config_from_py_file
+from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
 
 
 class MissingConfigParameterException(Exception):
@@ -41,6 +41,7 @@ def build_task_config_for_language(tasks, language, config_file_path, include_op
     :rtype: dict
     """
     raw_config = get_config_from_py_file(config_file_path)
+    raw_config = overwrite_local_config_with_environ(raw_config)
     dependencies = raw_config["CONFIG_DEPENDENCIES"]
     target_config = {}
 

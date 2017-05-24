@@ -181,12 +181,14 @@ class RelationsDatabaseWritingTask(luigi.Task):
     def output(self):
         user = self.task_config["NEO4J_USER"]
         password = self.task_config["NEO4J_PASSWORD"]
+        host = self.task_config["NEO4J_HOST"]
         categories = self.task_config["DATABASE_CATEGORIES"]
 
         return Neo4jTarget(
             self.pipeline_run_info, user, password,
             node_relevance_function=self.is_relevant_node,
             categorization_function=self.categorize_node,
+            host=host,
             categories=categories
         )
 

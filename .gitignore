@@ -13,8 +13,9 @@ data/*
 *.ctrl
 *.ipynb
 */apicache/*
-build/*
+backend/build/*
 dist/*
-bwg.egg-info/*
+backend/bwg.egg-info/*
 backend/logs/*
 *.egg
+.env
