@@ -7,7 +7,7 @@ services:
   backend:
     build: ./backend/
     ports:
-      - "5000:5000"
+      - "6050:5000"
     depends_on:
       - neo4j
     environment:
@@ -15,8 +15,32 @@ services:
       - API_HOST=0.0.0.0
       - NEO4J_HOST=neo4j
       - NEO4J_PASSWORD=neo4jj
+      - FRENCH_NES_OUTPUT_PATH=/french_pipeline/fr_articles_nes.json
+      - FRENCH_POS_OUTPUT_PATH=/french_pipeline/fr_articles_pos.json
+      - FRENCH_DEPENDENCY_OUTPUT_PATH=/french_pipeline/fr_articles_dependencies.json
+      - FRENCH_ORE_OUTPUT_PATH=/french_pipeline/fr_articles_relations.json
+      - FRENCH_WIKIPEDIA_READING_OUTPUT_PATH=/french_pipeline/fr_articles.json
+      - FRENCH_PE_OUTPUT_PATH=/french_pipeline/fr_articles_participations.json
+      - FRENCH_RELATION_MERGING_OUTPUT_PATH=/french_pipeline/fr_articles_merged_relations.json
+      - FRENCH_PC_OUTPUT_PATH=/french_pipeline/fr_articles_properties.json
+      - FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH=/french_pipeline/fr_info.json
+      - FRENCH_CORPUS_INPATH=/french_corpora/corpus_affairs_modern_french_in_france.xml
+      - FRENCH_LUIGI_DATA_PATH=/french_pipeline/
+      - FRENCH_CORPORA_PATH=/french_corpora/
+      - STANFORD_CORENLP_SERVER_ADDRESS=http://stanford:9000
+      - FRENCH_STANFORD_NER_MODEL_PATH=/stanford_models/ner-model-french.ser.gz
+      - FRENCH_CORENLP_STANFORD_NER_MODEL_PATH=/stanford_models/ner-model-french.ser.gz
+      - FRENCH_STANFORD_POS_MODEL_PATH=/stanford_models/french.tagger
+      - FRENCH_STANFORD_MODELS_PATH=/stanford_models/french.jar
+      - FRENCH_STANFORD_DEPENDENCY_MODEL_PATH=/stanford_models/UD_French.gz
+      - STANFORD_POSTAGGER_PATH=/stanford_models/stanford-postagger.jar
+      - STANFORD_CORENLP_MODELS_PATH=/stanford_models/stanford-corenlp-3.7.0-models.jar
     networks:
       - app-tier
+    volumes:
+      - ./backend/data/corpora_french/:/french_corpora
+      - ./backend/data/pipeline_french/:/french_pipeline
+      - ./backend/data/stanford/models/:/stanford_models/
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/neo4jj
@@ -26,3 +50,13 @@ services:
       - "6070:7687"
     networks:
       - app-tier
+  stanford:
+    build: ./backend/data/stanford/
+    depends_on:
+      - backend
+    networks:
+      - app-tier
+    ports:
+      - "6080:9000"
+    volumes:
+      - ./backend/data/stanford/models/:/stanford_models/
