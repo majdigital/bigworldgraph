@@ -76,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -169,6 +169,62 @@
 <em class="property">class </em><code class="descclassname">bwg.additional_tasks.</code><code class="descname">RelationsDatabaseWritingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
 <p>Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database.</p>
+<dl class="method">
+<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.categorize_node">
+<code class="descname">categorize_node</code><span class="sig-paren">(</span><em>label</em>, <em>node_data</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.categorize_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign a node a category out of a pre-defined set of categories. This function can be overwritten by tasks
+inheriting from this tasks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> &#8211; Node label</li>
+<li><strong>node_data</strong> (<em>dict</em>) &#8211; Node&#8217;s data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Tyoe label:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Category for node.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.is_relevant_node">
+<code class="descname">is_relevant_node</code><span class="sig-paren">(</span><em>label</em>, <em>node_data</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.is_relevant_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether a node is relevant and should be written to the database. This function can be overwritten by
+tasks inheriting from this tasks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> &#8211; Node label</li>
+<li><strong>node_data</strong> (<em>dict</em>) &#8211; Node&#8217;s data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Tyoe label:</th><td class="field-body"><p class="first">str</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Result of check.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="bwg.additional_tasks.RelationsDatabaseWritingTask.pipeline_run_info">
 <code class="descname">pipeline_run_info</code><em class="property"> = None</em><a class="headerlink" href="#bwg.additional_tasks.RelationsDatabaseWritingTask.pipeline_run_info" title="Permalink to this definition">¶</a></dt>
@@ -211,7 +267,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

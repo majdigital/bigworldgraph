@@ -19,9 +19,7 @@ CONFIG_DEPENDENCIES = {
     # Exclude the following parameters from the target config
     "exclude": [
         "CONFIG_DEPENDENCIES",
-        "SUPPORTED_LANGUAGES",
-        "{language}_LUIGI_DATA_PATH",
-        "STANFORD_PATH"
+        "SUPPORTED_LANGUAGES"
     ],
     # Necessary config parameters for Named Entity Recognition
     "named_entity_recognition": [
@@ -81,6 +79,7 @@ CONFIG_DEPENDENCIES = {
     "relations_database_writing_task": [
         "NEO4J_USER",
         "NEO4J_PASSWORD",
+        "NEO4J_HOST",
         "{language}_DATABASE_CATEGORIES"  # Categories of nodes in the database with their level of detail as int
     ]
 }
@@ -91,7 +90,6 @@ STANFORD_CORENLP_MODELS_PATH = "../data/stanford/models/stanford-corenlp-3.7.0-m
 STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
 STANFORD_POSTAGGER_PATH = "../data/stanford/models/stanford-postagger.jar"
 DEPENDENCY_TREE_KEEP_FIELDS = ["address", "ctag", "deps", "word", "head", "rel"]
-STANFORD_PATH = "../data/stanford/models/"
 VERB_NODE_POS_TAGS = ["VPP", "V", "VINF", "VPR", "VS"]
 NER_TAGSET = ["I-PERS", "B-PERS", "I-LOC", "B-LOC", "I-ORG", "B-ORG", "I-MISC", "B-MISC"]
 DEFAULT_NE_TAG = "O"
@@ -105,31 +103,30 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # ------------------------------ Database configurations --------------------------------
 
 # Neo4j
+NEO4J_HOST = "localhost"
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "neo4jj"
 
 # ------------------------------- French configurations ---------------------------------
 
 # Paths for Luigi task outputs
-FRENCH_LUIGI_DATA_PATH = "../data/pipeline_french/"
-FRENCH_CORPORA_PATH = "../data/corpora_french/"
-FRENCH_NES_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_nes.json"
-FRENCH_POS_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_pos.json"
-FRENCH_DEPENDENCY_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_dependencies.json"
-FRENCH_ORE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_relations.json"
-FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles.json"
-FRENCH_PE_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_participations.json"
-FRENCH_RELATION_MERGING_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_merged_relations.json"
-FRENCH_PC_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_articles_properties.json"
-FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = FRENCH_LUIGI_DATA_PATH + "fr_info.json"
-FRENCH_CORPUS_INPATH = FRENCH_CORPORA_PATH + "corpus_affairs_modern_french_in_france_sample.xml"
+FRENCH_NES_OUTPUT_PATH = "../data/pipeline_french/fr_articles_nes.json"
+FRENCH_POS_OUTPUT_PATH = "../data/pipeline_french/fr_articles_pos.json"
+FRENCH_DEPENDENCY_OUTPUT_PATH = "../data/pipeline_french/fr_articles_dependencies.json"
+FRENCH_ORE_OUTPUT_PATH = "../data/pipeline_french/fr_articles_relations.json"
+FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = "../data/pipeline_french/fr_articles.json"
+FRENCH_PE_OUTPUT_PATH = "../data/pipeline_french/fr_articles_participations.json"
+FRENCH_RELATION_MERGING_OUTPUT_PATH = "../data/pipeline_french/fr_articles_merged_relations.json"
+FRENCH_PC_OUTPUT_PATH = "../data/pipeline_french/fr_articles_properties.json"
+FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = "../data/pipeline_french/fr_info.json"
+FRENCH_CORPUS_INPATH = "../data/corpora_french/corpus_affairs_modern_french_in_france.xml"
 
 # Paths for french Stanford models
-FRENCH_STANFORD_NER_MODEL_PATH = STANFORD_PATH + "ner-model-french.ser.gz"
+FRENCH_STANFORD_NER_MODEL_PATH = "../data/stanford/models/ner-model-french.ser.gz"
 FRENCH_CORENLP_STANFORD_NER_MODEL_PATH = "./" + "ner-model-french.ser.gz"
-FRENCH_STANFORD_POS_MODEL_PATH = STANFORD_PATH + "french.tagger"
-FRENCH_STANFORD_MODELS_PATH = STANFORD_PATH + "french.jar"
-FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = STANFORD_PATH + "UD_French.gz"
+FRENCH_STANFORD_POS_MODEL_PATH = "../data/stanford/models/french.tagger"
+FRENCH_STANFORD_MODELS_PATH = "../data/stanford/models/french.jar"
+FRENCH_STANFORD_DEPENDENCY_MODEL_PATH = "../data/stanford/models/UD_French.gz"
 
 # Misc
 FRENCH_PARTICIPATION_PHRASES = {

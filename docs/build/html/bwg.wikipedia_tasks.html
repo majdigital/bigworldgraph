@@ -75,7 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -153,33 +153,6 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="bwg.wikipedia_tasks.RequestCache">
-<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">RequestCache</code><a class="headerlink" href="#bwg.wikipedia_tasks.RequestCache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Special class used as a Cache, so that requests being made don&#8217;t have to be repeated if they occurred in the past.</p>
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.RequestCache.request">
-<code class="descname">request</code><span class="sig-paren">(</span><em>key</em>, <em>request_func</em>, <em>*request_args</em>, <em>**request_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.RequestCache.request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a request, but make a lookup to the cache first to see if you may be able to avoid it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<em>str</em><em>, </em><em>int</em>) &#8211; Key that should be used to cache the request.</li>
-<li><strong>request_func</strong> (<em>func</em>) &#8211; Function to do the request.</li>
-<li><strong>request_args</strong> (<em>tuple</em>) &#8211; Arguments for request.</li>
-<li><strong>request_kwargs</strong> (<em>dict</em>) &#8211; Key word arguments for request.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="bwg.wikipedia_tasks.WikipediaReadingTask">
 <em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">WikipediaReadingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
@@ -202,7 +175,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

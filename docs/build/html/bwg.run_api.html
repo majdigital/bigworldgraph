@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.run_api &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.standard_tasks" href="bwg.standard_tasks.html" />
+    <link rel="prev" title="bwg.neo4j_extensions" href="bwg.neo4j_extensions.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.run_api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">bwg.run_api</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#module-bwg.run_api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="bwg.neo4j_extensions.html" title="Previous Chapter: bwg.neo4j_extensions"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; bwg.neo4j_extensions</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.standard_tasks.html" title="Next Chapter: bwg.standard_tasks"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.standard_tasks &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.run_api.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="bwg-run-api">
+<h1>bwg.run_api<a class="headerlink" href="#bwg-run-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the API. To run the API, just this command in the source root folder:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
+</pre></div>
+</div>
+<p>So fill the database connected to the API with data, use</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sh</span> <span class="o">./</span><span class="n">run_pipeline</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>This requires you to provide a corpus file in a directory specified in your pipeline&#8217;s config file.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<p>So far, you can use the API to do the following things:</p>
+<p>Get the current version of the API by using the <a href="#id1"><span class="problematic" id="id2">``</span></a>/version/` endpoint:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">gX</span> <span class="n">GET</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">version</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>will return</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.7.0&quot;</span><span class="p">,</span> <span class="s2">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;Copyright (c) 2017 Malabaristalicious Unipessoal, Lda.</span><span class="se">\n</span><span class="s2">For more information read LICENSE.md on https://github.com/majdigital/bigworldgraph&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>You can also query for entities and their relationships in the database using the <code class="docutils literal"><span class="pre">/entities/</span></code> endpoints
+(not recommended because the result will probably be very big):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">gX</span> <span class="n">GET</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span><span class="n">entities</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>which returns</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;_items&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;42904ca7f582449eafb98c1e94cd8b0d&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;wikidata_last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2015-12-31T03:11:20Z&quot;</span><span class="p">,</span> <span class="s2">&quot;wikidata_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Q3039421&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;pi</span><span class="se">\u00e8</span><span class="s2">ce de th</span><span class="se">\u00e9\u00e2</span><span class="s2">tre de Jean-Claude Grumberg&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;claims&quot;</span><span class="p">:</span> <span class="p">{}},</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>To be more specific, you can query special kinds of entities like <code class="docutils literal"><span class="pre">/people/</span></code>, <code class="docutils literal"><span class="pre">/locations/</span></code>, <code class="docutils literal"><span class="pre">/organizations/</span></code> or
+<code class="docutils literal"><span class="pre">/misc/</span></code>.</p>
+<p>To make responses more readable for humans, use the <code class="docutils literal"><span class="pre">?pretty</span></code> query parameter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>curl -gX GET http://127.0.0.1:5000/people?pretty
+</pre></div>
+</div>
+<p>which in turn returns</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;_items&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="p">[</span>
+               <span class="p">{</span>
+                  <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;42904ca7f582449eafb98c1e94cd8b0d&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
+                     <span class="s2">&quot;wikidata_last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2015-12-31T03:11:20Z&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;wikidata_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Q3039421&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;pi</span><span class="se">\u00e8</span><span class="s2">ce de th</span><span class="se">\u00e9\u00e2</span><span class="s2">tre de Jean-Claude Grumberg&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;claims&quot;</span><span class="p">:</span> <span class="p">{}</span>
+                  <span class="p">},</span>
+                  <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span>
+               <span class="p">},</span>
+               <span class="o">...</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;links&quot;</span><span class="p">:</span> <span class="p">[</span>
+               <span class="o">...</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<dl class="docutils">
+<dt>As of version 0.7.0, <code class="docutils literal"><span class="pre">BigWorldGraph</span></code> only comprises the following query parameters:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">?pretty</span></code></li>
+<li>Filtering like <code class="docutils literal"><span class="pre">/entities?uid=42904ca7f582449eafb98c1e94cd8b0d</span></code></li>
+</ul>
+</dd>
+</dl>
+<p class="last">Any other functionalities presented by <code class="docutils literal"><span class="pre">Eve</span></code> in <a class="reference external" href="http://python-eve.org/features.html">its documentation</a> are not
+implemented yet.</p>
+</div>
+<p>To only get a subset of a graph, specify an identifier in for the target node in the request:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>curl -gX GET http://127.0.0.1:5000/people?uid=42904ca7f582449eafb98c1e94cd8b0d
+</pre></div>
+</div>
+<p>This will return the target node as well as its <strong>friends</strong> and its <strong>friends of friends</strong>.</p>
+</div>
+<div class="section" id="module-bwg.run_api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.run_api" title="Permalink to this headline">¶</a></h2>
+<p>Module to run the API that connects the graph database to the frontend.</p>
+<dl class="function">
+<dt id="bwg.run_api.add_additional_endpoints">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_additional_endpoints</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_additional_endpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add additional endpoints to the current API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.add_error_handlers">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_error_handlers</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_error_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add error handlers to the current API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.add_logger_to_app">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_logger_to_app</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_logger_to_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add logger to the current app.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app</strong> (<em>eve.Eve</em>) &#8211; Current app.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">App with logger.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.log_request">
+<code class="descclassname">bwg.run_api.</code><code class="descname">log_request</code><span class="sig-paren">(</span><em>resource</em>, <em>request</em>, <em>payload</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.log_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a request on an endpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resource</strong> (<em>str</em>) &#8211; Resource being called.</li>
+<li><strong>request</strong> (<em>dict</em>) &#8211; Request information.</li>
+<li><strong>payload</strong> (<em>dict</em>) &#8211; Request payload.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.set_up_api">
+<code class="descclassname">bwg.run_api.</code><code class="descname">set_up_api</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.set_up_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the API using the following steps:</p>
+<ol class="arabic simple">
+<li>Read the configuration file.</li>
+<li>Overwrite configuration parameters if corresponding environment variables exist.</li>
+<li>Initialize the logger.</li>
+<li>Create the API.</li>
+<li>Add error handlers to the API.</li>
+<li>Add additional endpoints to the API.</li>
+<li>Connect the API to the logger.</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Completely set up API.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

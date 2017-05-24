@@ -76,7 +76,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -195,6 +195,24 @@ for these fields from the source dict</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="bwg.helpers.fast_copy">
+<code class="descclassname">bwg.helpers.</code><code class="descname">fast_copy</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.fast_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a fast copy of a object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<em>object</em>) &#8211; Object to be copied.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Copy.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="bwg.helpers.filter_dict">
 <code class="descclassname">bwg.helpers.</code><code class="descname">filter_dict</code><span class="sig-paren">(</span><em>dictionary</em>, <em>keep_fields</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.filter_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter a dictionary&#8217;s entries.</p>
@@ -256,6 +274,31 @@ for these fields from the source dict</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Configuration parameters as a dictionary.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.get_if_exists">
+<code class="descclassname">bwg.helpers.</code><code class="descname">get_if_exists</code><span class="sig-paren">(</span><em>dictionary</em>, <em>*keys</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.get_if_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a value from a nested dictionary without raising a <code class="docutils literal"><span class="pre">KeyError</span></code>, but returning a default value instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dictionary</strong> (<em>dict</em>) &#8211; Dictionary in question.</li>
+<li><strong>keys</strong> (<em>list</em>) &#8211; Keys that lead to the desired value within the nested dictionary.</li>
+<li><strong>default</strong> (<em>None</em>) &#8211; Default value that should be returned instead of raising a <code class="docutils literal"><span class="pre">KeyError</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Desired target value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None or other</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -370,7 +413,7 @@ function&#8217;s return value in an dictionary.</li>
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>
