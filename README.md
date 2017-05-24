@@ -1,3 +1,6 @@
+
+![](./img/logo.png)
+
 # README
 
 DISCLAIMER: This project is still in development and hasn't produced a stable version yet.
@@ -15,13 +18,13 @@ The data can then be inspected afterwards using an interactive graph.
 ### General information
 
 The prototype of this project was developed during an internship at [MAJ // Digital](http://maj.digital/) in Lisbon in 2017. 
-It is open-source (see LICENSE.md) and hoped to be improved upon by other volunteers (see section Contributing for more 
+It is open-source (see `LICENSE.md`) and hoped to be improved upon by other volunteers (see section Contributing for more 
 information). 
 
 The project is intended to work with all kinds of texts in different languages; however, the prototype was developed to 
 work with a corpus composed of Wikipedia articles of (political) affairs in France since 1996.
 
-To see what future features are planned to be included in this project, check TODO.md.
+To see what future features are planned to be included in this project, check `TODO.md`.
 
 #### Project description
 
@@ -31,7 +34,7 @@ in a graph database as well as the front end using a graph visualization library
 #### Contributing
 
 Contributions of all forms, be it code contributions, bug reports or suggestions are welcome. Please read the 
-CONTRIBUTE.md file for more information or visit the [project's GitHub page](https://github.com/majdigital/bigworldgraph).
+`CONTRIBUTE.md` file for more information or visit the [project's GitHub page](https://github.com/majdigital/bigworldgraph).
 
 ### Usage
 

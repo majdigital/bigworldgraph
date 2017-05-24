@@ -8,3 +8,4 @@ eve
 sphinx
 sphinx_bootstrap_theme
 flask_cors
+nose2
