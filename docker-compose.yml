@@ -3,6 +3,11 @@ networks:
   app-tier:
     driver: bridge
 
+volumes:
+  french_corpora:
+  french_pipeline:
+  stanford_models:
+
 services:
   backend:
     build: ./backend/
@@ -14,7 +19,7 @@ services:
       - NEO4J_PORT=7687
       - API_HOST=0.0.0.0
       - NEO4J_HOST=neo4j
-      - NEO4J_PASSWORD=neo4jj
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
       - FRENCH_NES_OUTPUT_PATH=/french_pipeline/fr_articles_nes.json
       - FRENCH_POS_OUTPUT_PATH=/french_pipeline/fr_articles_pos.json
       - FRENCH_DEPENDENCY_OUTPUT_PATH=/french_pipeline/fr_articles_dependencies.json
@@ -40,10 +45,9 @@ services:
     volumes:
       - ./backend/data/corpora_french/:/french_corpora
       - ./backend/data/pipeline_french/:/french_pipeline
-      - ./backend/data/stanford/models/:/stanford_models/
   neo4j:
     environment:
-      - NEO4J_AUTH=neo4j/neo4jj
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
     image: neo4j:3.0
     ports:
       - "6060:7474"
@@ -58,5 +62,3 @@ services:
       - app-tier
     ports:
       - "6080:9000"
-    volumes:
-      - ./backend/data/stanford/models/:/stanford_models/
