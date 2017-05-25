@@ -1,4 +1,4 @@
-FROM python:3.6-slim
+FROM python:3.6
 MAINTAINER Kaleidophon (https://github.com/Kaleidophon)
 
 RUN mkdir -p /data/src/app
