@@ -1,0 +1,12 @@
+{
+  "name": "bigworldgraph",
+  "version": "0.1.0",
+  "description": "A data visualization project",
+  "dependencies": {
+   
+  },
+   "scripts": {
+    "start": "gulp"
+  }
+  
+}

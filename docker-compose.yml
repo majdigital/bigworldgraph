@@ -62,3 +62,12 @@ services:
       - app-tier
     ports:
       - "6080:9000"
+  frontend:
+      build: ./frontend/
+      ports:
+          - "8080:8080"
+      networks:
+          - app-tier
+      volumes:
+          - ./frontend:/frontend
+          - /app/node_modules

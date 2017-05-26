@@ -19,3 +19,4 @@ backend/bwg.egg-info/*
 backend/logs/*
 *.egg
 .env
+*.pyc
