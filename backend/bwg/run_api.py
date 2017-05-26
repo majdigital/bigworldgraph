@@ -19,6 +19,7 @@ from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_env
 from bwg.neo4j_extensions import Neo4jLayer
 
 
+
 def set_up_api():
     """
     Set up the API using the following steps:
@@ -55,6 +56,7 @@ def set_up_api():
 
     # Set up API
     api = Eve(data=Neo4jLayer, settings=api_config)
+    flask_cors.CORS(api)
     api = add_error_handlers(api)
     api = add_additional_endpoints(api)
     api = add_logger_to_app(api)

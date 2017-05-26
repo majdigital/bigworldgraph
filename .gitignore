@@ -19,3 +19,9 @@ backend/bwg.egg-info/*
 backend/logs/*
 *.egg
 .env
+frontend/node_modules/
+frontend/.sass-cache/
+frontend/build/*
+frontend/dist/*
+bwg.egg-info/*
+logs/*

@@ -1,4 +1,10 @@
+'use stric';
+
+import styles from '../scss/styles.scss'
+
 var BigWorldGraph = BigWorldGraph || {};
+
+
 /*
 ::::::::::: ::::    ::: ::::::::::: :::::::::::
     :+:     :+:+:   :+:     :+:         :+:
@@ -9,7 +15,7 @@ var BigWorldGraph = BigWorldGraph || {};
 ########### ###    #### ###########     ###
 */
 (function(){
-    BigWorldGraph= {
+    BigWorldGraph= { 
         config:[],
         init:function(){
             //Main Function
