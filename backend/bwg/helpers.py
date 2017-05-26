@@ -23,7 +23,7 @@ def filter_dict(dictionary, keep_fields):
     :param dictionary: Dictionary that is going to be filtered.
     :type dictionary: dict
     :param keep_fields: Dictionary keys that aren't going to be filtered.
-    :type keep_fields: dict
+    :type keep_fields: dict or list or set
     :return: Filtered dictionary.
     :rtype: dict
     """
