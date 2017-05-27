@@ -13,6 +13,9 @@ module.exports = {
   },
   plugins: [new webpack.NoErrorsPlugin(), extractSass],
   watch: true,
+  watchOptions: {
+   poll: true
+  },
   module: {
     loaders: [
       {
