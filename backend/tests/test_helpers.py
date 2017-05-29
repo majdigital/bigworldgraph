@@ -4,7 +4,13 @@ Testing module for simple helper functions.
 """
 
 # STD
+import copy
+import io
+import os
+import random
+import time
 import unittest
+import re
 
 # PROJECT
 from bwg.helpers import (
@@ -12,6 +18,7 @@ from bwg.helpers import (
     flatten_dictlist, download_nltk_resource_if_missing, is_collection, seconds_to_hms,
     time_function, fast_copy, get_if_exists
 )
+from fixtures import TEST_DICT
 
 
 class DictionaryHelpersTestCase(unittest.TestCase):
@@ -21,17 +28,7 @@ class DictionaryHelpersTestCase(unittest.TestCase):
     test_dict = None
 
     def setUp(self):
-        self.test_dict = {
-            "field1": True,
-            "field2": 33,
-            "field3": "hello",
-            "field4": {
-                "field4_1": {
-                    "field4_1_1": "nested"
-                },
-                "field4_2": False
-            }
-        }
+        self.test_dict = TEST_DICT
 
     def test_filter_dict(self):
         assert filter_dict(self.test_dict, []) == {}
@@ -82,19 +79,124 @@ class DictionaryHelpersTestCase(unittest.TestCase):
 
 class ConfigurationHelpersTestCase(unittest.TestCase):
     """
-    Test loading a .py config file.
+    Test all functions concerning configuration.
     """
-    pass
+    original_config = {
+        "CONFIG_DEPENDENCIES": {
+            "all": [
+                "PIPELINE_DEBUG",
+                "{language}_LANGUAGE_ABBREVIATION"
+            ],
+            "optional": [
+                "OPTIONAL_PARAMETER"
+            ],
+            "exclude": [
+                "CONFIG_DEPENDENCIES",
+                "SUPPORTED_LANGUAGES",
+            ],
+            "task1": [
+                "PARAM1"
+            ],
+            "task2": [
+                "PARAM2",
+                "{language}_PARAM"
+            ],
+            "task3": [
+                "PARAM3"
+            ]
+        },
+        "SUPPORTED_LANGUAGES": ["DEMO"],
+        "PARAM1": "abc",
+        "PARAM2": 12,
+        "PARAM3": True,
+        "DEMO_PARAM": 3.5,
+        "REDUNDANT_PARAM": "yada yada",
+        "PIPELINE_DEBUG": True,
+        "DEMO_LANGUAGE_ABBREVIATION": "demo",
+        "OPTIONAL_PARAMETER": "I am optional"
+    }
+
+    def test_get_config_from_py_file(self):
+        assert get_config_from_py_file("./non_existing_config.py") == {}
+        raw_config = get_config_from_py_file("./dummy_pipeline_config.py")
+        assert raw_config == self.original_config
+
+    @staticmethod
+    def test_overwrite_local_config_with_environ():
+        os.environ["DEMO_LANGUAGE_ABBREVIATION"] = "do"
+        os.environ["UNIMPORTANT_PARAMETER"] = "not important"
+        raw_config = get_config_from_py_file("./dummy_pipeline_config.py")
+        config = overwrite_local_config_with_environ(raw_config)
+        assert config["DEMO_LANGUAGE_ABBREVIATION"] == "do"
+        assert "UNIMPORTANT_PARAMETER" not in config
 
 
 class TimeHelpersTestCase(unittest.TestCase):
-    # TODO (Implement) [DU 26.05.17]
-    pass
+    """
+    Test all functions concerning time.
+    """
+    @staticmethod
+    def _dummy_function():
+        for i in range(4):
+            time.sleep(random.randint(1, 9) / 10)
+        return True
+
+    @staticmethod
+    def test_seconds_to_hms():
+        hours, minutes, seconds = seconds_to_hms(0)
+        assert hours == minutes == seconds == 0
+
+        hours, minutes, seconds = seconds_to_hms(61)
+        assert hours == 0 and minutes == 1 and seconds == 1
+
+        hours, minutes, seconds = seconds_to_hms(3601)
+        assert hours == 1 and minutes == 0 and seconds == 1
+
+    def test_time_function(self):
+        mock_stdout1 = io.StringIO()
+        mock_stdout2 = io.StringIO()
+        time_string_regex = "Function .+? took \d+.\d{2} hour\(s\), \d+.\d{2} minute\(s\) and \d+.\d{2} second\(s\)" \
+                            " to complete\."
+
+        @time_function(out=mock_stdout1)
+        def dummy1():
+            return self._dummy_function()
+
+        @time_function(out=mock_stdout2, return_time=True)
+        def dummy2():
+            return self._dummy_function()
+
+        result1 = dummy1()
+        result2 = dummy2()
+        time_string1 = mock_stdout1.getvalue()
+        time_string2 = mock_stdout2.getvalue()
+
+        assert result1
+        assert result2["return"]
+        assert type(result2["runtime"]) == float
+        assert re.search(time_string_regex, time_string1) is not None
+        assert re.search(time_string_regex, time_string2) is not None
 
 
 class MiscellaneousHelpersTestCase(unittest.TestCase):
-    # TODO (Implement) [DU 26.05.17]
-    pass
+    """
+    Test remaining helper functions.
+    """
+    def test_is_collection(self):
+        inputs_and_expected = [
+            ("", False), ({}, True), (set(), True), (tuple(), True), (frozenset(), True), ([], True), (2, False),
+            (2.2, False), (True, False)
+        ]
+
+        for input_, expected in inputs_and_expected:
+            assert is_collection(input_) == expected
+
+    @staticmethod
+    def test_fast_copy():
+        dict_copy1 = copy.deepcopy(TEST_DICT)
+        dict_copy2 = fast_copy(TEST_DICT)
+        assert TEST_DICT == dict_copy1 == dict_copy2
+        assert {} == copy.deepcopy({}) == fast_copy({})
 
 
 if __name__ == "__main__":
