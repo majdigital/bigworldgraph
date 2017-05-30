@@ -1,17 +1,17 @@
 var path = require("path");
 var webpack = require("webpack");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const extractSass = new ExtractTextPlugin({ filename: "./css/styles.min.css" });
 
 module.exports = {
   devtool: "eval",
-  entry: ["./scripts/main.js"],
+  entry: ["./scripts/main.js", "./scss/styles.scss"],
   output: {
     path: path.join(__dirname, "dist"),
     filename: "./scripts/main.min.js",
     publicPath: "/dist/"
   },
-  plugins: [new webpack.NoErrorsPlugin(), extractSass],
+  plugins: [
+    new webpack.NoErrorsPlugin()
+    ],
   watch: true,
   watchOptions: {
    poll: true
@@ -22,7 +22,7 @@ module.exports = {
         test: /\.js$/,
         loaders: ["babel"],
         exclude: /node_modules/,
-        include: path.join(__dirname, "client")
+        include: path.join(__dirname, "scripts")
       },
       {
         test: /\.json$/,
@@ -32,21 +32,10 @@ module.exports = {
         test: /\.css$/,
         loader: "style!css"
       },
-
       {
         test: /\.scss$/,
-        use: extractSass.extract({
-          use: [
-            {
-              loader: "css-loader"
-            },
-            {
-              loader: "sass-loader"
-            }
-          ],
-          // use style-loader in development
-          fallback: "style-loader"
-        })
+        exclude: /node_modules/,
+        loader: 'style!css?sourceMap!sass?sourceMap&sourceComments'
       }
     ]
   }
