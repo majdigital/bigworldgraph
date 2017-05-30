@@ -15,8 +15,7 @@ import re
 # PROJECT
 from bwg.helpers import (
     filter_dict, construct_dict_from_source, get_config_from_py_file, overwrite_local_config_with_environ,
-    flatten_dictlist, download_nltk_resource_if_missing, is_collection, seconds_to_hms,
-    time_function, fast_copy, get_if_exists
+    flatten_dictlist, is_collection, seconds_to_hms, time_function, fast_copy, get_if_exists
 )
 from fixtures import TEST_DICT
 
@@ -182,7 +181,8 @@ class MiscellaneousHelpersTestCase(unittest.TestCase):
     """
     Test remaining helper functions.
     """
-    def test_is_collection(self):
+    @staticmethod
+    def test_is_collection():
         inputs_and_expected = [
             ("", False), ({}, True), (set(), True), (tuple(), True), (frozenset(), True), ([], True), (2, False),
             (2.2, False), (True, False)
