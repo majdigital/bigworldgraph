@@ -16,7 +16,7 @@ export default class BigWorldGraph {
 
     createGraph(data){
         console.log(this);
-        this.graph = new Graph(data);
+        this.graph = new Graph(data); 
     }
 }
 
