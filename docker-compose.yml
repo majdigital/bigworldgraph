@@ -59,7 +59,8 @@ services:
     ports:
       - "6080:9000"
     volumes:
-      - ./backend/data/stanford/models/:/stanford_models/
+      - ./backend/:/backend
+      - /backend/data/stanford/models
   #frontend:
   #  build: ./frontend/
   #  ports:
