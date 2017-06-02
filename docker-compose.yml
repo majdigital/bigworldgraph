@@ -50,17 +50,17 @@ services:
   #    - "6070:7687"
   #  networks:
   #    - app-tier
-  stanford:
-    build: ./backend/data/stanford/
-    #depends_on:
+  #stanford:
+  #  build: ./backend/data/stanford/
+  #  #depends_on:
     #  - backend
     #networks:
     #  - app-tier
-    ports:
-      - "6080:9000"
-    volumes:
-      - ./backend/:/backend
-      - /backend/data/stanford/models
+  #  ports:
+  #    - "6080:9000"
+  #  volumes:
+  #    - ./backend/:/backend
+  #    - /backend/data/stanford/models
   #frontend:
   #  build: ./frontend/
   #  ports:
