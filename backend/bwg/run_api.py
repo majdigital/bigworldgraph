@@ -19,7 +19,6 @@ from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_env
 from bwg.neo4j_extensions import Neo4jLayer
 
 
-
 def set_up_api():
     """
     Set up the API using the following steps:
