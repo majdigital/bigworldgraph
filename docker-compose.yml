@@ -40,7 +40,7 @@ services:
     volumes:
       - ./backend/data/corpora_french/:/french_corpora:ro
       - ./backend/data/pipeline_french/:/french_pipeline
-      - ./backend/pipeline/stanford/models/:/stanford_models
+      - ./pipeline/stanford/models/:/stanford_models
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
