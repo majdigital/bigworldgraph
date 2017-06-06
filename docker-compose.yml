@@ -50,12 +50,12 @@ services:
       - "6070:7687"
     networks:
       - app-tier
-  #frontend:
-  #  build: ./frontend/
-  #  ports:
-  #      - "8080:8080"
-  #  networks:
-  #      - app-tier
-  #  volumes:
-  #      - ./frontend:/frontend
-  #      - /frontend/node_modules
+  frontend:
+    build: ./frontend/
+    ports:
+        - "8080:8080"
+    networks:
+        - app-tier
+    volumes:
+        - ./frontend:/frontend
+        - /frontend/node_modules
