@@ -2,6 +2,8 @@
 
 import {dataloader} from "./DataLoader";
 import Graph from "./Graph";
+import {loader} from "./Loader";
+import Loader from "./Loader";
 
 export default class BigWorldGraph {
 
@@ -10,13 +12,14 @@ export default class BigWorldGraph {
         this.port = "8080";
         this.service = "tempdata/relations.json";
         this.graph = void 0;
-        dataloader.LoadData(this.url+':'+this.port+'/'+this.service, this.createGraph.bind(this));
-
+        dataloader.LoadData(this.url+':'+this.port+'/'+this.service);
+        loader.addListener(Loader.STATES.PREBUILDING_GRAPH, this.onChange.bind(this));
     }
-
+    onChange(data){
+        this.graph = new Graph(data);
+    }
     createGraph(data){
-        console.log(this);
-        this.graph = new Graph(data); 
+        this.graph = new Graph(data);
     }
 }
 

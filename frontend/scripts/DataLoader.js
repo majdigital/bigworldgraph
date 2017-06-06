@@ -1,26 +1,27 @@
 'use stric';
-
-
-
+import {loader} from './Loader';
+import Loader from './loader';
 export default class DataLoader {
 
     constructor(){
-        console.log('in the class');
+
     }
 
     LoadData(endpoint,cb){
         var cb = cb;
-        console.log(endpoint);
+        console.log(Loader.STATES.FETCHING_DATA)
+        Loader.changeState(Loader.STATES.FETCHING_DATA);
         $.ajax({
             url:endpoint,
             method:'GET',
             contentType: 'text/plain',
             success:function(response){
-                console.log(cb);
+                //console.log(cb);
                 if(cb && typeof cb === "function"){
-                    console.log(response);
-                    cb(response);
+
+                    //cb(response);
                 }
+                loader.emit(Loader.STATES.PREBUILDING_GRAPH, response);
             },
             error:function(textStatus){
                 console.error(textStatus);
