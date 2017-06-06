@@ -16,12 +16,5 @@ fi
 # Build stanford container and run pipeline
 cd ./stanford/
 docker build -t stanford .
-docker run -d -v /stanford_models/:/stanford_models/ -p 6080:9000 --network="bigworldgraph_app-tier" --name stanford stanford
-docker network ls
-ls -lah
-ls -lah /stanford_models/
-echo stanford name: `docker ps --filter name=stanford --format "{{.Names}}"`
-#docker network connect --alias stanford bigworldgraph_app-tier `docker ps --filter name=stanford --format "{{.Names}}"`
+docker run -d --volumes-from $(docker ps --filter name=backend --format "{{.Names}}") -p 6080:9000 --network="bigworldgraph_app-tier" --name stanford stanford
 clear && docker exec `docker ps --filter name=backend --format "{{.Names}}"` python3 ./french_wikipedia.py
-#echo Stopping stanford container...
-#docker rm $(docker stop $(docker ps --filter name=stanford --format "{{.Names}}"))
