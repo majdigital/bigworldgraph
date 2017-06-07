@@ -129,7 +129,7 @@ def serialize_sentence(sentence_id, sentence, state="raw", pretty=False, dump=Tr
    Serialize a simple sentence.
 
    :param sentence_id: ID of current sentence.
-   :type sentence_id: int
+   :type sentence_id: str
    :param sentence: Sentence.
    :type sentence: str
    :param state: State that describes the kind of processing that is applied to the data in this step. It's 
@@ -169,7 +169,7 @@ def serialize_relation(sentence_id, sentence, relations, state="raw", infix="", 
     Serialize an extracted relation.
     
     :param sentence_id: ID of current sentence.
-    :type sentence_id: int
+    :type sentence_id: str
     :param sentence: Sentence.
     :type sentence: str
     :param relations: Extracted relations.
@@ -285,7 +285,7 @@ def serialize_article(article_id, article_url, article_title, sentences, state="
     Serialize a Wikipedia article.
     
     :param article_id: ID of current article.
-    :type article_id: int
+    :type article_id: str
     :param article_url: URL of current article.
     :type article_url: str
     :param article_title: Title of current article.
