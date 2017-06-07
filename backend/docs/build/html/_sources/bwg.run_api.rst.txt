@@ -42,8 +42,8 @@ which returns
 
    {"_items": [{"nodes": [{"uid": "42904ca7f582449eafb98c1e94cd8b0d", "category": "Person", "label": "Dreyfus", "data": {"wikidata_last_modified": "2015-12-31T03:11:20Z", "wikidata_id": "Q3039421", "label": "Dreyfus", "description": "pi\u00e8ce de th\u00e9\u00e2tre de Jean-Claude Grumberg", "type": "I-PER", "claims": {}}, "id": 0}, ...}
 
-To be more specific, you can query special kinds of entities like ``/people/``, ``/locations/``, ``/organizations/`` or
-``/misc/``.
+To be more specific, you can query special kinds of entities like ``/people/``, ``/locations/``, ``/organizations/``,
+``/companies/``, ``/parties/``, ``/affairs/``, ``/politicians/``, ``/businesspeople/``, ``/media/``, ``/misc/``.
 
 To make responses more readable for humans, use the ``?pretty`` query parameter:
 ::
