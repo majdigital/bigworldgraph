@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.wikidata &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.wikipedia_tasks" href="bwg.wikipedia_tasks.html" />
+    <link rel="prev" title="bwg.utilities" href="bwg.utilities.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.wikidata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">bwg.wikidata</a><ul>
+<li><a class="reference internal" href="#module-bwg.wikidata">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="bwg.utilities.html" title="Previous Chapter: bwg.utilities"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; bwg.utilities</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.wikipedia_tasks.html" title="Next Chapter: bwg.wikipedia_tasks"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.wikipedia_tasks &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.wikidata.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="bwg-wikidata">
+<h1>bwg.wikidata<a class="headerlink" href="#bwg-wikidata" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bwg.wikidata">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.wikidata" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>This module provides two different way to access Wikidata:</dt>
+<dd><ul class="first last simple">
+<li>Through the Wikimedia API with <code class="docutils literal"><span class="pre">Pywikibot</span></code> as a wrapper</li>
+<li>Over a scraper using <code class="docutils literal"><span class="pre">BeautifulSoup4</span></code></li>
+</ul>
+</dd>
+</dl>
+<p>Currently, accessing the data via the API is faster than the scraper.</p>
+<dl class="class">
+<dt id="bwg.wikidata.AbstractWikidataMixin">
+<em class="property">class </em><code class="descclassname">bwg.wikidata.</code><code class="descname">AbstractWikidataMixin</code><a class="headerlink" href="#bwg.wikidata.AbstractWikidataMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Define the functions inheriting subclasses should implement.</p>
+<dl class="method">
+<dt id="bwg.wikidata.AbstractWikidataMixin.get_entity">
+<code class="descname">get_entity</code><span class="sig-paren">(</span><em>wikidata_id</em>, <em>language</em>, <em>relevant_properties</em>, <em>properties_implying_relations</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.AbstractWikidataMixin.get_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Wikidata information about an entity based on its identifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wikidata_id</strong> (<em>str</em>) &#8211; Wikidata ID of desired entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+<li><strong>relevant_properties</strong> (<em>list</em>) &#8211; Types of claims that should be included.</li>
+<li><strong>properties_implying_relations</strong> &#8211; Set of property IDs for properties that are not mere characteristics, but</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>imply other relations that should later be shown in the graph.
+:type properties_implying_relations: list, set
+:return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
+:rtype: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.AbstractWikidataMixin.get_matches">
+<code class="descname">get_matches</code><span class="sig-paren">(</span><em>name</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.AbstractWikidataMixin.get_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get matches for an entity&#8217;s name on Wikidata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of matches.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.wikidata.RequestCache">
+<em class="property">class </em><code class="descclassname">bwg.wikidata.</code><code class="descname">RequestCache</code><a class="headerlink" href="#bwg.wikidata.RequestCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Special class used as a Cache, so that requests being made don&#8217;t have to be repeated if they occurred in the past.</p>
+<dl class="method">
+<dt id="bwg.wikidata.RequestCache.request">
+<code class="descname">request</code><span class="sig-paren">(</span><em>key</em>, <em>request_func</em>, <em>*request_args</em>, <em>**request_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.RequestCache.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a request, but make a lookup to the cache first to see if you may be able to avoid it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>str</em><em>, </em><em>int</em>) &#8211; Key that should be used to cache the request.</li>
+<li><strong>request_func</strong> (<em>func</em>) &#8211; Function to do the request.</li>
+<li><strong>request_args</strong> (<em>tuple</em>) &#8211; Arguments for request.</li>
+<li><strong>request_kwargs</strong> (<em>dict</em>) &#8211; Key word arguments for request.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.wikidata.WikidataAPIMixin">
+<em class="property">class </em><code class="descclassname">bwg.wikidata.</code><code class="descname">WikidataAPIMixin</code><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bwg.wikidata.AbstractWikidataMixin" title="bwg.wikidata.AbstractWikidataMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikidata.AbstractWikidataMixin</span></code></a></p>
+<p>Access Wikidata information via Wikimedia&#8217;s API.</p>
+<dl class="method">
+<dt id="bwg.wikidata.WikidataAPIMixin.get_entity">
+<code class="descname">get_entity</code><span class="sig-paren">(</span><em>wikidata_id</em>, <em>language</em>, <em>relevant_properties</em>, <em>properties_implying_relations</em>, <em>recursively=True</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.get_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Wikidata information about an entity based on its identifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wikidata_id</strong> (<em>str</em>) &#8211; Wikidata ID of desired entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+<li><strong>relevant_properties</strong> (<em>list</em>) &#8211; Types of claims that should be included.</li>
+<li><strong>properties_implying_relations</strong> &#8211; Dict of property IDs for properties that are not mere characteristics, but</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>imply other relations that should later be shown in the graph. The properties are the keys and the entity node
+class they&#8217;re implying are the values.
+:type properties_implying_relations: dict
+:param recursively: Request data for fof nodes recursively.
+:type recursively: bool
+:return: Wikidata entity as dictionary
+:rtype: dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.WikidataAPIMixin.get_entity_name">
+<code class="descname">get_entity_name</code><span class="sig-paren">(</span><em>entity_id</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.get_entity_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a wikidata entity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>entity_id</strong> (<em>str</em>) &#8211; Wikidata property ID.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Name of entity.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="bwg.wikidata.WikidataAPIMixin.get_image_url">
+<em class="property">static </em><code class="descname">get_image_url</code><span class="sig-paren">(</span><em>image_name</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.get_image_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Wikidata URL for a Wikidata image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>image_name</strong> (<em>str</em>) &#8211; Name of image as given by the API request.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Link to image.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.WikidataAPIMixin.get_matches">
+<code class="descname">get_matches</code><span class="sig-paren">(</span><em>name</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.get_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get matches for an entity&#8217;s name on Wikidata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of matches.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.WikidataAPIMixin.get_property_name">
+<code class="descname">get_property_name</code><span class="sig-paren">(</span><em>property_id</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.get_property_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of a wikidata property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>property_id</strong> (<em>str</em>) &#8211; Wikidata property ID.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Name of property.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataAPIMixin.match_cache">
+<code class="descname">match_cache</code><em class="property"> = &lt;bwg.wikidata.RequestCache object&gt;</em><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.match_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataAPIMixin.request_cache">
+<code class="descname">request_cache</code><em class="property"> = &lt;bwg.wikidata.RequestCache object&gt;</em><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.request_cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.WikidataAPIMixin.resolve_claims">
+<code class="descname">resolve_claims</code><span class="sig-paren">(</span><em>claims</em>, <em>language</em>, <em>relevant_properties</em>, <em>properties_implying_relations</em>, <em>recursively=True</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.resolve_claims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve the claims (~ claimed facts) about a wikidata entity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>claims</strong> (<em>dict</em>) &#8211; Dictionary with property ID as key and claim data as value.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+<li><strong>relevant_properties</strong> (<em>list</em>) &#8211; Types of claims that should be included.</li>
+<li><strong>properties_implying_relations</strong> &#8211; Set of property IDs for properties that are not mere characteristics, but</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>imply other relations that should later be shown in the graph.
+:type properties_implying_relations: list, set
+:param recursively: Request data for fof nodes recursively.
+:type recursively: bool
+:return: List of dates about every sense of the entity (un-ambiguous entities just will have one sense).
+:rtype: list</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataAPIMixin.wikidata_site">
+<code class="descname">wikidata_site</code><em class="property"> = DataSite(&quot;wikidata&quot;, &quot;wikidata&quot;)</em><a class="headerlink" href="#bwg.wikidata.WikidataAPIMixin.wikidata_site" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.wikidata.WikidataScraperMixin">
+<em class="property">class </em><code class="descclassname">bwg.wikidata.</code><code class="descname">WikidataScraperMixin</code><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bwg.wikidata.AbstractWikidataMixin" title="bwg.wikidata.AbstractWikidataMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikidata.AbstractWikidataMixin</span></code></a></p>
+<p>Access Wikidata information via a scraper.</p>
+<dl class="method">
+<dt id="bwg.wikidata.WikidataScraperMixin.get_entity">
+<code class="descname">get_entity</code><span class="sig-paren">(</span><em>wikidata_id</em>, <em>language</em>, <em>relevant_properties</em>, <em>properties_implying_relations</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.get_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Wikidata information about an entity based on its identifier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>wikidata_id</strong> (<em>str</em>) &#8211; Wikidata ID of desired entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+<li><strong>relevant_properties</strong> (<em>list</em>) &#8211; Types of claims that should be included.</li>
+<li><strong>properties_implying_relations</strong> &#8211; Set of property IDs for properties that are not mere characteristics, but</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>imply other relations that should later be shown in the graph.
+:type properties_implying_relations: list, set
+:return: List of dates about every sense of the entity (un-ambiguous entites just will have one sense).
+:rtype: list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bwg.wikidata.WikidataScraperMixin.get_matches">
+<code class="descname">get_matches</code><span class="sig-paren">(</span><em>name</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.get_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get matches for an entity&#8217;s name on Wikidata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; Name of entity.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Abbreviation of target language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of matches.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataScraperMixin.wikidata_base_url">
+<code class="descname">wikidata_base_url</code><em class="property"> = 'https://www.wikidata.org/wiki/'</em><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.wikidata_base_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataScraperMixin.wikidata_entity_url">
+<code class="descname">wikidata_entity_url</code><em class="property"> = 'https://www.wikidata.org/wiki/{entity_id}'</em><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.wikidata_entity_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataScraperMixin.wikidata_property_url">
+<code class="descname">wikidata_property_url</code><em class="property"> = 'https://www.wikidata.org/wiki/Property:{property_id}'</em><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.wikidata_property_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bwg.wikidata.WikidataScraperMixin.wikidata_search_url">
+<code class="descname">wikidata_search_url</code><em class="property"> = 'https://www.wikidata.org/w/index.php?search=&amp;search={name}&amp;language={language}'</em><a class="headerlink" href="#bwg.wikidata.WikidataScraperMixin.wikidata_search_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
