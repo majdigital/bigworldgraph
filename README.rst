@@ -1,3 +1,6 @@
+.. figure:: ./img/logo.png
+   :alt: 
+
 README
 ======
 
@@ -77,8 +80,11 @@ following:
 
 ::
 
-    sh ./run_pipeline.sh
+    cd ./pipeline/
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
 
+If you are on a Windows system, replace ``pwd`` inside the ``-v`` flag
+with the **absolute** path to the ``stanford/models`` directory.
 Afterwards, you can make requests to the API using port ``6050`` by
 default (see the documentation for ``bwg/run_api.py`` for more
 information).
@@ -200,13 +206,3 @@ pipeline, using the pre-defined task names in your pipeline file:
             [MyNewTask(task_config=task_config)],
             local_scheduler=True, workers=1, log_level="INFO"
         )
-
-Graph visualization
-^^^^^^^^^^^^^^^^^^^
-
-TODO: How to install and use
-
-Server deployment
-^^^^^^^^^^^^^^^^^
-
-TODO: How to

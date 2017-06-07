@@ -16,6 +16,16 @@ people = {
     "resource_methods": ["GET"],
     "item_methods": ["GET"]
 }
+parties = {
+    "item_title": "party",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
+companies = {
+    "item_title": "company",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
 locations = {
     "item_title": "location",
     "resource_methods": ["GET"],
@@ -23,6 +33,26 @@ locations = {
 }
 organizations = {
     "item_title": "organization",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
+affairs = {
+    "item_title": "affair",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
+politicians = {
+    "item_title": "politician",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
+businesspeople = {
+    "item_title": "businessperson",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
+media = {
+    "item_title": "media",
     "resource_methods": ["GET"],
     "item_methods": ["GET"]
 }
@@ -42,13 +72,19 @@ DOMAIN = {
     "locations": locations,
     "organizations": organizations,
     "dates": dates,
-    "misc": misc
+    "misc": misc,
+    "parties": parties,
+    "affairs": affairs,
+    "politicians": politicians,
+    "businesspeople": businesspeople,
+    "media": media,
+    "companies": companies
 }
 
 # RELATION_BASE_CLASSES = ()
 NODE_BASE_CLASSES = ("Entity", )
 RELATION_TYPES = {"relations"}
-NODE_TYPES = {"people", "locations", "organizations", "dates", "misc"}
+NODE_TYPES = DOMAIN.keys()
 NEO4J_USER = 'neo4j'
 NEO4J_PASSWORD = 'neo4jj'
 NEO4J_PORT = 7687
