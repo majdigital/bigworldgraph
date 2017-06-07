@@ -54,6 +54,7 @@ The building of the docker images in this project might take a while, especially
 project. After all containers are running, you can run the pipeline by executing the following:
 
     cd ./pipeline/
+    docker build . -t pipeline
     docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
     
 If you are on a Windows system, replace `pwd` inside the `-v` flag with the **absolute** path to the `stanford/models` 
