@@ -2,7 +2,7 @@
 ./vscode/*
 .idea/*
 __pycache__/*
-backend/data/stanford/*
+pipeline/stanford/*
 backend/data/pipeline_*/*
 backend/data/*
 python_sudo.sh

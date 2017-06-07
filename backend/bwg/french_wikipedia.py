@@ -302,7 +302,6 @@ class FrenchServerRelationMergingTask(RelationMergingTask):
     """
     A luigi Task that merges extracted relations from other tasks, but it's specifically for the french Wikipedia.
     """
-
     def requires(self):
         return FrenchServerParticipationExtractionTask(task_config=self.task_config), \
                FrenchServerNaiveOpenRelationExtractionTask(task_config=self.task_config)
