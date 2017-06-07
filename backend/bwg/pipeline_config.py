@@ -81,6 +81,7 @@ CONFIG_DEPENDENCIES = {
     "relations_database_writing_task": [
         "NEO4J_USER",
         "NEO4J_PASSWORD",
+        "NEO4J_HOST",
         "{language}_DATABASE_CATEGORIES"  # Categories of nodes in the database with their level of detail as int
     ]
 }
@@ -105,6 +106,7 @@ ONLY_INCLUDE_RELEVANT_ARTICLES = True
 # ------------------------------ Database configurations --------------------------------
 
 # Neo4j
+NEO4J_HOST = "localhost"
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "neo4jj"
 
