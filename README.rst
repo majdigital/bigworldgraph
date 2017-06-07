@@ -77,8 +77,11 @@ following:
 
 ::
 
-    sh ./run_pipeline.sh
+    cd ./pipeline/
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
 
+If you are on a Windows system, replace ``pwd`` inside the ``-v`` flag
+with the **absolute** path to the ``stanford/models`` directory.
 Afterwards, you can make requests to the API using port ``6050`` by
 default (see the documentation for ``bwg/run_api.py`` for more
 information).

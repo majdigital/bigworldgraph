@@ -147,13 +147,3 @@ pre-defined task names in your pipeline file:
             [MyNewTask(task_config=task_config)],
             local_scheduler=True, workers=1, log_level="INFO"
         )
-
-#### Graph visualization
-
-TODO: How to install and use
-
-#### Server deployment
-
-TODO: How to
-
-

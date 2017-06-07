@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Main project contents &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="main-project-contents">
+<h1>Main project contents<a class="headerlink" href="#main-project-contents" title="Permalink to this headline">¶</a></h1>
+<p>The project contains the following modules:</p>
+<ul class="simple">
+<li><cite>bwg.additional_tasks</cite>: Tasks that can be helpful to include in the pipeline, but are not obligatory.</li>
+<li><cite>bwg.config_management</cite>: Functions used to create the configuration for the pipeline.</li>
+<li><cite>bwg.corenlp_server_tasks</cite>: NLP pipeline tasks that use the <cite>Stanford CoreNLP Server`</cite>.</li>
+<li><cite>bwg.french_wikipedia</cite>: Example pipeline tasks to specifically process the french wikipedia.</li>
+<li><cite>bwg.helpers</cite>: Helper functions used throughout the project.</li>
+<li><cite>bwg.mixins</cite>: Mixin classes used in the projects.</li>
+<li><cite>neo4j_extensions</cite>: Extensions to the <code class="docutils literal"><span class="pre">Neo4j</span></code> database, to make it compatible to <code class="docutils literal"><span class="pre">Luigi</span></code> and <code class="docutils literal"><span class="pre">Eve</span></code>.</li>
+<li><cite>bwg.standard_tasks</cite>: Standard tasks often uses in pipelines.</li>
+<li><cite>bwg.utilities</cite>: Mostly serializing functions used in pipeline tasks.</li>
+<li><cite>bwg.wikidata</cite>: Wrappers for Wikidata, using <code class="docutils literal"><span class="pre">pywikibot</span></code>.</li>
+<li><cite>bwg.wikipedia_tasks</cite>: Tasks involving the Wikidata or processing a Wikipedia corpus.</li>
+<li><cite>bwg.run_api</cite>: Module used to run the API.</li>
+<li><cite>bwg.demo_pipeline.py</cite>: Simple example pipeline to process a minimal corpus.</li>
+</ul>
+<div class="section" id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.additional_tasks.html#module-bwg.additional_tasks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#module-bwg.config_management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#module-bwg.corenlp_server_tasks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#module-bwg.demo_pipeline">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#backstory">Backstory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#module-bwg.french_wikipedia">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.helpers.html#module-bwg.helpers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.mixins.html#module-bwg.mixins">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#motivation">Motivation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#module-bwg.neo4j_extensions">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#module-bwg.run_api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#module-bwg.standard_tasks">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.utilities.html#module-bwg.utilities">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.wikidata.html#module-bwg.wikidata">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.wikipedia_tasks.html#module-bwg.wikipedia_tasks">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Main project contents</a><ul>
+<li><a class="reference internal" href="#modules">Modules</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bwg.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Malabalistalicious Unipessoal Lda..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/bwg.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

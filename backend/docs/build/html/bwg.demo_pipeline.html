@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.demo_pipeline &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.french_wikipedia" href="bwg.french_wikipedia.html" />
+    <link rel="prev" title="bwg.corenlp_server_tasks" href="bwg.corenlp_server_tasks.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bwg-demo-pipeline">
+<h1>bwg.demo_pipeline<a class="headerlink" href="#bwg-demo-pipeline" title="Permalink to this headline">¶</a></h1>
+<p>This module illustrates how pipelines in the context of this project are used. For this purpose, the pipeline in this
+module comprises three very simple tasks:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">DemoTask1</span></code> simply replaces characters defined in <code class="docutils literal"><span class="pre">demo_pipeline_config.py</span></code> with &#8220;x&#8221;.</li>
+<li><code class="docutils literal"><span class="pre">DemoTask2</span></code> duplicates characters defined in <code class="docutils literal"><span class="pre">demo_pipeline_config.py</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">DemoTask3</span></code> removes characters defined in <code class="docutils literal"><span class="pre">demo_pipeline_config.py</span></code>.</li>
+</ul>
+<p>Therefore, the original corpus, that should look like this (see <code class="docutils literal"><span class="pre">data/corpora_demo/demo_corpus.xml</span></code>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">doc</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;12345&quot;</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://github.com/majdigital/bigworldgraph&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Demo corpus&quot;</span><span class="o">&gt;</span>
+<span class="n">Lorem</span> <span class="n">ipsum</span> <span class="n">dolor</span> <span class="n">sit</span> <span class="n">amet</span><span class="p">,</span> <span class="n">consectetur</span> <span class="n">adipiscing</span> <span class="n">elit</span><span class="p">,</span> <span class="n">sed</span> <span class="n">do</span> <span class="n">eiusmod</span> <span class="n">tempor</span> <span class="n">incididunt</span> <span class="n">ut</span> <span class="n">labore</span> <span class="n">et</span> <span class="n">dolore</span> <span class="n">magna</span> <span class="n">aliqua</span><span class="o">.</span>
+<span class="n">Ut</span> <span class="n">enim</span> <span class="n">ad</span> <span class="n">minim</span> <span class="n">veniam</span><span class="p">,</span> <span class="n">quis</span> <span class="n">nostrud</span> <span class="n">exercitation</span> <span class="n">ullamco</span> <span class="n">laboris</span> <span class="n">nisi</span> <span class="n">ut</span> <span class="n">aliquip</span> <span class="n">ex</span> <span class="n">ea</span> <span class="n">commodo</span> <span class="n">consequat</span><span class="o">.</span>
+<span class="n">Duis</span> <span class="n">aute</span> <span class="n">irure</span> <span class="n">dolor</span> <span class="ow">in</span> <span class="n">reprehenderit</span> <span class="ow">in</span> <span class="n">voluptate</span> <span class="n">velit</span> <span class="n">esse</span> <span class="n">cillum</span> <span class="n">dolore</span> <span class="n">eu</span> <span class="n">fugiat</span> <span class="n">nulla</span> <span class="n">pariatur</span><span class="o">.</span>
+<span class="n">Excepteur</span> <span class="n">sint</span> <span class="n">occaecat</span> <span class="n">cupidatat</span> <span class="n">non</span> <span class="n">proident</span><span class="p">,</span> <span class="n">sunt</span> <span class="ow">in</span> <span class="n">culpa</span> <span class="n">qui</span> <span class="n">officia</span> <span class="n">deserunt</span> <span class="n">mollit</span> <span class="n">anim</span> <span class="nb">id</span> <span class="n">est</span> <span class="n">laborum</span><span class="o">.</span>
+
+<span class="o">&lt;/</span><span class="n">doc</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Should result in <code class="docutils literal"><span class="pre">data/pipeline_demo/demo_corpus_removed.json</span></code> looking like this</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/majdigital/bigworldgraph&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Demo corpus&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;article&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;removed&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;12345/00001&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345/00001&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;removed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;Looex isux doooo sit xxet, coonnsectetu xdiiscinng eit, sed doo eiusxood texoo inncididunnt ut xbbooe et dooooe xxgnnx xiqux.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;12345/00002&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345/00002&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;removed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;Ut ennix xd xinnix vennixx, quis nnoostud execitxtioonn uxxcoo xbboois nnisi ut xiqui ex ex cooxxoodoo coonnsequxt.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;12345/00003&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345/00003&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;removed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;Duis xute iue doooo inn eehenndeit inn vooutxte veit esse ciux dooooe eu fugixt nnux xixtu.&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;12345/00004&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345/00004&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;removed&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;Exceteu sinnt ooccxecxt cuidxtxt nnoonn ooidennt, sunnt inn cux qui oofficix deseunnt xooit xnnix id est xbbooux.&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The pipeline is simply run by running the module:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">bwg</span><span class="o">/</span><span class="n">demo_pipeline</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="section" id="adjusting-your-pipeline-configuration">
+<h2>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h2>
+<p>If you add a new kind of task to the pipeline, make sure to include a
+description of its necessary parameters in your pipeline configuration
+file. You can use <code class="docutils literal"><span class="pre">bwg/raw_pipeline_config.py</span></code> as a template, which
+provides a minimal example.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CONFIG_DEPENDENCIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="c1"># Your task</span>
+    <span class="s2">&quot;my_new_task&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="s2">&quot;</span><span class="si">{language}</span><span class="s2">_SPECIFIC_PARAMETER&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;LANGUAGE_INDEPENDENT_PARAMETER&quot;</span>
+    <span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then you have to include those declared parameters somewhere in your
+config file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My config parameters</span>
+<span class="n">ENGLISH_SPECIFIC_PARAMETER</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">LANGUAGE_INDPENENDENT_PARAMETER</span> <span class="o">=</span> <span class="s2">&quot;yada yada&quot;</span>
+</pre></div>
+</div>
+<p>If you implement tasks that extend the pipeline to support other
+language, please add it to the following list:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SUPPORTED_LANGUAGES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FRENCH&quot;</span><span class="p">,</span> <span class="s2">&quot;ENGLISH&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Finally, create a module for your own pipeline (e.g.
+<code class="docutils literal"><span class="pre">bwg/my_pipeline.py</span></code>) and build the configuration before running the
+pipeline, using the pre-defined task names in your pipeline file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">luigi</span>
+<span class="kn">from</span> <span class="nn">bwg.nlp.config_management</span> <span class="k">import</span> <span class="n">build_task_config_for_language</span>
+
+<span class="k">class</span> <span class="nc">MyNewTask</span><span class="p">(</span><span class="n">luigi</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">requires</span><span class="p">():</span>
+        <span class="c1"># Define task input here</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">():</span>
+        <span class="c1"># Define task output here</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="c1"># Define what to do during the task here</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">task_config</span> <span class="o">=</span> <span class="n">build_task_config_for_language</span><span class="p">(</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;my_new_task&quot;</span>
+        <span class="p">],</span>
+        <span class="n">language</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">,</span>
+        <span class="n">config_file_path</span><span class="o">=</span><span class="s2">&quot;path/to/pipeline_config.py&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># MyNewTask is the last task of the pipeline</span>
+    <span class="n">luigi</span><span class="o">.</span><span class="n">build</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">MyNewTask</span><span class="p">(</span><span class="n">task_config</span><span class="o">=</span><span class="n">task_config</span><span class="p">)],</span>
+        <span class="n">local_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-bwg.demo_pipeline">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.demo_pipeline" title="Permalink to this headline">¶</a></h2>
+<p>Demo pipeline to demonstrate configuration management and the way <code class="docutils literal"><span class="pre">Luigi</span></code> pipelines are used in this project.</p>
+<dl class="class">
+<dt id="bwg.demo_pipeline.DemoTask1">
+<em class="property">class </em><code class="descclassname">bwg.demo_pipeline.</code><code class="descname">DemoTask1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.demo_pipeline.DemoTask1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Tasks that reads in the demo corpus and replaces pre-defined characters with an x.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.demo_pipeline.DemoTask2">
+<em class="property">class </em><code class="descclassname">bwg.demo_pipeline.</code><code class="descname">DemoTask2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.demo_pipeline.DemoTask2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Task that duplicates pre-defined characters.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.demo_pipeline.DemoTask3">
+<em class="property">class </em><code class="descclassname">bwg.demo_pipeline.</code><code class="descname">DemoTask3</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.demo_pipeline.DemoTask3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Task that removes pre-defined characters.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bwg.demo_pipeline</a><ul>
+<li><a class="reference internal" href="#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
+<li><a class="reference internal" href="#module-bwg.demo_pipeline">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="bwg.corenlp_server_tasks.html" title="previous chapter">bwg.corenlp_server_tasks</a></li>
+      <li>Next: <a href="bwg.french_wikipedia.html" title="next chapter">bwg.french_wikipedia</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bwg.demo_pipeline.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Malabalistalicious Unipessoal Lda..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/bwg.demo_pipeline.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

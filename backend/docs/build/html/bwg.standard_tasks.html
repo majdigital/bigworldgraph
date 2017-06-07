@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.standard_tasks &#8212; BigWorldGraph 0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.utilities" href="bwg.utilities.html" />
+    <link rel="prev" title="bwg.run_api" href="bwg.run_api.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bwg-standard-tasks">
+<h1>bwg.standard_tasks<a class="headerlink" href="#bwg-standard-tasks" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bwg.standard_tasks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.standard_tasks" title="Permalink to this headline">¶</a></h2>
+<p>Defining standard tasks for the NLP pipeline.</p>
+<dl class="class">
+<dt id="bwg.standard_tasks.DependencyParseTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">DependencyParseTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.DependencyParseTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Luigi task that dependency-parses sentences in a corpus.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.standard_tasks.NERTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">NERTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.NERTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Luigi task that performs Named Entity Recognition on a corpus.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.standard_tasks.NaiveOpenRelationExtractionTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">NaiveOpenRelationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.NaiveOpenRelationExtractionTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Luigi task that performs Open Relation extraction on a corpus.</p>
+<dl class="method">
+<dt id="bwg.standard_tasks.NaiveOpenRelationExtractionTask.extract_relations">
+<code class="descname">extract_relations</code><span class="sig-paren">(</span><em>ne_tagged_line</em>, <em>dependency_tree</em>, <em>pos_tagged_line</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.NaiveOpenRelationExtractionTask.extract_relations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract relations involving Named Entities from a sentence, using a dependency graph and named entity tags.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ne_tagged_line</strong> (<em>list</em>) &#8211; Current NE tagged sentence.</li>
+<li><strong>dependency_tree</strong> (<em>dict</em>) &#8211; Dependency parse tree.</li>
+<li><strong>pos_tagged_line</strong> (<em>list</em>) &#8211; Same sentence as dependency parse tree but with PoS tags.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of extracted relations.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.standard_tasks.ParticipationExtractionTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">ParticipationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.ParticipationExtractionTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Luigi task that extracts all Named Entity participating in an issue or topic.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.standard_tasks.PoSTaggingTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">PoSTaggingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.PoSTaggingTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a></p>
+<p>Luigi task that PoS tags a sentence in a corpus.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.standard_tasks.SimpleReadingTask">
+<em class="property">class </em><code class="descclassname">bwg.standard_tasks.</code><code class="descname">SimpleReadingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.standard_tasks.SimpleReadingTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
+<p>A luigi task that reads an extracted Wikipedia corpus (see README).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bwg.standard_tasks</a><ul>
+<li><a class="reference internal" href="#module-bwg.standard_tasks">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="bwg.run_api.html" title="previous chapter">bwg.run_api</a></li>
+      <li>Next: <a href="bwg.utilities.html" title="next chapter">bwg.utilities</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/bwg.standard_tasks.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Malabalistalicious Unipessoal Lda..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/bwg.standard_tasks.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
