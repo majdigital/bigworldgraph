@@ -150,7 +150,7 @@ class Neo4jResult:
         """
         return {
             key: value
-            for key, value in vars(dictionary).items()
+            for key, value in (dictionary.items() if type(dictionary) == dict else vars(dictionary).items())
             if self.is_json_serializable(value) and not key.startswith("_")
         }
 

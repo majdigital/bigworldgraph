@@ -5,6 +5,7 @@ Test support for the Neo4j graph database.
 
 # STD
 import unittest
+import unittest.mock as mock
 
 # EXT
 import neomodel
@@ -91,8 +92,74 @@ class Neo4jResultTestCase(unittest.TestCase):
     """
     Testing the Neo4jResult class.
     """
-    # TODO (Implement) [DU 07.06.17]
-    pass
+    test_result = None
+
+    def setUp(self):
+        class RelationList(list):
+            def __init__(self, *args, uid=None, relationships={}):
+                self.uid = uid
+                self.relationships = relationships
+                super().__init__(*args)
+
+            def relationship(self, other_node):
+                return self.relationships[(self.uid, other_node.uid)]
+
+        relationships = {
+            ("1", "2"): {
+                "label": "relation12",
+                "data": {},
+                "source": Entity(uid="1"),
+                "target": Entity(uid="2")
+            },
+            ("1", "3"): {
+                "label": "relation13",
+                "data": {},
+                "source": Entity(uid="1"),
+                "target": Entity(uid="3")
+            },
+            ("3", "2"): {
+                "label": "relation32",
+                "data": {},
+                "source": Entity(uid="3"),
+                "target": Entity(uid="2")
+            }
+        }
+
+        node1 = Entity(uid="1", relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships))
+        node2 = Entity(uid="2", relations=RelationList(uid="2", relationships=relationships))
+        node3 = Entity(uid="3", relations=RelationList((Entity(uid="2"), ), uid="3", relationships=relationships))
+        node4 = Entity(uid="4", relations=RelationList(uid="4", relationships=relationships))
+
+        test_nodes = [node1, node2, node3, node4]
+        self.test_result = Neo4jResult(test_nodes)
+
+    def test_neo4j_result_init(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_neo4j_magic_methods(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_count(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_clean_node(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_clean_unverserializables(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_is_json_serializable(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
+
+    def test_apply_request_parameters(self):
+        # TODO (Implement) [DU 07.06.17]
+        pass
 
 
 class Neo4jDatabaseTestCase(unittest.TestCase):
