@@ -13,6 +13,34 @@ html{
     width: 100%;
     height: 100%;
 }
+.affair{
+    color:$affair;
+    background-color: $affair;
+}
+.politician{
+    color:$politician;
+    background-color: $politician;
+}
+.party{
+    color:$party;
+    background-color: $party;
+}
+.company{
+    color:$company;
+    background-color: $company;
+}
+.organization{
+    color:$organization;
+    background-color: $organization;
+}
+.media{
+    color:$media;
+    background-color: $media;
+}
+.person{
+    color:$person;
+    background-color: $person;
+}
 @keyframes logo{
   0%{
     transform:scale(0);
@@ -385,5 +413,259 @@ text{
         font-size: 40px;
         color: #FFF;
 
+    }
+}
+#contentLayer{
+    position: fixed;
+    height: 100%;
+    width:500px;
+    top: 0;
+    right: 0;
+    background-color:#fff;
+    transform: matrix(1,0,0,1,500,0);
+    transition:all 0.7s;
+    transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+
+    &.on{
+        .pull{
+            transform: matrix(1,0,0,1,-40,0);
+            transition:transform 0.4s;
+            transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+        }
+        &.open{
+            transform: matrix(1,0,0,1,0,0);
+            .pull{
+                transform: matrix(1,0,0,1,0,0);
+                transition:transform 0.4s;
+                transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+                .triangle{
+                    border-color: transparent #ffffff transparent transparent;
+                    border-width:30px 0px 30px 0;
+                }
+                .info{
+                    transform: translate(0%,-50%);
+                    svg {
+                        *{
+                            fill:#000000;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .pull{
+        width: 40px;
+        height: 60px;
+        position: absolute;
+        right: 460px;
+        top: 20px;
+        cursor:pointer;
+        transform: matrix(1,0,0,1,0,0);
+        transition:transform 0.4s;
+        transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+        .triangle{
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width:30px 40px 30px 0;
+            border-color: transparent #373737 transparent transparent;
+            transition:border 0.4s;
+            transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+            cursor: pointer;
+        }
+        .info{
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: 50%;
+            left: calc(50% + 8px);
+            transform: translate(-50%,-50%);
+            transition:transform 0.4s;
+            transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+            svg{
+                display: block;
+                width: 20px;
+                height: auto;
+                *{
+                    fill:#ffffff;
+                    transition: all 0.3s;
+                }
+            }
+        }
+    }
+    .closeBtn{
+        position: absolute;
+        top: 40px;
+        right: 20px;
+        width:22px;
+        height: 15px;
+        cursor: pointer;
+        .bar{
+            width:100%;
+            height: 3px;
+            margin-bottom:1px;
+            transform-origin: 50%;
+            background-color: $black;
+            &.top{
+                transform: rotate(43deg) matrix(1,0,0,1,2,4);
+            }
+            &.medium{
+                opacity:0;
+            }
+            &.bottom{
+                transform: rotate(-43deg) matrix(1,0,0,1,2,-4);
+            }
+        }
+    }
+    .inner{
+        box-sizing: border-box;
+        position: absolute;
+        padding:40px;
+        width: 100%;
+        height: 100%;
+    }
+    .scrollable{
+        position: absolute;
+        width: calc(100% - 80px);
+        height: calc(100% - 80px);
+        overflow: hidden;
+    }
+    .content{
+        .image{
+            width:100px;
+            height: 100px;
+            border-radius: 50px;
+            overflow:hidden;
+            position: relative;
+            img{
+                display: block;
+                width:100%;
+            }
+        }
+        h2{
+            font-family:Arial,sans-serif;
+            font-size: 20px;
+        }
+        h1{
+            font-family:Arial,sans-serif;
+            font-size: 30px;
+        }
+    }
+}
+#infoInterface{
+    position: fixed;
+    width: 100%;
+    height: 200px;
+    bottom:0;
+    left: 0;
+    background-color: #191919;
+    transform: matrix(1,0,0,1,0,240);
+
+    &.on{
+        transition:transform 0.4s;
+        transform: matrix(1,0,0,1,0,200);
+        transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+        &.open{
+            transform: matrix(1,0,0,1,0,0);
+            transition: transform 0.5s;
+            transition-timing-function: cubic-bezier(0.190, 1.000, 0.220, 1.000);
+        }
+        &.close{
+            transform: matrix(1,0,0,1,0,200);
+            transition: transform 0.5s;
+            transition-timing-function: cubic-bezier(0.950, 0.050, 0.795, 0.035);
+        }
+    }
+    .pullup{
+        width:60px;
+        height: 40px;
+        position: absolute;
+        left: 50%;
+        top: -40px;
+        transform: translate(-50%,0);
+        cursor:pointer;
+        .triangle{
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 30px 40px 30px;
+            border-color: transparent transparent #191919 transparent;
+            cursor: pointer;
+        }
+        .info{
+            width:20px;
+            height: 20px;
+            position: absolute;
+            top: calc(50% + 8px);
+            left: 50%;
+            transform: translate(-50%,-50%);
+            svg{
+                display: block;
+                width: 100%;
+                height: auto;
+                *{
+                    fill:#ffffff;
+                }
+            }
+        }
+    }
+    .inner{
+        padding:40px;
+
+    }
+    .categories-container{
+        width: 40%;
+
+    }
+    .categories{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        flex-flow: row wrap;
+        .category{
+            flex-grow: 1;
+            min-width: 100px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            .marker{
+                width:20px;
+                height: 20px;
+                border-radius:10px;
+                display: inline-block;
+                vertical-align: middle;
+                margin-right: 20px;
+            }
+            span{
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                color: #ffffff;
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
+    }
+    .resetBtn{
+        cursor:pointer;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        span{
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        svg{
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+            *{
+                fill:#ffffff;
+            }
+        }
     }
 }

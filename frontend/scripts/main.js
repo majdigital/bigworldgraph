@@ -9,8 +9,8 @@ export default class BigWorldGraph {
 
     constructor(){
         this.url = "http://localhost";
-        this.port = "8080";
-        this.service = "tempdata/relations.json";
+        this.port = "6050";
+        this.service = "entities";
         this.graph = void 0;
         dataloader.LoadData(this.url+':'+this.port+'/'+this.service);
         loader.addListener(Loader.STATES.PREBUILDING_GRAPH, this.onChange.bind(this));

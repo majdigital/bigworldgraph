@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo Downloading stanford model files if necessary...
+echo Downloading stanford models files as necessary...
 if [ ! -f ./stanford_models/UD_French.gz ]; then wget majconsulting.ch/newsletters/stanford_models_french_100417.zip -P ./stanford_models/; fi
 if [ -f ./stanford_models/stanford_models_french_100417.zip ]; then unzip ./stanford_models/stanford_models_french_100417.zip -d ./stanford_models/ && rm ./stanford_models/stanford_models_french_100417.zip; fi
 

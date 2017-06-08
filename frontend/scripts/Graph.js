@@ -2,6 +2,9 @@
 import Viva from "./vendor/vivagraphjs";
 import {loader} from './Loader';
 import Loader from './loader';
+import {contentlayer} from './ContentLayer';
+import {settingslayer} from './SettingsLayer';
+
 export default class Graph {
     constructor(graphData) {
         this.data = graphData;
@@ -10,6 +13,7 @@ export default class Graph {
         this.renderer = void 0;
         this.graphics = void 0;
         this.links = this.data._items[0].links;
+        this.contentLayer = $('#contentLayer');
         this.colors = [
             {"Affair":"#bb1b66"},
             {"Politician":"#9565f1"},
@@ -22,6 +26,10 @@ export default class Graph {
         this.categories = ["Affair","Politician","Party","Company","Organization","Media","Person"]
 
         this.generateGraph();
+        settingslayer.Populate(this.categories);
+
+        settingslayer.addListener('reset',this.ResetNodes.bind(this));
+        settingslayer.addListener('filter',this.FilterNodes.bind(this));
         loader.addListener(Loader.STATES.DONE, this.renderGraph.bind(this));
     }
 
@@ -176,21 +184,95 @@ export default class Graph {
         let nodeUi = _this.graphics.getNodeUI(nodeId);
         nodeUi.attr('fill',_this.getNodeColor(_this.graph.getNode(nodeId)));
         $(nodeUi).addClass('active');
+        _this.ShowContent(node.data);
+        _this.renderer.resume();
+
+        setTimeout(function(){
+            _this.renderer.pause();
+        },2000);
+
+    };
+
+    ShowContent(data){
+        var _data = data;
+        var _this = this;
+        contentlayer.currentData = _data;
+        contentlayer.element.addClass('on');
+
+    };
+
+    FilterNodes(data){
+        var _this = this;
+        var newCat = data.cat;
+
+        var toKeep = _this.getCategoryNodes(newCat);
+
+        this.graph.forEachNode(function(node){
+            let nodeUi = _this.graphics.getNodeUI(node.id);
+            nodeUi.attr('fill','#000000');
+            $(nodeUi).removeClass('hide active').addClass('hide');
+        });
+        toKeep.map((item, index) => {
+            let nodeUi = _this.graphics.getNodeUI(item.id);
+            $(nodeUi).removeClass('hide').addClass('show');
+        });
+
+        this.graph.forEachLink(function(link){
+            let linkUi = _this.graphics.getLinkUI(link.id);
+            $(linkUi).addClass('hide');
+        });
 
         _this.renderer.resume();
 
         setTimeout(function(){
             _this.renderer.pause();
-        },2000)
+        },2000);
 
     }
+
+    ResetNodes(){
+        var _this = this;
+        this.graph.forEachNode(function(node){
+            let nodeUi = _this.graphics.getNodeUI(node.id);
+            nodeUi.attr('fill','#000000');
+            $(nodeUi).removeClass('hide active');
+        });
+        this.graph.forEachLink(function(link){
+            let linkUi = _this.graphics.getLinkUI(link.id);
+            $(linkUi).removeClass('hide');
+        });
+        settingslayer.Close();
+        _this.renderer.moveTo(0,0);
+        _this.renderer.resume();
+
+        contentlayer.element.removeClass('on open');
+        contentlayer.state = false;
+
+        setTimeout(function(){
+            _this.renderer.pause();
+        },5000);
+    };
 
     getLinkedNodes(nodeId){
         var nodes = [];
         var _this = this;
         this.graph.forEachLinkedNode(nodeId,function(node,link){
-
             nodes.push(node);
+        });
+        return nodes;
+    }
+
+    getCategoryNodes(cat){
+        var nodes = [];
+        var _this = this;
+        var _cat = cat;
+
+        this.graph.forEachNode(function(node, link){
+            //console.log(node.data.category);
+
+            if(node.data.category == _cat){
+                nodes.push(node);
+            }
         });
         return nodes;
     }

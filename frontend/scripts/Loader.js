@@ -1,4 +1,5 @@
 'use strict';
+import {settingslayer} from './SettingsLayer';
 const STATES = {
     FETCHING_DATA : 'fetching',
     PREBUILDING_GRAPH : 'prebuilding',
@@ -72,6 +73,7 @@ export default class Loader {
     hide(){
         DOMElement.addClass('done');
         $('.logo').addClass('loaded');
+        settingslayer.On();
     }
 }
 

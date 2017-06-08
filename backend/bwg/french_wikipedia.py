@@ -61,7 +61,7 @@ class FrenchPipelineRunInfoGenerationTask(PipelineRunInfoGenerationTask):
 
 class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     """
-    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
+    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database,
     but it's specifically for the french Wikipedia.
     """
     MEDIA_TYPES = [
@@ -335,6 +335,7 @@ if __name__ == "__main__":
         language="french",
         config_file_path="./pipeline_config.py"
     )
+    print("Created config")
     luigi.build(
         [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
