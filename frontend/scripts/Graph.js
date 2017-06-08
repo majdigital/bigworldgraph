@@ -194,6 +194,7 @@ export default class Graph {
     };
 
     ShowContent(data){
+        console.log(data);
         var _data = data;
         var _this = this;
         contentlayer.currentData = _data;

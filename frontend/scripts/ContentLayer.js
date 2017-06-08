@@ -13,6 +13,7 @@ export default class ContentLayer {
         this.element = $('#contentLayer');
         this.contentContainer = this.element.find('.scrollpane');
         this.currentData = void 0;
+        this.previousData = void 0;
 
         this.openBtn = this.element.find('.pull');
         this.closeBtn = this.element.find('.closeBtn');
@@ -26,11 +27,19 @@ export default class ContentLayer {
 
     Open(data) {
         this.state = true;
-        this.element.addClass('open');
         var _this = this;
-        if(data.category == 'Politician'){
-            this.ShowPolitician(data);
+        setTimeout(function(){
+            _this.element.addClass('open');
+        },100);
+
+
+        if(_this.currentData != _this.previousData){
+            if(data.category == 'Politician'){
+                this.ShowPolitician(data);
+            }
+            _this.previousData = _this.currentData;
         }
+
 
         setTimeout(function(){
             _this.scroll.refresh();
@@ -40,6 +49,7 @@ export default class ContentLayer {
 
     ShowPolitician(data){
         if(!data.all.ambiguous){
+            this.contentContainer.empty();
             this.contentContainer.append('<div class="content"><h2 class="'+data.category.toLowerCase()+'">'+data.category+'</h2><h1>'+data.label+'</h1><div class="image"><img src="'+data.all.senses[0].claims.image.target+'" alt="" /></div></div>');
         }
     }
