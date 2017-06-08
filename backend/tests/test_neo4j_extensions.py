@@ -106,18 +106,21 @@ class Neo4jResultTestCase(unittest.TestCase):
 
         relationships = {
             ("1", "2"): {
+                "id": "R1",
                 "label": "relation12",
                 "data": {},
                 "source": Entity(uid="1"),
                 "target": Entity(uid="2")
             },
             ("1", "3"): {
+                "id": "R2",
                 "label": "relation13",
                 "data": {},
                 "source": Entity(uid="1"),
                 "target": Entity(uid="3")
             },
             ("3", "2"): {
+                "id": "R3",
                 "label": "relation32",
                 "data": {},
                 "source": Entity(uid="3"),
@@ -125,10 +128,26 @@ class Neo4jResultTestCase(unittest.TestCase):
             }
         }
 
-        node1 = Entity(uid="1", relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships))
-        node2 = Entity(uid="2", relations=RelationList(uid="2", relationships=relationships))
-        node3 = Entity(uid="3", relations=RelationList((Entity(uid="2"), ), uid="3", relationships=relationships))
-        node4 = Entity(uid="4", relations=RelationList(uid="4", relationships=relationships))
+        node1 = Entity(
+            uid="1",
+            data={},
+            relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships)
+        )
+        node2 = Entity(
+            uid="2",
+            data={},
+            relations=RelationList(uid="2", relationships=relationships)
+        )
+        node3 = Entity(
+            uid="3",
+            data={},
+            relations=RelationList((Entity(uid="2"), ), uid="3", relationships=relationships)
+        )
+        node4 = Entity(
+            uid="4",
+            data={},
+            relations=RelationList(uid="4", relationships=relationships)
+        )
 
         test_nodes = [node1, node2, node3, node4]
         self.test_result = Neo4jResult(test_nodes)
