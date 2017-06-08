@@ -34,6 +34,7 @@ class Relation(neomodel.StructuredRel, EveCompatibilityMixin):
     """
     label = neomodel.StringProperty()   # Text that should be displayed about this edge
     data = neomodel.JSONProperty()  # Dictionary with more detailed data about this relation
+    weight = neomodel.IntegerProperty(default=1)
 
 
 class Entity(neomodel.StructuredNode, EveCompatibilityMixin):
@@ -45,6 +46,7 @@ class Entity(neomodel.StructuredNode, EveCompatibilityMixin):
     label = neomodel.StringProperty()  # Text that should be displayed about this node
     data = neomodel.JSONProperty()  # Dictionary with more detailed data about this entity
     relations = neomodel.Relationship("Entity", "CONNECTED_WITH", model=Relation)
+    weight = neomodel.IntegerProperty(default=1)
 
 
 class PipelineRunInfo(neomodel.StructuredNode):
@@ -664,7 +666,10 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :rtype: Entity
         """
         try:
-            return Entity.nodes.get(label=label)
+            entity = Entity.nodes.get(label=label)
+            entity.weight += 1
+            entity.save()
+            return entity
         except Entity.DoesNotExist:
             implied_entity_class_string = entity_class
             categorized_entity_class_string = self.categorize_node(label, data)
@@ -698,7 +703,10 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :rtype: Relation
         """
         if obj_entity.relations.is_connected(subj_entity):
-            return obj_entity.relations.search(label=label)
+            connection = obj_entity.relations.relationship(subj_entity)
+            connection.weight += 1
+            connection.save()
+            return connection
         else:
             relation = obj_entity.relations.connect(
                 subj_entity,
