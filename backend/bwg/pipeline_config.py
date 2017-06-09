@@ -186,5 +186,6 @@ FRENCH_DATABASE_CATEGORIES = {
     "Person": 2,
     "Businessperson": 3,
     "Media": 4,
-    "Location": 1
+    "Location": 1,
+    "Journalist": 5
 }

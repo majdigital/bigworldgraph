@@ -3,11 +3,6 @@ networks:
   app-tier:
     driver: bridge
 
-volumes:
-  french_corpora:
-  french_pipeline:
-  stanford_models:
-
 services:
   backend:
     build: ./backend/
@@ -43,8 +38,9 @@ services:
     networks:
       - app-tier
     volumes:
-      - ./backend/data/corpora_french/:/french_corpora
+      - ./backend/data/corpora_french/:/french_corpora:ro
       - ./backend/data/pipeline_french/:/french_pipeline
+      - ./pipeline/stanford/models/:/stanford_models
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
@@ -54,20 +50,12 @@ services:
       - "6070:7687"
     networks:
       - app-tier
-  stanford:
-    build: ./backend/data/stanford/
-    depends_on:
-      - backend
-    networks:
-      - app-tier
-    ports:
-      - "6080:9000"
   frontend:
-      build: ./frontend/
-      ports:
-          - "8080:8080"
-      networks:
-          - app-tier
-      volumes:
-          - ./frontend:/frontend
-          - /app/node_modules
+    build: ./frontend/
+    ports:
+        - "8080:8080"
+    networks:
+        - app-tier
+    volumes:
+        - ./frontend:/frontend
+        - /frontend/node_modules
