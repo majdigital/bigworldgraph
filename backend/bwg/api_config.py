@@ -56,6 +56,11 @@ media = {
     "resource_methods": ["GET"],
     "item_methods": ["GET"]
 }
+journalists = {
+    "item_title": "journalist",
+    "resource_methods": ["GET"],
+    "item_methods": ["GET"]
+}
 dates = {
     "item_title": "date",
     "resource_methods": ["GET"],
@@ -66,6 +71,7 @@ misc = {
     "resource_methods": ["GET"],
     "item_methods": ["GET"]
 }
+
 DOMAIN = {
     "entities": entities,
     "people": people,
@@ -77,6 +83,7 @@ DOMAIN = {
     "affairs": affairs,
     "politicians": politicians,
     "businesspeople": businesspeople,
+    "journalists": journalists,
     "media": media,
     "companies": companies
 }

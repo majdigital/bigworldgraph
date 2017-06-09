@@ -65,8 +65,12 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     but it's specifically for the french Wikipedia.
     """
     MEDIA_TYPES = [
-        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire",
-
+        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire"
+    ]
+    JOURNALIST_TYPES = [
+        "journaliste", "rédacteur", "rédactrice", "blogueur", "blogeuse", "reporter", "écrivain", "chroniqueur",
+        "chroniqueuse", "attaché de presse", "attachee de presse", "porte-parole", "correspondant", "correspondante",
+        "chef de rubrique", "commentateur", "commentatrice", "essayiste"
     ]
 
     def requires(self):
@@ -114,11 +118,21 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         ]):
             return True
 
+        # Include reporters
+        if any([
+            any([
+                journalist_type in get_if_exists(sense, "description", default="")
+                for journalist_type in self.JOURNALIST_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return True
+
         # Include media
         if any([
             any([
-                media_term in get_if_exists(sense, "description", default="")
-                for media_term in self.MEDIA_TYPES
+                media_type in get_if_exists(sense, "description", default="")
+                for media_type in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
@@ -159,11 +173,21 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         ]):
             return "Businessperson"
 
+        # Include reporters
+        if any([
+            any([
+                journalist_type in get_if_exists(sense, "description", default="")
+                for journalist_type in self.JOURNALIST_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return "Journalist"
+
         # Assign media category
         if any([
             any([
-                media_term in get_if_exists(sense, "description", default="")
-                for media_term in self.MEDIA_TYPES
+                media_type in get_if_exists(sense, "description", default="")
+                for media_type in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
@@ -335,7 +359,6 @@ if __name__ == "__main__":
         language="french",
         config_file_path="./pipeline_config.py"
     )
-    print("Created config")
     luigi.build(
         [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],
         local_scheduler=True, workers=1, log_level="INFO"
