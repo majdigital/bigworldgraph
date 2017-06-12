@@ -13,6 +13,9 @@ from eve.exceptions import ConfigException
 import luigi
 import neomodel
 
+# PROJECT
+from bwg.helpers import get_if_exists
+
 
 class EveCompatibilityMixin:
     """
@@ -63,10 +66,6 @@ class Neo4jResult:
     """
     Object the result of a data layer query gets wrapped in.
     """
-    relations = []
-    relation_ids = set()
-    node_ids = set()
-
     def __init__(self, selection, **kwargs):
         """
         Constructor.
@@ -76,6 +75,9 @@ class Neo4jResult:
         :param kwargs: Additional key word arguments.
         :type kwargs: dict
         """
+        self.relations = []
+        self.relation_ids = set()
+        self.node_ids = set()
         self.parsed_request = kwargs.get("parsed_request", None)
         self._return_selection = self.selection = selection
 
@@ -90,7 +92,7 @@ class Neo4jResult:
 
     def __getitem__(self, *args):
         if type(args[0]) in (int, slice):
-            return self._return_selection[args[0]]
+            return self.return_selection[args[0]]
         return KeyError
 
     @property
@@ -136,11 +138,11 @@ class Neo4jResult:
         node = self.clean_unserializables(node)
 
         # Clean claims
-        if "data" in node:
-            if "claims" in node["data"]:
-                node["data"]["claims"] = {
+        for sense in get_if_exists(node, "data", "senses", default=[]):
+            if "claims" in sense:
+                sense["claims"] = {
                     claim: claim_data["target"]
-                    for claim, claim_data in node["data"]["claims"].items()
+                    for claim, claim_data in sense["claims"].items()
                 }
 
         if "relations" in node:
