@@ -87,6 +87,8 @@ DOMAIN = {
     "media": media,
     "companies": companies
 }
+PAGINATION_LIMIT = 10001
+PAGINATION_DEFAULT = 10000
 
 # RELATION_BASE_CLASSES = ()
 NODE_BASE_CLASSES = ("Entity", )

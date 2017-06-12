@@ -77,33 +77,39 @@ class Neo4jResult:
         :type kwargs: dict
         """
         self.parsed_request = kwargs.get("parsed_request", None)
-        self.selection = selection
+        self._return_selection = self.selection = selection
 
         for node in selection:
             self.node_ids.add(node.uid)
 
-        self._clean_selection()
-        self._apply_request_parameters()
-
     def __iter__(self):
         yield {
-            "nodes": self.cleaned_selection,
+            "nodes": self.return_selection,
             "links": self.relations
         }
 
-    def __getitem__(self, start=0, stop=0, step=1):
-        stop = len(self.return_selection)
-        return self.return_selection[start:stop:step]
+    def __getitem__(self, *args):
+        if type(args[0]) in (int, slice):
+            return self._return_selection[args[0]]
+        return KeyError
+
+    @property
+    def return_selection(self):
+        return_selection = self._return_selection
+        return_selection = self._apply_request_parameters(return_selection)
+        return_selection = self._clean_selection(return_selection)
+
+        return return_selection
 
     def count(self, with_limit_and_skip=False, **kwargs):
         # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
         return len(self.selection)
 
-    def _clean_selection(self):
+    def _clean_selection(self, selection):
         """
         Clean all elements of this selection of fields which values are not serializable.
         """
-        self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
+        return [self._clean_node(node) for node in selection]
 
     def _clean_node(self, node):
         """
@@ -172,22 +178,22 @@ class Neo4jResult:
         except (TypeError, OverflowError):
             return False
 
-    def _apply_request_parameters(self):
+    def _apply_request_parameters(self, selection):
         """
         Apply additional request parameters to the current selection.
         """
         if self.parsed_request is not None:
-            aggregation = self.parsed_request.get("aggregation", None)
-            embedded = self.parsed_request.get("embedded", None)
-            if_match = self.parsed_request.get("if_match", None)
-            if_modified_since = self.parsed_request.get("if_modified_since", None)
-            if_none_match = self.parsed_request.get("if_none_match", None)
-            max_results = self.parsed_request.get("max_results", None)
-            page = self.parsed_request.get("page", None)
-            projection = self.parsed_request.get("projection", None)
-            show_deleted = self.parsed_request.get("show_deleted", None)
-            sort = self.parsed_request.get("sort", None)
-            where = self.parsed_request.get("where", None)
+            aggregation = getattr(self.parsed_request, "aggregation")
+            embedded = getattr(self.parsed_request, "embedded")
+            if_match = getattr(self.parsed_request, "if_match")
+            if_modified_since = getattr(self.parsed_request, "if_modified_since")
+            if_none_match = getattr(self.parsed_request, "if_none_match")
+            max_results = getattr(self.parsed_request, "max_results")
+            page = getattr(self.parsed_request, "page")
+            projection = getattr(self.parsed_request, "projection")
+            show_deleted = getattr(self.parsed_request, "show_deleted")
+            sort = getattr(self.parsed_request, "sort")
+            where = getattr(self.parsed_request, "where")
 
             if aggregation is not None:
                 # TODO (Implement) [DU 28.04.17]
@@ -230,7 +236,9 @@ class Neo4jResult:
                 raise NotImplementedError
 
             if max_results is not None:
-                self.return_selection = self.return_selection[:max_results]
+                selection = selection[:max_results]
+
+        return selection
 
 
 class Neo4jDatabase:
@@ -273,7 +281,7 @@ class Neo4jDatabase:
         :rtype: list
         """
         try:
-            if req.args:
+            if req.where:
                 if "pretty" not in req.args:
                     identifier = list(req.args.keys())[0]
                     return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
@@ -438,7 +446,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult(results)
+        return Neo4jResult(results, parsed_request=req)
 
     def aggregate(self, resource, pipeline, options):
         """ 
@@ -479,7 +487,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult(results[0])
+        return Neo4jResult(results[0], parsed_request=req)
 
     def find_one_raw(self, resource, _id):
         """ 

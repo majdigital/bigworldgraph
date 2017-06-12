@@ -104,7 +104,7 @@ class Neo4jResultTestCase(unittest.TestCase):
             def relationship(self, other_node):
                 return self.relationships[(self.uid, other_node.uid)]
 
-        relationships = {
+        self.relationships = relationships = {
             ("1", "2"): {
                 "id": "R1",
                 "label": "relation12",
@@ -149,32 +149,67 @@ class Neo4jResultTestCase(unittest.TestCase):
             relations=RelationList(uid="4", relationships=relationships)
         )
 
-        test_nodes = [node1, node2, node3, node4]
+        self.test_selection = test_nodes = [node1, node2, node3, node4]
         self.test_result = Neo4jResult(test_nodes)
 
     def test_neo4j_result_init(self):
-        # TODO (Implement) [DU 07.06.17]
-        pass
+        assert self.test_result.selection == self.test_selection
 
     def test_neo4j_magic_methods(self):
-        # TODO (Implement) [DU 07.06.17]
-        pass
+        # Test __iter__
+        for result in self.test_result:
+            assert "nodes" in result
+            assert "links" in result
+
+        # Test __getitem__
+        for i in range(len(self.test_selection)):
+            for j in range(0, i):
+                a, b = self.test_result.return_selection[i], self.test_result[i]
+                assert self.test_result.return_selection[i] == self.test_result[i]
+                assert self.test_result.return_selection[j:i] == self.test_result[j:i]
+                assert self.test_result.return_selection[j:i:2] == self.test_result[j:i:2]
 
     def test_count(self):
-        # TODO (Implement) [DU 07.06.17]
-        pass
+        # TODO (Test): Test with_limit_and_skip key word argument after implementing it
+        assert self.test_result.count() == len(self.test_selection)
 
     def test_clean_node(self):
         # TODO (Implement) [DU 07.06.17]
         pass
 
-    def test_clean_unverserializables(self):
-        # TODO (Implement) [DU 07.06.17]
-        pass
+    def test_clean_unserializables(self):
+        clean_dict = {
+            "param1": 1,
+            "param2": 2.22,
+            "param3": True,
+            "param4": None,
+            "param5": [1, 2, 3, 4, 5],
+            "param6": {n: n**2 for n in range(1, 5)}
+        }
 
-    def test_is_json_serializable(self):
-        # TODO (Implement) [DU 07.06.17]
-        pass
+        # "Pollute" dict with unserializable types
+        dirty_dict = dict(clean_dict)
+        dirty_dict.update(
+            {
+                "param7": lambda x: x**2,
+                "param8": type("Test Class", tuple(), {})
+            }
+        )
+
+        cleaned_dict = self.test_result.clean_unserializables(dirty_dict)
+        assert cleaned_dict == clean_dict
+
+    @staticmethod
+    def test_is_json_serializable():
+        assert Neo4jResult.is_json_serializable("test string")
+        assert Neo4jResult.is_json_serializable(None)
+        assert Neo4jResult.is_json_serializable(1234)
+        assert Neo4jResult.is_json_serializable(True)
+        assert Neo4jResult.is_json_serializable(22.2)
+        assert Neo4jResult.is_json_serializable([1, 2, 3, 4, 5])
+        assert Neo4jResult.is_json_serializable({n: n**2 for n in range(1, 5)})
+        assert not Neo4jResult.is_json_serializable(lambda x: x**2)
+        assert not Neo4jResult.is_json_serializable(type("Test Class", tuple(), {}))
 
     def test_apply_request_parameters(self):
         # TODO (Implement) [DU 07.06.17]
