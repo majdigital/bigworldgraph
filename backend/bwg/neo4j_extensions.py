@@ -10,6 +10,7 @@ import sys
 # EXT
 from eve.io.base import DataLayer
 from eve.exceptions import ConfigException
+from eve.utils import ParsedRequest
 import luigi
 import neomodel
 
@@ -94,6 +95,9 @@ class Neo4jResult:
         if type(args[0]) in (int, slice):
             return self.return_selection[args[0]]
         return KeyError
+
+    def __len__(self):
+        return self.count()
 
     @property
     def return_selection(self):
@@ -283,7 +287,7 @@ class Neo4jDatabase:
         :rtype: list
         """
         try:
-            if hasattr(req, "where"):
+            if req.args not in ({}, None):
                 if "pretty" not in req.args:
                     identifier = list(req.args.keys())[0]
                     return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
@@ -489,7 +493,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult(results[0], parsed_request=req)
+        return Neo4jResult([results[0]], parsed_request=req)
 
     def find_one_raw(self, resource, _id):
         """ 
@@ -516,14 +520,14 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
 
         if item_title in self.node_base_classes_names:
             node_class = self.get_node_class(item_title)
-            results = self.find_nodes(node_class)
+            results = self.find_nodes(node_class, req=ParsedRequest())
         elif resource in self.node_types:
             node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
             results = self.find_nodes(node_class)
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult([result for result in results if result.id in ids])
+        return Neo4jResult([result for result in results if result["id"] in ids])
 
     def insert(self, resource, doc_or_docs):
         """
@@ -617,7 +621,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve the
             actual datasource name.
         """
-        resource_collection = self.find(resource, {}, None)
+        resource_collection = self.find(resource, ParsedRequest(), None)
         return resource_collection.count() == 0
 
 

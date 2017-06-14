@@ -6,7 +6,7 @@ Test support for the Neo4j graph database.
 # STD
 import copy
 import unittest
-import unittest.mock as mock
+import random
 
 # EXT
 import neomodel
@@ -19,6 +19,22 @@ from bwg.api_config import (
     NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER, NODE_TYPES, RELATION_TYPES, NODE_BASE_CLASSES
 )
 from bwg.helpers import overwrite_local_config_with_environ
+
+
+class DummyParsedRequest:
+    legit_parameters = {
+        "aggregation", "embedded", "if_match", "if_modified_since", "if_none_match", "max_results", "page",
+        "projection", "show_deleted", "sort", "where"
+    }
+
+    def __init__(self, **kwargs):
+        self.args = kwargs.get("args", {})
+
+        for param in self.legit_parameters:
+            if param in kwargs:
+                setattr(self, param, kwargs[param])
+            else:
+                setattr(self, param, None)
 
 
 class Neo4jTestMixin:
@@ -218,6 +234,9 @@ class Neo4jResultTestCase(unittest.TestCase, Neo4jTestMixin):
                 assert [el["uid"] for el in self.test_result.return_selection[j:i:2]] == \
                        [el["uid"] for el in self.test_result[j:i:2]]
 
+        # Test __len__
+        assert len(self.test_selection) == len(self.test_result)
+
     def test_count(self):
         # TODO (Test): Test with_limit_and_skip key word argument after implementing it [DU 09.06.17]
         assert self.test_result.count() == len(self.test_selection)
@@ -291,19 +310,6 @@ class Neo4jResultTestCase(unittest.TestCase, Neo4jTestMixin):
         assert not Neo4jResult.is_json_serializable(type("Test Class", tuple(), {}))
 
     def test_apply_request_parameters(self):
-        class DummyParsedRequest:
-            legit_parameters = {
-                "aggregation", "embedded", "if_match", "if_modified_since", "if_none_match", "max_results", "page",
-                "projection", "show_deleted", "sort", "where"
-            }
-
-            def __init__(self, **kwargs):
-                for param in self.legit_parameters:
-                    if param in kwargs:
-                        setattr(self, param, kwargs[param])
-                    else:
-                        setattr(self, param, None)
-
         # Test no request parameters
         no_request_result = Neo4jResult(self.test_selection, parsed_request=DummyParsedRequest())
         assert self.test_result.return_selection == no_request_result.return_selection
@@ -377,24 +383,41 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
         assert all([isinstance(relation_type, str) for relation_type in self.neo4j_layer.relation_types])
 
     def test_find(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        # All nodes
+        search_result1 = self.neo4j_layer.find("entities", DummyParsedRequest(), None)
+        assert len(search_result1) == 4
+        assert len(set([node["uid"] for node in search_result1.return_selection]) - {"1", "2", "3", "4"}) == 0
+
+        # Friends and friends of friends
+        search_result2 = self.neo4j_layer.find("entities", DummyParsedRequest(args={"uid": 1}), None)
+        assert len(set([node["uid"] for node in search_result2.return_selection]) - {"1", "2", "3"}) == 0
+
+        # Non-existing nodes
+        search_result3 = self.neo4j_layer.find("entities", DummyParsedRequest(args={"uid": 100}), None)
+        assert len(search_result3) == 0
 
     def test_aggregate(self):
         # TODO (Test): Implement when Neo4jLayer.aggregate() is implemented [DU 14.06.17]
         pass
 
     def test_find_one(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        search_result = self.neo4j_layer.find_one("entities", DummyParsedRequest())
+        assert len(search_result) == 1
+        assert search_result[0]["uid"] == "1"
 
     def test_find_one_raw(self):
         # TODO (Test): Implement when Neo4jLayer.find_one_raw() is implemented [DU 14.06.17]
         return True
 
     def test_find_list_of_ids(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        search_result1 = self.neo4j_layer.find_list_of_ids("entities", set(range(0, 10000)))
+        assert len(search_result1) == 4
+
+        node_ids = [node["id"] for node in search_result1.return_selection]
+        test_id = random.choice(node_ids)
+        search_result2 = self.neo4j_layer.find_list_of_ids("entities", [test_id])
+        assert len(search_result2) == 1
+        assert search_result2.return_selection[0]["id"] == test_id
 
     def test_insert(self):
         # TODO (Test): Implement when Neo4jLayer.insert() is implemented [DU 14.06.17]
