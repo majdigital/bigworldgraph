@@ -17,6 +17,93 @@ from bwg.neo4j_extensions import (
 )
 
 
+class Neo4jTestMixin:
+    """
+    Create some testing nodes for different Neo4j-related tests.
+    """
+    @property
+    def create_test_nodes(self):
+        class RelationList(list):
+            def __init__(self, *args, uid=None, relationships={}):
+                self.uid = uid
+                self.relationships = relationships
+                super().__init__(*args)
+
+            def relationship(self, other_node):
+                return self.relationships[(self.uid, other_node.uid)]
+
+        relationships = {
+            ("1", "2"): {
+                "id": "R1",
+                "label": "relation12",
+                "data": {},
+                "source": Entity(uid="1"),
+                "target": Entity(uid="2")
+            },
+            ("1", "3"): {
+                "id": "R2",
+                "label": "relation13",
+                "data": {},
+                "source": Entity(uid="1"),
+                "target": Entity(uid="3")
+            },
+            ("3", "2"): {
+                "id": "R3",
+                "label": "relation32",
+                "data": {},
+                "source": Entity(uid="3"),
+                "target": Entity(uid="2")
+            }
+        }
+
+        node1 = Entity(
+            uid="1",
+            data={
+                'category': "entity",
+                'ambiguous': False,
+                'senses': [
+                    {
+                        'aliases': ["Entity"],
+                        'description': 'test entity',
+                        'label': 'Test Entity',
+                        'claims': {
+                            'claim1': {
+                                'target': 'claim_attribute',
+                                'implies_relation': False,
+                                'entity_class': None,
+                                'target_data': {
+                                    'ambiguous': False,
+                                    'senses': []
+                                }
+                            }
+                        },
+                        'type': 'I-PER',
+                        'wikidata_last_modified': '2017-02-26T18:25:53Z',
+                        'wikidata_id': 'Q12345678'
+                    }
+                ]
+            },
+            relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships)
+        )
+        node2 = Entity(
+            uid="2",
+            data={},
+            relations=RelationList(uid="2", relationships=relationships)
+        )
+        node3 = Entity(
+            uid="3",
+            data={},
+            relations=RelationList((Entity(uid="2"),), uid="3", relationships=relationships)
+        )
+        node4 = Entity(
+            uid="4",
+            data={},
+            relations=RelationList(uid="4", relationships=relationships)
+        )
+
+        return [copy.deepcopy(node) for node in [node1, node2, node3, node4]]
+
+
 class EveCompatibilityMixinTestCase(unittest.TestCase):
     """
     Testing the EveCompatibilityMixin class.
@@ -89,92 +176,14 @@ class StucturedNodesTestCase(unittest.TestCase):
                 assert getattr(node, key) == value
 
 
-class Neo4jResultTestCase(unittest.TestCase):
+class Neo4jResultTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jResult class.
     """
     test_result = None
 
     def setUp(self):
-        class RelationList(list):
-            def __init__(self, *args, uid=None, relationships={}):
-                self.uid = uid
-                self.relationships = relationships
-                super().__init__(*args)
-
-            def relationship(self, other_node):
-                return self.relationships[(self.uid, other_node.uid)]
-
-        self.relationships = relationships = {
-            ("1", "2"): {
-                "id": "R1",
-                "label": "relation12",
-                "data": {},
-                "source": Entity(uid="1"),
-                "target": Entity(uid="2")
-            },
-            ("1", "3"): {
-                "id": "R2",
-                "label": "relation13",
-                "data": {},
-                "source": Entity(uid="1"),
-                "target": Entity(uid="3")
-            },
-            ("3", "2"): {
-                "id": "R3",
-                "label": "relation32",
-                "data": {},
-                "source": Entity(uid="3"),
-                "target": Entity(uid="2")
-            }
-        }
-
-        node1 = Entity(
-            uid="1",
-            data={
-                'category': "entity",
-                'ambiguous': False,
-                'senses': [
-                    {
-                        'aliases': ["Entity"],
-                        'description': 'test entity',
-                        'label': 'Test Entity',
-                        'claims': {
-                            'claim1': {
-                                'target': 'claim_attribute',
-                                'implies_relation': False,
-                                'entity_class': None,
-                                'target_data': {
-                                    'ambiguous': False,
-                                    'senses': []
-                                }
-                            }
-                        },
-                        'type': 'I-PER',
-                        'wikidata_last_modified': '2017-02-26T18:25:53Z',
-                        'wikidata_id': 'Q12345678'
-                    }
-                ]
-            },
-            relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships)
-        )
-        node2 = Entity(
-            uid="2",
-            data={},
-            relations=RelationList(uid="2", relationships=relationships)
-        )
-        node3 = Entity(
-            uid="3",
-            data={},
-            relations=RelationList((Entity(uid="2"), ), uid="3", relationships=relationships)
-        )
-        node4 = Entity(
-            uid="4",
-            data={},
-            relations=RelationList(uid="4", relationships=relationships)
-        )
-
-        self._test_selection = [node1, node2, node3, node4]
+        self._test_selection = self.create_test_nodes
 
     @property
     def test_selection(self):
@@ -303,7 +312,7 @@ class Neo4jResultTestCase(unittest.TestCase):
         # TODO (Testing): Test other query parameters when they are implemented
 
 
-class Neo4jDatabaseTestCase(unittest.TestCase):
+class Neo4jDatabaseTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jDatabase class.
     """
@@ -311,12 +320,64 @@ class Neo4jDatabaseTestCase(unittest.TestCase):
     pass
 
 
-class Neo4jLayerTestCase(unittest.TestCase):
+class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jLayer class.
     """
-    # TODO (Implement) [DU 07.06.17]
-    pass
+    def test_init_app(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_find(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_aggregate(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_find_one(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_find_one_raw(self):
+        # TODO (Test): Implement when Neo4jLayer.find_one_raw() is implemented [DU 14.06.17]
+        return True
+
+    def test_find_list_of_ids(self):
+        pass
+
+    def test_insert(self):
+        # TODO (Test): Implement when Neo4jLayer.insert() is implemented [DU 14.06.17]
+        return True
+
+    def test_update(self):
+        # TODO (Test): Implement when Neo4jLayer.update() is implemented [DU 14.06.17]
+        return True
+
+    def test_replace(self):
+        # TODO (Test): Implement when Neo4jLayer.replace() is implemented [DU 14.06.17]
+        return True
+
+    def test_remove(self):
+        # TODO (Test): Implement when Neo4jLayer.find_one_raw() is implemented [DU 14.06.17]
+        return True
+
+    def test_combine_queries(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_get_value_from_query(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_query_contains_field(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
+
+    def test_is_empty(self):
+        # TODO (Implement) [DU 14.06.17]
+        pass
 
 
 class Neo4jTargetTestCase(unittest.TestCase):
