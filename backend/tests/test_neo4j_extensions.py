@@ -15,6 +15,10 @@ import neomodel
 from bwg.neo4j_extensions import (
     EveCompatibilityMixin, Relation, Entity, PipelineRunInfo, Neo4jResult, Neo4jDatabase, Neo4jLayer, Neo4jTarget
 )
+from bwg.api_config import (
+    NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER, NODE_TYPES, RELATION_TYPES, NODE_BASE_CLASSES
+)
+from bwg.helpers import overwrite_local_config_with_environ
 
 
 class Neo4jTestMixin:
@@ -22,7 +26,7 @@ class Neo4jTestMixin:
     Create some testing nodes for different Neo4j-related tests.
     """
     @property
-    def create_test_nodes(self):
+    def created_test_nodes(self):
         class RelationList(list):
             def __init__(self, *args, uid=None, relationships={}):
                 self.uid = uid
@@ -183,7 +187,7 @@ class Neo4jResultTestCase(unittest.TestCase, Neo4jTestMixin):
     test_result = None
 
     def setUp(self):
-        self._test_selection = self.create_test_nodes
+        self._test_selection = self.created_test_nodes
 
     @property
     def test_selection(self):
@@ -324,16 +328,60 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jLayer class.
     """
+    def setUp(self):
+        class MockApp:
+            def __init__(self, **config):
+                self.config = config
+                self.config["DOMAIN"] = {
+                    "entities": {
+                        "item_title": "Entity"
+                    }
+                }
+
+        config = {
+            "NEO4J_USER": NEO4J_USER,
+            "NEO4J_HOST": NEO4J_HOST,
+            "NEO4J_PORT": NEO4J_PORT,
+            "NEO4J_PASSWORD": NEO4J_PASSWORD,
+            "NODE_TYPES": NODE_TYPES,
+            "NODE_BASE_CLASSES": NODE_BASE_CLASSES,
+            "RELATION_TYPES": RELATION_TYPES
+        }
+        config = overwrite_local_config_with_environ(config)
+        mock_app = MockApp(**config)
+        self.neo4j_layer = Neo4jLayer(app=mock_app)
+        self.url = neomodel.config.DATABASE_URL
+        neomodel.util.clear_neo4j_database(neomodel.db)
+
+        for node in self.created_test_nodes:
+            node.save()
+
+    def tearDown(self):
+        neomodel.util.clear_neo4j_database(neomodel.db)
+
+    @neomodel.util.ensure_connection
     def test_init_app(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        assert len(self.neo4j_layer.node_types) > 0
+        assert len(self.neo4j_layer.relation_types) > 0
+        assert len(self.neo4j_layer.node_base_classes) > 0
+        assert len(self.neo4j_layer.node_base_classes_names) > 0
+
+        assert all(
+            [
+                issubclass(node_base_class, neomodel.StructuredNode) and
+                issubclass(node_base_class, EveCompatibilityMixin)
+                for node_base_class in self.neo4j_layer.node_base_classes
+            ]
+        )
+        assert all([isinstance(node_type, str) for node_type in self.neo4j_layer.node_types])
+        assert all([isinstance(relation_type, str) for relation_type in self.neo4j_layer.relation_types])
 
     def test_find(self):
         # TODO (Implement) [DU 14.06.17]
         pass
 
     def test_aggregate(self):
-        # TODO (Implement) [DU 14.06.17]
+        # TODO (Test): Implement when Neo4jLayer.aggregate() is implemented [DU 14.06.17]
         pass
 
     def test_find_one(self):
@@ -345,6 +393,7 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
         return True
 
     def test_find_list_of_ids(self):
+        # TODO (Implement) [DU 14.06.17]
         pass
 
     def test_insert(self):
@@ -364,20 +413,20 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
         return True
 
     def test_combine_queries(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        with self.assertRaises(NotImplementedError):
+            self.neo4j_layer.combine_queries("", "")
 
     def test_get_value_from_query(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        with self.assertRaises(NotImplementedError):
+            self.neo4j_layer.get_value_from_query("", "")
 
     def test_query_contains_field(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        with self.assertRaises(NotImplementedError):
+            self.neo4j_layer.query_contains_field("", "")
 
     def test_is_empty(self):
-        # TODO (Implement) [DU 14.06.17]
-        pass
+        neomodel.util.clear_neo4j_database(neomodel.db)
+        assert self.neo4j_layer.is_empty("entities")
 
 
 class Neo4jTargetTestCase(unittest.TestCase):

@@ -283,7 +283,7 @@ class Neo4jDatabase:
         :rtype: list
         """
         try:
-            if req.where:
+            if hasattr(req, "where"):
                 if "pretty" not in req.args:
                     identifier = list(req.args.keys())[0]
                     return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
@@ -617,7 +617,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve the
             actual datasource name.
         """
-        resource_collection = self.find(resource)
+        resource_collection = self.find(resource, {}, None)
         return resource_collection.count() == 0
 
 
