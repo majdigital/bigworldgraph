@@ -292,7 +292,7 @@ class Neo4jDatabase:
                     identifier = list(req.args.keys())[0]
                     return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
 
-            return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
+            return [node_class.nodes.get(**constraints)] if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
             return []
 

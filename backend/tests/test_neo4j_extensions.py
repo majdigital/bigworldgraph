@@ -43,41 +43,9 @@ class Neo4jTestMixin:
     """
     @property
     def created_test_nodes(self):
-        class RelationList(list):
-            def __init__(self, *args, uid=None, relationships={}):
-                self.uid = uid
-                self.relationships = relationships
-                super().__init__(*args)
-
-            def relationship(self, other_node):
-                return self.relationships[(self.uid, other_node.uid)]
-
-        relationships = {
-            ("1", "2"): {
-                "id": "R1",
-                "label": "relation12",
-                "data": {},
-                "source": Entity(uid="1"),
-                "target": Entity(uid="2")
-            },
-            ("1", "3"): {
-                "id": "R2",
-                "label": "relation13",
-                "data": {},
-                "source": Entity(uid="1"),
-                "target": Entity(uid="3")
-            },
-            ("3", "2"): {
-                "id": "R3",
-                "label": "relation32",
-                "data": {},
-                "source": Entity(uid="3"),
-                "target": Entity(uid="2")
-            }
-        }
-
         node1 = Entity(
             uid="1",
+            label="node1",
             data={
                 'category': "entity",
                 'ambiguous': False,
@@ -102,26 +70,35 @@ class Neo4jTestMixin:
                         'wikidata_id': 'Q12345678'
                     }
                 ]
-            },
-            relations=RelationList((Entity(uid="2"), Entity(uid="2")), uid="1", relationships=relationships)
+            }
         )
-        node2 = Entity(
-            uid="2",
-            data={},
-            relations=RelationList(uid="2", relationships=relationships)
-        )
-        node3 = Entity(
-            uid="3",
-            data={},
-            relations=RelationList((Entity(uid="2"),), uid="3", relationships=relationships)
-        )
-        node4 = Entity(
-            uid="4",
-            data={},
-            relations=RelationList(uid="4", relationships=relationships)
-        )
+        node2 = Entity(uid="2", label="node2", data={})
+        node3 = Entity(uid="3", label="node3", data={})
+        node4 = Entity(uid="4", label="node4", data={})
+
+        nodes = [node1, node2, node3, node4]
+        for node in nodes:
+            node.save()
 
         return [copy.deepcopy(node) for node in [node1, node2, node3, node4]]
+
+    def create_nodes(self):
+        for node in self.created_test_nodes:
+            node.save()
+
+    def create_and_connect_nodes(self):
+        connections = [(1, 2), (1, 3), (3, 2)]
+        self.create_nodes()
+
+        for start, end in connections:
+            start_node = Entity.nodes.get(uid=start)
+            end_node = Entity.nodes.get(uid=end)
+            relation = end_node.relations.connect(start_node)
+            relation.save()
+
+    @staticmethod
+    def reset_database():
+        neomodel.util.clear_neo4j_database(neomodel.db)
 
 
 class EveCompatibilityMixinTestCase(unittest.TestCase):
@@ -326,8 +303,85 @@ class Neo4jDatabaseTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jDatabase class.
     """
-    # TODO (Implement) [DU 07.06.17]
-    pass
+    def setUp(self):
+        self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+        self.reset_database()
+
+    def tearDown(self):
+        self.reset_database()
+
+    def test_init(self):
+        assert neomodel.config.DATABASE_URL == "bolt://{user}:{password}@{host}:{port}".format(
+            user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT
+        )
+
+    def test_get_node_class(self):
+        # Default
+        class1 = self.neo4j_database.get_node_class("SpecificEntity")
+        assert class1.__name__ == "SpecificEntity"
+        assert issubclass(class1, neomodel.StructuredNode) and issubclass(class1, EveCompatibilityMixin)
+
+        # Custom base classes
+        class2 = self.neo4j_database.get_node_class("NewEntity", base_classes=(neomodel.StructuredNode, ))
+        assert class2.__name__ == "NewEntity"
+        assert issubclass(class2, neomodel.StructuredNode) and not issubclass(class2, EveCompatibilityMixin)
+
+    def test_find_nodes(self):
+        # Non-existing node
+        assert self.neo4j_database.find_nodes(Entity, DummyParsedRequest()) == []
+
+        for node in self.created_test_nodes:
+            node.save()
+
+        # All nodes
+        assert len(self.neo4j_database.find_nodes(Entity, DummyParsedRequest())) == 4
+
+        # Single node with constraint
+        assert len(self.neo4j_database.find_nodes(Entity, req=DummyParsedRequest(), uid="1")) == 1
+
+        self.reset_database()
+
+    def test_friends_of_friends(self):
+        self.reset_database()
+
+        assert len(self.neo4j_database.find_friends_of_friends(Entity, "uid", "1")) == 0
+
+        self.create_and_connect_nodes()
+
+        friends_of_friends = self.neo4j_database.find_friends_of_friends(Entity, "uid", "1")
+        assert len(friends_of_friends) == 3
+        assert len(set([node.uid for node in friends_of_friends]) - {"1", "2", "3"}) == 0
+
+        self.reset_database()
+
+    def test_get_or_create_node(self):
+        test_nodes = self.created_test_nodes
+        self.reset_database()
+
+        first_node = test_nodes[0]
+        new_node = self.neo4j_database.get_or_create_node(label=first_node.label, data=first_node.data)
+        same_node = self.neo4j_database.get_or_create_node(label=first_node.label, data=first_node.data)
+        assert new_node.id == same_node.id
+        assert new_node.weight == 1
+        assert same_node.weight == 2
+        assert new_node.label == same_node.label == first_node.label
+        assert new_node.data == same_node.data == first_node.data
+
+    def test_or_create_connection(self):
+        test_nodes = self.created_test_nodes
+
+        first_node, second_node = test_nodes[0], test_nodes[1]
+        new_connection = self.neo4j_database.get_or_create_connection(
+            first_node, second_node, "new_connection", {"param": "test"}
+        )
+        same_connection = self.neo4j_database.get_or_create_connection(
+            first_node, second_node, "new_connection", {"param": "test"}
+        )
+        assert new_connection.id == same_connection.id
+        assert new_connection.weight == 1
+        assert same_connection.weight == 2
+        assert new_connection.label == same_connection.label
+        assert new_connection.data == same_connection.data
 
 
 class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
