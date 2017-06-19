@@ -208,6 +208,14 @@ WIKIDATA_ENTITIES = [
                     'implies_relation': False,
                     'entity_class': None,
                     'target_data': {}
+                },
+                'connected_with': {
+                    'target': 'Different entity',
+                    'implies_relation': True,
+                    'entity_class': 'Entity',
+                    'target_data': {
+                        "param": "test"
+                    }
                 }
             },
             'type': 'I-LOC'

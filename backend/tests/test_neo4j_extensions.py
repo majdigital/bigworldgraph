@@ -6,12 +6,15 @@ Test support for the Neo4j graph database.
 # STD
 import copy
 import unittest
+import unittest.mock as mock
 import random
 
 # EXT
 import neomodel
 
 # PROJECT
+from toolkit import mock_class_method
+from fixtures import WIKIDATA_ENTITIES
 from bwg.neo4j_extensions import (
     EveCompatibilityMixin, Relation, Entity, PipelineRunInfo, Neo4jResult, Neo4jDatabase, Neo4jLayer, Neo4jTarget
 )
@@ -506,12 +509,233 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
         assert self.neo4j_layer.is_empty("entities")
 
 
-class Neo4jTargetTestCase(unittest.TestCase):
+class Neo4jTargetTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jTarget class.
     """
-    # TODO (Implement) [DU 07.06.17]
-    pass
+    @property
+    def neo4j_target(self):
+        return Neo4jTarget(pipeline_run_info={}, user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST)
+
+    def setUp(self):
+        self.reset_database()
+        self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+
+    def tearDown(self):
+        self.reset_database()
+
+    @staticmethod
+    def test_init():
+        assert neomodel.config.DATABASE_URL == "bolt://{user}:{password}@{host}:{port}".format(
+            user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT
+        )
+
+    def test_magic_methods(self):
+        neo4j_target = self.neo4j_target
+        with neo4j_target as context_neo4j_target:
+            assert neo4j_target == context_neo4j_target
+
+    def test_categorize_nodes(self):
+        categories = {
+            "Entity": 0,
+            "SpecificEntity": 1,
+            "MoreSpecificEntity": 2
+        }
+
+        def categorization_function(label, node_data):
+            if "specific" in label and node_data["priority"] == "very important":
+                return "MoreSpecificEntity"
+
+            if "specific" in label:
+                return "SpecificEntity"
+
+            return "Entity"
+
+        neo4j_target = self.neo4j_target
+        neo4j_target.categories = categories
+        neo4j_target._categorize_node = categorization_function
+
+        # Test a boring node
+        boring_label, boring_data = "boring entity", {}
+        boring_entity_class, boring_entity_class_string = neo4j_target.categorize_node(boring_label, boring_data)
+        assert boring_entity_class == Entity
+        assert all([
+            key1 == key2 and value1 == value2
+            for (key1, value1), (key2, value2)
+            in zip(vars(boring_entity_class).items(), vars(Entity).items())
+            if key1 != "DoesNotExist"
+        ])  # The 'DoesNotExist' property is different, but it doesn't affect functionality
+        assert boring_entity_class_string == "Entity"
+
+        # Test specific node
+        specific_label, specific_data = "specific entity", {"priority": "quite important"}
+        specific_entity_class, specific_entity_class_string = neo4j_target.categorize_node(
+            specific_label, specific_data
+        )
+        assert all([
+           key1 == key2 and value1 == value2
+           for (key1, value1), (key2, value2)
+           in zip(
+                vars(specific_entity_class).items(),
+                vars(neo4j_target.get_node_class("SpecificEntity", (Entity, ))).items()
+            )
+           if key1 != "DoesNotExist"
+        ])  # The 'DoesNotExist' property is different, but it doesn't affect functionality
+
+        # Test more specific node
+        more_specific_label, more_specific_data = "more specific entity", {"priority": "very important"}
+        more_specific_entity_class, more_specific_entity_class_string = neo4j_target.categorize_node(
+            more_specific_label, more_specific_data
+        )
+        assert all([
+            key1 == key2 and value1 == value2
+            for (key1, value1), (key2, value2)
+            in zip(
+                vars(more_specific_entity_class).items(),
+                vars(neo4j_target.get_node_class("MoreSpecificEntity", (Entity,))).items()
+            )
+            if key1 != "DoesNotExist"
+        ])  # The 'DoesNotExist' property is different, but it doesn't affect functionality
+
+    def test_add_relation(self):
+
+        def node_mock(self, *args, **kwargs):
+            self.node_mock_calls += 1
+
+        def connection_mock(self, *args, **kwargs):
+            self.connection_mock_calls += 1
+
+        def node_relevance_function(label, node_data):
+            if label == "relevant node" or node_data["relevance"] == "high":
+                return True
+            return False
+
+        entity_properties = {
+            "relevant node": {
+                "relevance": "quite high",
+                "senses": [
+                    {"label": "relevant node"}
+                ]
+            },
+            "irrelevant node": {
+                "relevance": "not so much",
+                "senses": [
+                    {"label": "irrelevant node"}
+                ]
+            },
+            "another irrelevant node": {
+                "relevance": "not at all",
+                "senses": [
+                    {"label": "another irrelevant node"}
+                ]
+            },
+            "another relevant node": {
+                "relevance": "high",
+                "senses": [
+                    {"label": "another relevant node"}
+                ]
+            }
+        }
+
+        relation_json1 = {
+            "meta": {
+                "id": "R1"
+            },
+            "data": {
+                "subject_phrase": "irrelevant node",
+                "verb": "is in a sentence with",
+                "object_phrase": "another irrelevant node"
+            }
+        }
+
+        relation_json2 = {
+            "meta": {
+                "id": "R2"
+            },
+            "data": {
+                "subject_phrase": "irrelevant node",
+                "verb": "is in a sentence with",
+                "object_phrase": "relevant node"
+            }
+        }
+
+        relation_json3 = {
+            "meta": {
+                "id": "R3"
+            },
+            "data": {
+                "subject_phrase": "relevant node",
+                "verb": "is in a sentence with",
+                "object_phrase": "another relevant node"
+            }
+        }
+
+        with mock_class_method(Neo4jTarget, "get_or_create_node", node_mock), \
+             mock_class_method(Neo4jTarget, "get_or_create_connection", connection_mock):
+
+            neo4j_target = self.neo4j_target
+            neo4j_target.node_relevance_function = node_relevance_function
+            neo4j_target.node_mock_calls = 0
+            neo4j_target.connection_mock_calls = 0
+
+            # Test subj node relevance
+            neo4j_target.add_relation(
+                relation_json1,
+                "irrelevant node is in a sentence with another irrelevant node",
+                entity_properties
+            )
+            assert neo4j_target.node_mock_calls == 0
+            assert neo4j_target.connection_mock_calls == 0
+
+            # Test obj node relevance
+            neo4j_target.add_relation(
+                relation_json2,
+                "irrelevant node is in a sentence with another relevant node",
+                entity_properties
+            )
+            assert neo4j_target.node_mock_calls == 1
+            assert neo4j_target.connection_mock_calls == 0
+
+            # Test connection relevance
+            neo4j_target.add_relation(
+                relation_json3,
+                "relevant node is in a sentence with another relevant node",
+                entity_properties
+            )
+            assert neo4j_target.node_mock_calls == 3
+            assert neo4j_target.connection_mock_calls == 1
+
+    def test_add_wikidata_relations(self):
+        self.reset_database()
+
+        def node_mock(_, *args, **kwargs):
+            label, data, node_category = kwargs["label"], kwargs["data"], kwargs["node_category"]
+            assert label == "Different entity"
+            assert data == {"param": "test"}
+            assert node_category == Entity
+            return {"param": "obj_node"}
+
+        def connection_mock(_, *args, **kwargs):
+            subj_node, obj_node = args[0], args[1]
+            label, data = kwargs["label"], kwargs["data"]
+
+            assert label == "connected_with"
+            assert data == {}
+            assert subj_node["uid"] == "1"
+            assert obj_node == {"param": "obj_node"}
+
+        with mock_class_method(Neo4jTarget, "get_or_create_node", node_mock),\
+            mock_class_method(Neo4jTarget, "get_or_create_connection", connection_mock):
+            first_node = self.created_test_nodes[0]
+            self.neo4j_target._add_wikidata_relations(first_node, {"senses": WIKIDATA_ENTITIES[0]})
+
+    def test_if_run_exists_and_add(self):
+        # TODO (Test): Implement if problems with run information are fixed [DU 16.06.17]
+        assert True
+
+    def test_exists(self):
+        # TODO (Test): Implement if problems with run information are fixed [DU 16.06.17]
+        assert True
 
 
 if __name__ == "__main__":

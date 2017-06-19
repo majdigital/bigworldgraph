@@ -711,17 +711,17 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         subj_phrase, verb, obj_phrase = relation_data["subject_phrase"], relation_data["verb"], \
                                         relation_data["object_phrase"]
         subj_data = entity_properties.get(subj_phrase, {})
-        obj_data = entity_properties.get(subj_phrase, {})
+        obj_data = entity_properties.get(obj_phrase, {})
         subj_node_is_relevant = self.node_relevance_function(subj_phrase, subj_data)
         obj_node_is_relevant = self.node_relevance_function(obj_phrase, obj_data)
 
         if subj_node_is_relevant:
-            node_category = self.categorize_node(subj_data["senses"][0]["label"], subj_data)
+            node_category, _ = self.categorize_node(subj_data["senses"][0]["label"], subj_data)
             subj_node = self.get_or_create_node(label=subj_phrase, data=subj_data, node_category=node_category)
             self._add_wikidata_relations(subj_node, subj_data)
 
         if obj_node_is_relevant:
-            node_category = self.categorize_node(obj_data["senses"][0]["label"], obj_data)
+            node_category, _ = self.categorize_node(obj_data["senses"][0]["label"], obj_data)
             obj_node = self.get_or_create_node(label=obj_phrase, data=obj_data, node_category=node_category)
             self._add_wikidata_relations(obj_node, obj_data)
 
@@ -750,11 +750,12 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
         if "claims" in sense_data:
             for claim, claim_data in sense_data["claims"].items():
-                target, implies_relation, entity_class, target_data = claim_data["target"], claim_data["implies_relation"], \
+                target, implies_relation, node_category, target_data = claim_data["target"], claim_data["implies_relation"], \
                                                          claim_data["entity_class"], claim_data["target_data"]
 
                 if implies_relation and target != sense_data["label"]:
-                    obj_node = self._get_or_create_node(label=target, data=target_data, entity_class=entity_class)
+                    entity_class = self.get_node_class(node_category, base_classes=(Entity, ))
+                    obj_node = self.get_or_create_node(label=target, data=target_data, node_category=entity_class)
                     self.get_or_create_connection(node, obj_node, label=claim, data={})
 
     def _check_if_run_exists_and_add(self, pipeline_run_info):
