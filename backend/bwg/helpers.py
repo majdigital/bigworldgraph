@@ -23,7 +23,7 @@ def filter_dict(dictionary, keep_fields):
     :param dictionary: Dictionary that is going to be filtered.
     :type dictionary: dict
     :param keep_fields: Dictionary keys that aren't going to be filtered.
-    :type keep_fields: dict
+    :type keep_fields: dict or list or set
     :return: Filtered dictionary.
     :rtype: dict
     """
@@ -199,14 +199,14 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
             # Calculate result and write it
             run_time = end_time - start_time
             hours, minutes, seconds = seconds_to_hms(run_time)
-            class_name = " of '{}' ".format(args[0].__class__.__name__) if is_classmethod else ""
+            class_name = " of '{}' ".format(args[0].__class__.__name__) if is_classmethod else " "
             result = "Function '{}'{}took {:.2f} hour(s), {:.2f} minute(s) and {:.2f} second(s) to complete.\n".format(
                 func.__name__, class_name, hours, minutes, seconds
             )
 
             # Write to stdout or file
             if out is not None:
-                if out != sys.stdout:
+                if type(out) == str:
                     with codecs.open(out, "a", "utf-8") as outfile:
                         outfile.write(result)
                 else:
