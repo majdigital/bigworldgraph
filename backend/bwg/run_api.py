@@ -19,7 +19,7 @@ from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_env
 from bwg.neo4j_extensions import Neo4jLayer
 
 
-def set_up_api():
+def set_up_api(config_path="./api_config.py", log=True):
     """
     Set up the API using the following steps:
 
@@ -35,39 +35,42 @@ def set_up_api():
     :rtype: eve.Eve
     """
     # Init configuration
-    api_config = get_config_from_py_file("./api_config.py")
+    api_config = get_config_from_py_file(config_path)
     api_config = overwrite_local_config_with_environ(api_config)
 
-    # Create logging directory
-    logging_file = api_config["LOGGING_PATH"]
-    logging_path = "/".join(logging_file.split("/")[:-1])
-    if not os.path.exists(logging_path):
-        os.makedirs(logging_path)
+    if log:
+        # Create logging directory
+        logging_file = api_config["LOGGING_PATH"]
+        logging_path = "/".join(logging_file.split("/")[:-1])
+        if not os.path.exists(logging_path):
+            os.makedirs(logging_path)
 
-    # Init logger
-    logging.basicConfig(
-        filename=api_config["LOGGING_PATH"],
-        filemode="w",
-        level=api_config["LOGGING_LEVEL"],
-        format="%(asctime)s %(levelname)s:%(message)s",
-        datefmt="%d.%m.%Y %I:%M:%S"
-    )
+        # Init logger
+        logging.basicConfig(
+            filename=api_config["LOGGING_PATH"],
+            filemode="w",
+            level=api_config["LOGGING_LEVEL"],
+            format="%(asctime)s %(levelname)s:%(message)s",
+            datefmt="%d.%m.%Y %I:%M:%S"
+        )
 
     # Set up API
     api = Eve(data=Neo4jLayer, settings=api_config)
     flask_cors.CORS(api)
     api = add_error_handlers(api)
     api = add_additional_endpoints(api)
-    api = add_logger_to_app(api)
 
-    if api.config["DEBUG"]:
-        logging.getLogger().addHandler(logging.StreamHandler())
+    if log:
+        api = add_logger_to_app(api)
 
-    # Add callback functions
-    api.on_post_GET += log_request
-    api.on_post_PUT += log_request
-    api.on_post_POST += log_request
-    api.on_post_DELETE += log_request
+        if api.config["DEBUG"]:
+            logging.getLogger().addHandler(logging.StreamHandler())
+
+        # Add callback functions
+        api.on_post_GET += log_request
+        api.on_post_PUT += log_request
+        api.on_post_POST += log_request
+        api.on_post_DELETE += log_request
 
     return api
 
@@ -94,14 +97,14 @@ def add_error_handlers(api):
         if hasattr(error, "msg"):
             logging.error("The following {} occurred: {}".format(type(error).__name__, error.msg))
         else:
-            logging.error("A {} occured: {}".format(type(error).__name__, traceback.format_exc()))
+            logging.error("A {} occurred: {}".format(type(error).__name__, traceback.format_exc()))
 
         if api.config["DEBUG"]:
             raise error
 
         return json.dumps(
             {
-                "Sorry!": "There was an error. Please check your request or consult the projects GitHub page: "
+                "Sorry!": "There was an error. Please check your request or consult the project's GitHub page: "
                 "https://github.com/majdigital/bigworldgraph."
             }
         )
