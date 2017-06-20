@@ -15,7 +15,7 @@ from bwg.utilities import (
     serialize_tagged_sentence, serialize_wikidata_entity, deserialize_line, just_dump, retry_with_fallback,
     get_nes_from_sentence
 )
-from fixtures import RAW_SENTENCE, TAGGED_SENTENCE, SENTENCES, DEPENDENCY_TREE, RELATIONS, WIKIDATA_ENTITIES
+from .fixtures import RAW_SENTENCE, TAGGED_SENTENCE, SENTENCES, DEPENDENCY_TREE, RELATIONS, WIKIDATA_ENTITIES
 
 
 class SerializingTestCase(unittest.TestCase):

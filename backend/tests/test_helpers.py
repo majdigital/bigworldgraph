@@ -17,7 +17,7 @@ from bwg.helpers import (
     filter_dict, construct_dict_from_source, get_config_from_py_file, overwrite_local_config_with_environ,
     flatten_dictlist, is_collection, seconds_to_hms, time_function, fast_copy, get_if_exists
 )
-from fixtures import TEST_DICT
+from .fixtures import TEST_DICT
 
 
 class DictionaryHelpersTestCase(unittest.TestCase):

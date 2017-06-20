@@ -19,7 +19,7 @@ from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_env
 from bwg.neo4j_extensions import Neo4jLayer
 
 
-def set_up_api(config_path="./api_config.py", log=True):
+def set_up_api(config_path="./api_config.py", log=True, screen_output=True):
     """
     Set up the API using the following steps:
 
@@ -63,7 +63,7 @@ def set_up_api(config_path="./api_config.py", log=True):
     if log:
         api = add_logger_to_app(api)
 
-        if api.config["DEBUG"]:
+        if api.config["DEBUG"] and screen_output:
             logging.getLogger().addHandler(logging.StreamHandler())
 
         # Add callback functions

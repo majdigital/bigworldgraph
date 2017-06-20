@@ -267,3 +267,53 @@ WIKIDATA_ENTITIES = [
         }
     ]
 ]
+
+#                           #########################################################
+#                           ##                NLP Pipeline Fixtures                ##
+#                           #########################################################
+
+# TODO (Implement): Add test data [DU 20.06.17]
+READING_TASK = {
+    "input": [
+        '<doc id="12345" url="https://web.site" title="Sample article">',
+        '<!---',
+        'Comment in sample article',
+        '-->',
+        'Sample article',
+        '',
+        'First sample article sentence',
+        'This is the second sample article sentence.',
+        '</doc>'
+    ],
+    "output": []
+}
+
+# TODO (Implement): Add test data [DU 20.06.17]
+NER_TASK = {
+    "input": [],
+    "output": []
+}
+
+# TODO (Implement): Add test data [DU 20.06.17]
+DEPENDENCY_TASK = {
+    "input": [],
+    "output": []
+}
+
+# TODO (Implement): Add test data [DU 20.06.17]
+POS_TAGGING_TASK = {
+    "input": [],
+    "output": []
+}
+
+# TODO (Implement): Add test data [DU 20.06.17]
+NAIVE_OPEN_RELATION_EXTRACTION_TASK = {
+    "input": [],
+    "output": []
+}
+
+# TODO (Implement): Add test data [DU 20.06.17]
+PARTICIPATION_EXTRACTION_TASK = {
+    "input": [],
+    "output": []
+}

@@ -6,15 +6,14 @@ Test support for the Neo4j graph database.
 # STD
 import copy
 import unittest
-import unittest.mock as mock
 import random
 
 # EXT
 import neomodel
 
 # PROJECT
-from toolkit import mock_class_method
-from fixtures import WIKIDATA_ENTITIES
+from .toolkit import mock_class_method
+from .fixtures import WIKIDATA_ENTITIES
 from bwg.neo4j_extensions import (
     EveCompatibilityMixin, Relation, Entity, PipelineRunInfo, Neo4jResult, Neo4jDatabase, Neo4jLayer, Neo4jTarget
 )

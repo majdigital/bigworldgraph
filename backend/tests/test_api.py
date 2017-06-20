@@ -10,15 +10,18 @@ import codecs
 import datetime
 import os
 
+# EXT
+import neomodel
+
 # PROJECT
 import bwg
 from bwg.api_config import (
-    DOMAIN, NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER, NODE_TYPES, RELATION_TYPES, NODE_BASE_CLASSES
+    DOMAIN, NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER
 )
 from bwg.run_api import set_up_api
 from bwg.neo4j_extensions import Neo4jDatabase
-from test_neo4j_extensions import Neo4jTestMixin
-from toolkit import make_api_request, mock_class_method
+from .test_neo4j_extensions import Neo4jTestMixin
+from .toolkit import make_api_request
 
 
 class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
@@ -26,10 +29,12 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
     Testing API endpoints and defined method on these same endpoints.
     """
     def setUp(self):
+        os.environ["DEBUG"] = str(False)
         self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+        neomodel.util.logger.setLevel("WARNING")
         self.reset_database()
         self.create_and_connect_nodes()
-        self.api = set_up_api(config_path="../bwg/api_config.py", log=False)
+        self.api = set_up_api(config_path="../bwg/api_config.py", log=False, screen_output=False)
         self.api = self.api.test_client()
 
     def tearDown(self):
@@ -86,10 +91,12 @@ class APIAdditionalFunctionsTestCase(unittest.TestCase):
     """
     def setUp(self):
         self.logging_path = "./test.log"
+        neomodel.util.logger.setLevel("WARNING")
 
         os.environ["LOGGING_PATH"] = self.logging_path
-        os.environ["DEBUG"] = str(False)
-        self.api = set_up_api(config_path="../bwg/api_config.py", log=True)
+        os.environ["DEBUG"] = str(True)
+
+        self.api = set_up_api(config_path="../bwg/api_config.py", log=True, screen_output=False)
         self.api = self.api.test_client()
 
     def tearDown(self):
