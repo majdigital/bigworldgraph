@@ -17,7 +17,7 @@ from bwg.standard_tasks import (
 )
 from .toolkit import MockInput, MockOutput, mock_class_method
 from .fixtures import (
-    READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK
+    READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK
 )
 from bwg.pipeline_config import FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN
 
@@ -237,7 +237,6 @@ class PoSTaggingTaskTestCase(unittest.TestCase):
     """
     Testing PoSTaggingTask.
     """
-
     @mock.patch('bwg.standard_tasks.PoSTaggingTask.output')
     @mock.patch('bwg.standard_tasks.PoSTaggingTask.input')
     def test_task_functions(self, input_patch, output_patch):
@@ -266,7 +265,6 @@ class PoSTaggingTaskTestCase(unittest.TestCase):
             # Testing
             self._test_task(task)
             self._test_pos_tag(task)
-
 
     @staticmethod
     def naive_pos_tag(token, tokenized_sentence):
@@ -306,8 +304,88 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     """
     Testing NaiveOpenRelatioNExtractionTask.
     """
-    # TODO (Implement) [DU 20.06.17]
-    pass
+    @mock.patch('bwg.standard_tasks.NaiveOpenRelationExtractionTask.output')
+    @mock.patch('bwg.standard_tasks.NaiveOpenRelationExtractionTask.input')
+    def test_task_functions(self, input_patch, output_patch):
+        with mock.patch(
+                "bwg.standard_tasks.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
+        ) as workflow_mock:
+            task_config = {
+                "NER_TAGSET": {"i-P", "I-N"},
+                "DEFAULT_NE_TAG": "O",
+                "VERB_NODE_POS_TAGS": ["VV"],
+                "OMITTED_TOKENS_FOR_ALIGNMENT": [],
+                "CORPUS_ENCODING": "",
+                "ORE_OUTPUT_PATH": ""
+            }
+
+            output_patch.return_value = MockOutput()
+            input_patch.return_value = MockInput(NAIVE_OPEN_RELATION_EXTRACTION_TASK["input"])
+            workflow_mock.__get__ = mock.Mock(return_value={})
+
+            task = bwg.standard_tasks.NaiveOpenRelationExtractionTask(task_config=task_config)
+
+            # Testing
+            self._test_task(task)
+            self._test_extract_relations_from_sentence(task)
+            self._test_get_sentence()
+            self._test_align_tagged_sentence()
+            self._test_normalize_node_addresses()
+            self._test_extract_verb_nodes(task)
+            self._test_expand_node(task)
+            self._test_word_is_ne_tagged(task)
+            self._test_join_expanded_node()
+            self._test_get_subj_and_obj()
+            self._test_extract_relations()
+
+    def _test_task(self, task):
+        pass
+
+    def _test_extract_relations_from_sentence(self, task):
+        pass
+
+    @staticmethod
+    def _test_get_sentence():
+        pass
+
+    @staticmethod
+    def _test_align_tagged_sentence():
+        pass
+
+    @staticmethod
+    def _test_normalize_node_addresses():
+        pass
+
+    @staticmethod
+    def _test_extract_verb_nodes(task):
+        pass
+
+    @staticmethod
+    def _test_expand_node(task):
+        pass
+
+    @staticmethod
+    def _test_word_is_ne_tagged(task):
+        pass
+
+    @staticmethod
+    def _test_expanded_node_is_ne_tagged(task):
+        pass
+
+    @staticmethod
+    def _test_join_expanded_node():
+        pass
+
+    @staticmethod
+    def _test_get_subj_and_obj():
+        pass
+
+    @staticmethod
+    def _test_extract_relations():
+        pass
+
+
+
 
 
 class ParticipationExtractionTaskTestCase(unittest.TestCase):
