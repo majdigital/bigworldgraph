@@ -1,3 +1,5 @@
+import json
+
 TEST_DICT = {
     "field1": True,
     "field2": 33,
@@ -281,7 +283,7 @@ READING_TASK = {
         'Sample article',
         '',
         'First sample article sentence',
-        'This is the second sample article sentence.',
+        'This is the second sample article sentence',
         '</doc>'
     ],
     "output": [
@@ -308,7 +310,45 @@ READING_TASK = {
                         "type": "sentence",
                         "state": "parsed"
                     },
-                    "data": "This is the second sample article sentence."
+                    "data": "This is the second sample article sentence"
+                }
+            }
+        }
+    ]
+}
+
+NER_TASK = {
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "ne_tagged"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "type": "sentence",
+                        "state": "ne_tagged"
+                    },
+                    "data": [
+                       ["First", "O"], ["sample", "I-N"], ["article", "I-N"], ["sentence", "O"]
+                    ]
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "type": "sentence",
+                        "state": "ne_tagged"
+                    },
+                    "data": [
+                        ["This", "O"], ["is", "O"], ["the", "O"], ["second", "O"], ["sample", "I-N"],
+                        ["article", "I-N"], ["sentence", "O"]
+                    ]
                 }
             }
         }
@@ -316,20 +356,14 @@ READING_TASK = {
 }
 
 # TODO (Implement): Add test data [DU 20.06.17]
-NER_TASK = {
-    "input": READING_TASK["output"],
-    "output": []
-}
-
-# TODO (Implement): Add test data [DU 20.06.17]
 DEPENDENCY_TASK = {
-    "input": READING_TASK["output"],
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
     "output": []
 }
 
 # TODO (Implement): Add test data [DU 20.06.17]
 POS_TAGGING_TASK = {
-    "input": READING_TASK["output"],
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
     "output": []
 }
 

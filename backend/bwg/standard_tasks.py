@@ -195,7 +195,7 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
         Tag a single sentence with named entities.
 
         :param sentence_data: Data of the sentence that is going to be named entity tagged.
-        :type sentence_data: dict
+        :type sentence_data: str
         :param workflow_resources: Additional resources for this step.
         :type workflow_resources: dict
         :return: Processed sentence.
