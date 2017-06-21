@@ -272,7 +272,6 @@ WIKIDATA_ENTITIES = [
 #                           ##                NLP Pipeline Fixtures                ##
 #                           #########################################################
 
-# TODO (Implement): Add test data [DU 20.06.17]
 READING_TASK = {
     "input": [
         '<doc id="12345" url="https://web.site" title="Sample article">',
@@ -285,24 +284,52 @@ READING_TASK = {
         'This is the second sample article sentence.',
         '</doc>'
     ],
-    "output": []
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "parsed"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "type": "sentence",
+                        "state": "parsed"
+                    },
+                    "data": "First sample article sentence"
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "type": "sentence",
+                        "state": "parsed"
+                    },
+                    "data": "This is the second sample article sentence."
+                }
+            }
+        }
+    ]
 }
 
 # TODO (Implement): Add test data [DU 20.06.17]
 NER_TASK = {
-    "input": [],
+    "input": READING_TASK["output"],
     "output": []
 }
 
 # TODO (Implement): Add test data [DU 20.06.17]
 DEPENDENCY_TASK = {
-    "input": [],
+    "input": READING_TASK["output"],
     "output": []
 }
 
 # TODO (Implement): Add test data [DU 20.06.17]
 POS_TAGGING_TASK = {
-    "input": [],
+    "input": READING_TASK["output"],
     "output": []
 }
 
