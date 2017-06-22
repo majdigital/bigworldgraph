@@ -418,7 +418,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         Get the original (not de-tokenized) sentence from a line tagged with NE tags.
 
         :param ne_tagged_line: Sentence with Named Entity tags.
-        :type ne_tagged_line: str
+        :type ne_tagged_line: list
         :return: Raw sentence.
         :rtype: str
         """
@@ -457,6 +457,9 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         if "0" in dependency_tree["nodes"]:
             if dependency_tree["nodes"]["0"]["word"] in (None, "ROOT"):
                 del dependency_tree["nodes"]["0"]
+        elif 0 in dependency_tree["nodes"]:
+            if dependency_tree["nodes"][0]["word"] in (None, "ROOT"):
+                del dependency_tree["nodes"][0]
         else:
             # Empty tree
             return dependency_tree
@@ -498,7 +501,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         verb_node_pos_tags = self.task_config["VERB_NODE_POS_TAGS"]
         verb_nodes = []
 
-        if len(pos_tagged_line) == 0 and len(dependency_tree["nodes"]) == 1:
+        if len(pos_tagged_line) == 0 or len(dependency_tree["nodes"]) == 1:
             return verb_nodes
 
         for address, node in dependency_tree["nodes"].items():

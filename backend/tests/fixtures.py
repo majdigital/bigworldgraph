@@ -512,14 +512,110 @@ POS_TAGGING_TASK = {
     ]
 }
 
-# TODO (Implement): Add test data [DU 20.06.17]
 NAIVE_OPEN_RELATION_EXTRACTION_TASK = {
-    "input": [],
-    "output": []
+    "input": [
+        [json.dumps(article, ensure_ascii=False) for article in NER_TASK["output"]],
+        [json.dumps(article, ensure_ascii=False) for article in DEPENDENCY_TASK["output"]],
+        [json.dumps(article, ensure_ascii=False) for article in POS_TAGGING_TASK["output"]]
+    ],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "extracted_relations"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "state": "extracted_relations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "first sample article sentence",
+                        "relations": {}
+                    }
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "state": "extracted_relations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "this is the second sample article sentence",
+                        "relations": {}
+                    }
+                }
+            }
+        }
+    ]
 }
 
-# TODO (Implement): Add test data [DU 20.06.17]
 PARTICIPATION_EXTRACTION_TASK = {
-    "input": [],
-    "output": []
+    "input": [[json.dumps(article, ensure_ascii=False) for article in NER_TASK["output"]]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "extracted_participations"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "state": "extracted_participations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "first sample article sentence",
+                        "relations": {
+                            "12345/00001/PE00001": {
+                                "meta": {
+                                    "id": "12345/00001/PE00001",
+                                    "state": "extracted_participations",
+                                    "type": "sentence"
+                                },
+                                "data": {
+                                    "subject_phrase": "sample article",
+                                    "verb": "is related with",
+                                    "object_phrase": "Sample article"
+                                }
+                            }
+                        }
+                    }
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "state": "extracted_participations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "this is the second sample article sentence",
+                        "relations": {
+                            "12345/00002/PE00001": {
+                                "meta": {
+                                    "id": "12345/00002/PE00001",
+                                    "state": "extracted_participations",
+                                    "type": "sentence"
+                                },
+                                "data": {
+                                    "subject_phrase": "sample article",
+                                    "verb": "is related with",
+                                    "object_phrase": "Sample article"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
 }

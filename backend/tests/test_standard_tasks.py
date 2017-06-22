@@ -8,6 +8,7 @@ import codecs
 import unittest
 import unittest.mock as mock
 import json
+import copy
 
 # PROJECT
 import bwg
@@ -17,9 +18,16 @@ from bwg.standard_tasks import (
 )
 from .toolkit import MockInput, MockOutput, mock_class_method
 from .fixtures import (
-    READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK
+    READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK,
+    PARTICIPATION_EXTRACTION_TASK, DEPENDENCY_TREE
 )
 from bwg.pipeline_config import FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN
+
+# CONSTANTS
+NE_TAGGED_PINEAPPLE_SENTENCE = [
+    ("this", "O"), ("pineapple", "I-P"), ("is", "O"), ("part", "O"), ("of", "O"), ("a", "O"), ("sample", "I-N"),
+    ("sentence", "O"), ("in", "O"), ("an", "O"), ("article", "I-N")
+]
 
 
 class MockTokenizer:
@@ -143,10 +151,7 @@ class NERTaskTestCase(unittest.TestCase):
     def _test_ner_tag(task):
         sentence_data = "this pineapple is part of a sample sentence in an article"
         ner_tagged_sentence = task._ner_tag(sentence_data, **task.workflow_resources)
-        assert ner_tagged_sentence == [
-            ("this", "O"), ("pineapple", "I-P"), ("is", "O"), ("part", "O"), ("of", "O"), ("a", "O"), ("sample", "I-N"),
-            ("sentence", "O"), ("in", "O"), ("an", "O"), ("article", "I-N")
-        ]
+        assert ner_tagged_sentence == NE_TAGGED_PINEAPPLE_SENTENCE
 
 
 class DependencyParseTaskTestCase(unittest.TestCase):
@@ -308,10 +313,10 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     @mock.patch('bwg.standard_tasks.NaiveOpenRelationExtractionTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-                "bwg.standard_tasks.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
+            "bwg.standard_tasks.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
-                "NER_TAGSET": {"i-P", "I-N"},
+                "NER_TAGSET": ["I-P", "I-N"],
                 "DEFAULT_NE_TAG": "O",
                 "VERB_NODE_POS_TAGS": ["VV"],
                 "OMITTED_TOKENS_FOR_ALIGNMENT": [],
@@ -320,7 +325,11 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
             }
 
             output_patch.return_value = MockOutput()
-            input_patch.return_value = MockInput(NAIVE_OPEN_RELATION_EXTRACTION_TASK["input"])
+            input_patch.return_value = (
+                MockInput(NAIVE_OPEN_RELATION_EXTRACTION_TASK["input"][0]),
+                MockInput(NAIVE_OPEN_RELATION_EXTRACTION_TASK["input"][1]),
+                MockInput(NAIVE_OPEN_RELATION_EXTRACTION_TASK["input"][2])
+            )
             workflow_mock.__get__ = mock.Mock(return_value={})
 
             task = bwg.standard_tasks.NaiveOpenRelationExtractionTask(task_config=task_config)
@@ -329,7 +338,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
             self._test_task(task)
             self._test_extract_relations_from_sentence(task)
             self._test_get_sentence()
-            self._test_align_tagged_sentence()
+            self._test_align_tagged_sentence(task)
             self._test_normalize_node_addresses()
             self._test_extract_verb_nodes(task)
             self._test_expand_node(task)
@@ -338,59 +347,149 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
             self._test_get_subj_and_obj()
             self._test_extract_relations()
 
-    def _test_task(self, task):
-        pass
+    @staticmethod
+    def _test_task(task):
+        task.run()
+        output_mock = task.output()
+        assert [json.loads(content, encoding="utf-8") for content in output_mock.contents] == \
+               NAIVE_OPEN_RELATION_EXTRACTION_TASK["output"]
 
     def _test_extract_relations_from_sentence(self, task):
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_get_sentence():
-        pass
+        tagged_sentence = NE_TAGGED_PINEAPPLE_SENTENCE
+        assert NaiveOpenRelationExtractionTask._get_sentence(tagged_sentence) == \
+               "this pineapple is part of a sample sentence in an article"
 
     @staticmethod
-    def _test_align_tagged_sentence():
-        pass
+    def _test_align_tagged_sentence(task):
+        assert task._align_tagged_sentence(NE_TAGGED_PINEAPPLE_SENTENCE) == NE_TAGGED_PINEAPPLE_SENTENCE
+
+        # TODO (Bug): Find a way to do this test [DU 22.06.17]
+        #new_config = {"OMITTED_TOKENS_FOR_ALIGNMENT": [token for token, _ in NE_TAGGED_PINEAPPLE_SENTENCE]}
+        #with mock.patch("bwg.standard_tasks.NaiveOpenRelationExtractionTask.task_config", return_value=new_config):
+        #    assert task._align_tagged_sentence(NE_TAGGED_PINEAPPLE_SENTENCE) == []
 
     @staticmethod
     def _test_normalize_node_addresses():
-        pass
+        empty_tree = {"nodes": {}, "root": {}}
+        assert NaiveOpenRelationExtractionTask._normalize_node_addresses(empty_tree) == empty_tree
+
+        normalized_tree = NaiveOpenRelationExtractionTask._normalize_node_addresses(DEPENDENCY_TREE)
+        assert normalized_tree["nodes"][0]["word"] not in (None, "ROOT")
+        assert normalized_tree["root"]["word"] not in (None, "ROOT")
 
     @staticmethod
     def _test_extract_verb_nodes(task):
-        pass
+        dependency_tree = {
+            "nodes": {
+                0: {
+                    "address": 0,
+                    "word": "pineapples",
+                    "deps": {}
+                },
+                1: {
+                    "address": 1,
+                    "word": "are",
+                    "deps": {
+                        "nsubj": 0,
+                        "dobj": 2
+                    }
+                },
+                2: {
+                    "address": 2,
+                    "word": "fruits",
+                    "deps": {}
+                }
+            },
+            "root": 2
+        }
+        pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("fruits", "NN")]
+
+        assert task._extract_verb_nodes({"nodes": {}}, []) == []
+        assert task._extract_verb_nodes(dependency_tree, pos_tagged_line) == [dependency_tree["nodes"][1]]
 
     @staticmethod
     def _test_expand_node(task):
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_word_is_ne_tagged(task):
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_expanded_node_is_ne_tagged(task):
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_join_expanded_node():
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_get_subj_and_obj():
+        # TODO (Implement) [DU 22.06.17]
         pass
 
     @staticmethod
     def _test_extract_relations():
+        # TODO (Implement) [DU 22.06.17]
         pass
-
-
-
 
 
 class ParticipationExtractionTaskTestCase(unittest.TestCase):
     """
     Testing ParticipationExtractionTask.
     """
-    # TODO (Implement) [DU 20.06.17]
-    pass
+    @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.output')
+    @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.input')
+    def test_task_functions(self, input_patch, output_patch):
+        with mock.patch(
+            "bwg.standard_tasks.ParticipationExtractionTask.workflow_resources",
+            new_callable=mock.PropertyMock()
+        ) as workflow_mock:
+            task_config = {
+                "DEFAULT_NE_TAG": "O",
+                "PARTICIPATION_PHRASES": {
+                    "I-P": "is pineappled with",
+                    "I-N": "is related with",
+                    "DEFAULT": "is boringly related with"
+                },
+                "PE_OUTPUT_PATH": "",
+                "CORPUS_ENCODING": ""
+            }
+
+            output_patch.return_value = MockOutput()
+            input_patch.return_value = MockInput(PARTICIPATION_EXTRACTION_TASK["input"])
+            workflow_mock.__get__ = mock.Mock(return_value={})
+
+            task = bwg.standard_tasks.ParticipationExtractionTask(task_config=task_config)
+
+            # Testing
+            self._test_task(task)
+            self._test_build_participation_relations()
+            self._test_get_sentence()
+
+    @staticmethod
+    def _test_task(task):
+        task.run()
+        output_mock = task.output()
+        assert [json.loads(content, encoding="utf-8") for content in output_mock.contents] == \
+               PARTICIPATION_EXTRACTION_TASK["output"]
+
+    @staticmethod
+    def _test_build_participation_relations():
+        # TODO (Implement) [DU 22.06.17]
+        pass
+
+    @staticmethod
+    def _test_get_sentence():
+        tagged_sentence = NE_TAGGED_PINEAPPLE_SENTENCE
+        assert ParticipationExtractionTask._get_sentence(tagged_sentence) == \
+               "this pineapple is part of a sample sentence in an article"
