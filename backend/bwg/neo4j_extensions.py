@@ -678,13 +678,24 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         self.node_relevance_function = node_relevance_function
         self._categorize_node = categorization_function
 
-    # TODO (Document) [DU 27.06.17]
     # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
     @retry_on_condition(
         exception_class=neo4j.bolt.connection.ServiceUnavailable,
         condition=lambda: os.environ.get("ENV", None) == "testing"
     )
     def _init_db(self, user, password, host, port):
+        """
+        Initialize the database.
+
+        :param user: Username to access database.
+        :type user: str
+        :param password: Password to access database.
+        :type password: str
+        :param host: Host of database.
+        :type host: str
+        :param port: Port of database.
+        :type port: str
+        """
         Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
 
     def exists(self):

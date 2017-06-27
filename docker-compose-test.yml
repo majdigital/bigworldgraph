@@ -25,9 +25,6 @@ services:
     networks:
       - app-tier
     entrypoint: python3 -m unittest discover ./tests/
-    #entrypoint: python3 -m unittest ./tests/
-    #entrypoint: printenv
-    #entrypoint:  /bin/sh -c "while true; do sleep 2; df -h; done"
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}

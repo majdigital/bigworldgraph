@@ -265,7 +265,6 @@ def get_if_exists(dictionary, *keys, default=None):
     return value
 
 
-# TODO (Documentation) [DU 27.06.17]
 def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
     """
     Retry a function in case an exception occurs. You can also define an additional condition that has to be met as
@@ -273,9 +272,9 @@ def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
 
     :param exception_class: Exception class that triggers the retry.
     :type exception_class: Exception
-    :param condition:
-    :param max_retries:
-    :return:
+    :param condition: Additional condition that has to be met.
+    :type: func
+    :param max_retries: Maximum amount of retries, -1 means infinite retries.
     """
     def decorator(func):
         """
