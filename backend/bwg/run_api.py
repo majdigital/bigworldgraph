@@ -177,7 +177,9 @@ def add_logger_to_app(app):
 
 
 if __name__ == "__main__":
-    api = set_up_api()
+    api_config_path = os.environ.get("API_CONFIG_PATH", "./api_config.py")
+
+    api = set_up_api(api_config_path)
     flask_cors.CORS(api)
     logging.info("API is being run now!")
     logging.debug(

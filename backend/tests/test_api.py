@@ -12,16 +12,15 @@ import os
 
 # EXT
 import neomodel
+import neo4j
 
 # PROJECT
 import bwg
-from bwg.api_config import (
-    DOMAIN, NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER
-)
+from bwg.api_config import DOMAIN
 from bwg.run_api import set_up_api
 from bwg.neo4j_extensions import Neo4jDatabase
-from .test_neo4j_extensions import Neo4jTestMixin
-from .toolkit import make_api_request
+from tests.test_neo4j_extensions import Neo4jTestMixin, get_api_config
+from tests.toolkit import make_api_request
 
 
 class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
@@ -30,11 +29,16 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     def setUp(self):
         os.environ["DEBUG"] = str(False)
-        self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+        api_config = get_api_config()
+        self.neo4j_database = Neo4jDatabase(
+            user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"], host=api_config["NEO4J_HOST"],
+            port=api_config["NEO4J_PORT"]
+        )
         neomodel.util.logger.setLevel("WARNING")
         self.reset_database()
         self.create_and_connect_nodes()
-        self.api = set_up_api(config_path="../bwg/api_config.py", log=False, screen_output=False)
+        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api_config.py")
+        self.api = set_up_api(config_path=api_config_path, log=False, screen_output=False)
         self.api = self.api.test_client()
 
     def tearDown(self):
@@ -85,7 +89,7 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
         assert str(current_year) in content["license"]
 
 
-class APIAdditionalFunctionsTestCase(unittest.TestCase):
+class APIAdditionalFunctionsTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing additional API functions.
     """
@@ -96,13 +100,15 @@ class APIAdditionalFunctionsTestCase(unittest.TestCase):
         os.environ["LOGGING_PATH"] = self.logging_path
         os.environ["DEBUG"] = str(True)
 
-        self.api = set_up_api(config_path="../bwg/api_config.py", log=True, screen_output=False)
+        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api_config.py")
+        self.api = set_up_api(config_path=api_config_path, log=True, screen_output=False)
         self.api = self.api.test_client()
 
     def tearDown(self):
         os.remove(self.logging_path)
 
     def test_logging(self):
+        self._connect_to_db()
         make_api_request(self.api, "GET", "/entities")
 
         assert os.path.isfile(self.logging_path)

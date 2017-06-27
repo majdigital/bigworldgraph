@@ -11,6 +11,7 @@ import time
 import types
 import os
 import pickle
+import random
 
 # EXT
 import nltk
@@ -92,7 +93,7 @@ def overwrite_local_config_with_environ(config):
     :rtype: dict
     """
     return {
-        key: (value if key not in os.environ else os.environ[key])
+        key: os.environ.get(key, value)
         for key, value in config.items()
     }
 
@@ -262,3 +263,41 @@ def get_if_exists(dictionary, *keys, default=None):
             return default
 
     return value
+
+
+# TODO (Documentation) [DU 27.06.17]
+def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
+    """
+    Retry a function in case an exception occurs. You can also define an additional condition that has to be met as
+    well as a maximum amount of retries.
+
+    :param exception_class: Exception class that triggers the retry.
+    :type exception_class: Exception
+    :param condition:
+    :param max_retries:
+    :return:
+    """
+    def decorator(func):
+        """
+        Actual decorator.
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            assert callable(condition)
+            assert issubclass(exception_class, Exception)
+
+            if condition:
+                retries = 0
+
+                while retries < max_retries:
+                    retries += 1
+                    try:
+                        return func(*args, **kwargs)
+                    except exception_class:
+                        pass
+                    time.sleep(random.randint(0, 25) / 10)
+            else:
+                return func(*args, **kwargs)
+
+        return func_wrapper
+    return decorator

@@ -4,6 +4,7 @@ Testing functions concerning the config management of the NLP pipeline.
 """
 
 # STD
+import os
 import unittest
 
 # PROJECT
@@ -35,7 +36,9 @@ class ConfigManagementTest(unittest.TestCase):
     @staticmethod
     def test_building_task_config():
         dummy_pipeline_config = build_task_config_for_language(
-            ["task1", "task2"], language="DEMO", config_file_path="./dummy_pipeline_config.py"
+            ["task1", "task2"], language="DEMO", config_file_path=os.environ.get(
+                "DUMMY_PIPELINE_CONFIG_PATH", "./dummy_pipeline_config.py"
+            )
         )
         assert dummy_pipeline_config["PARAM"] == 3.5
         assert dummy_pipeline_config["PARAM1"] == "abc"
@@ -46,7 +49,10 @@ class ConfigManagementTest(unittest.TestCase):
         assert dummy_pipeline_config["OPTIONAL_PARAMETER"] == "I am optional"
 
         dummy_pipeline_config2 = build_task_config_for_language(
-            ["task1", "task2"], language="DEMO", config_file_path="./dummy_pipeline_config.py", include_optionals=False
+            ["task1", "task2"], language="DEMO", config_file_path=os.environ.get(
+                "DUMMY_PIPELINE_CONFIG_PATH", "./dummy_pipeline_config.py"
+            ),
+            include_optionals=False
         )
         assert "OPTIONAL_PARAMETER" not in dummy_pipeline_config2
 

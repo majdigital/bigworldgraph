@@ -6,6 +6,7 @@ Create support for the Neo4j graph database.
 # STD
 import json
 import sys
+import os
 
 # EXT
 from eve.io.base import DataLayer
@@ -13,9 +14,10 @@ from eve.exceptions import ConfigException
 from eve.utils import ParsedRequest
 import luigi
 import neomodel
+import neo4j
 
 # PROJECT
-from bwg.helpers import get_if_exists
+from bwg.helpers import get_if_exists, retry_on_condition
 
 
 class EveCompatibilityMixin:
@@ -252,6 +254,11 @@ class Neo4jDatabase:
     Wrapper for a ``Neo4j`` Graph database, providing an easy way to connect to a database, querying nodes and relations as 
     well as creating new Node and Relation classes on the fly.
     """
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing"
+    )
     def __init__(self, user, password, host, port):
         neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
             user=user, password=password, host=host, port=port
@@ -410,11 +417,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     def init_app(self, app):
         self.app = app
 
-        # Init database connection
-        Neo4jDatabase.__init__(
-            self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
-            host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
-        )
+        self._init_db(app)
 
         # Determine base types for nodes and vertices
         self.node_types = app.config["NODE_TYPES"]
@@ -426,6 +429,17 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         self.node_base_classes_names = [
             node_base_class.__name__ for node_base_class in self.node_base_classes
         ]
+
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing"
+    )
+    def _init_db(self, app):
+        Neo4jDatabase.__init__(
+            self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
+            host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
+        )
 
     def find(self, resource, req, sub_resource_lookup):
         """
@@ -659,9 +673,19 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         """
         self.categories = categories
         self.pipeline_run_info = pipeline_run_info
-        Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
+
+        self._init_db(user, password, host, port)
         self.node_relevance_function = node_relevance_function
         self._categorize_node = categorization_function
+
+    # TODO (Document) [DU 27.06.17]
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing"
+    )
+    def _init_db(self, user, password, host, port):
+        Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
 
     def exists(self):
         """

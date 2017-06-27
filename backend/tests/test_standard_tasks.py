@@ -16,8 +16,8 @@ from bwg.standard_tasks import (
     SimpleReadingTask, NERTask, DependencyParseTask, PoSTaggingTask, NaiveOpenRelationExtractionTask,
     ParticipationExtractionTask
 )
-from .toolkit import MockInput, MockOutput, mock_class_method
-from .fixtures import (
+from tests.toolkit import MockInput, MockOutput, mock_class_method
+from tests.fixtures import (
     READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK,
     PARTICIPATION_EXTRACTION_TASK, DEPENDENCY_TREE
 )

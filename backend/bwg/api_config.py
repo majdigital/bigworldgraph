@@ -105,3 +105,4 @@ API_HOST = "localhost"
 # Logging config
 LOGGING_PATH = "../logs/api_log.txt"
 LOGGING_LEVEL = logging.DEBUG
+TEST_PARAM = "test"

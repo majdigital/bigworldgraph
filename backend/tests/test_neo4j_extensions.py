@@ -3,24 +3,36 @@
 Test support for the Neo4j graph database.
 """
 
+# Avoid Pywikibot exception
+import os
+os.environ["PYWIKIBOT2_DIR"] = "../bwg/user-config.py"
+os.environ["PYWIKIBOT2_NO_USER_CONFIG"] = "1"
+
 # STD
 import copy
 import unittest
+import time
 import random
 
 # EXT
 import neomodel
+import neo4j
 
 # PROJECT
-from .toolkit import mock_class_method
-from .fixtures import WIKIDATA_ENTITIES
+from tests.toolkit import mock_class_method
+from tests.fixtures import WIKIDATA_ENTITIES
 from bwg.neo4j_extensions import (
     EveCompatibilityMixin, Relation, Entity, PipelineRunInfo, Neo4jResult, Neo4jDatabase, Neo4jLayer, Neo4jTarget
 )
-from bwg.api_config import (
-    NEO4J_HOST, NEO4J_PASSWORD, NEO4J_PORT, NEO4J_USER, NODE_TYPES, RELATION_TYPES, NODE_BASE_CLASSES
-)
 from bwg.helpers import overwrite_local_config_with_environ
+import bwg.api_config
+
+
+def get_api_config():
+    # Only import actual config parameters
+    _api_config = {key: value for key, value in bwg.api_config.__dict__.items() if key == key.upper()}
+    api_config = overwrite_local_config_with_environ(_api_config)
+    return api_config
 
 
 class DummyParsedRequest:
@@ -43,6 +55,8 @@ class Neo4jTestMixin:
     """
     Create some testing nodes for different Neo4j-related tests.
     """
+    is_connected = False
+
     @property
     def created_test_nodes(self):
         node1 = Entity(
@@ -78,6 +92,7 @@ class Neo4jTestMixin:
         node3 = Entity(uid="3", label="node3", data={})
         node4 = Entity(uid="4", label="node4", data={})
 
+        self._connect_to_db()
         nodes = [node1, node2, node3, node4]
         for node in nodes:
             node.save()
@@ -85,6 +100,7 @@ class Neo4jTestMixin:
         return [copy.deepcopy(node) for node in [node1, node2, node3, node4]]
 
     def create_nodes(self):
+        self._connect_to_db()
         for node in self.created_test_nodes:
             node.save()
 
@@ -98,9 +114,28 @@ class Neo4jTestMixin:
             relation = end_node.relations.connect(start_node)
             relation.save()
 
-    @staticmethod
-    def reset_database():
-        neomodel.util.clear_neo4j_database(neomodel.db)
+    def reset_database(self):
+        self._connect_to_db()
+        for node in Entity.nodes:
+            node.delete()
+
+    def _connect_to_db(self):
+        if not self.is_connected:
+            api_config = get_api_config()
+            api_config = overwrite_local_config_with_environ(api_config)
+
+            while True:
+                try:
+                    neomodel.db.set_connection("bolt://{user}:{password}@{host}:{port}".format(
+                        user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
+                        host=api_config["NEO4J_HOST"], port=api_config["NEO4J_PORT"]
+                    ))
+                    self.is_connected = True
+                    break
+                except neo4j.bolt.connection.ServiceUnavailable:
+                    pass
+
+                time.sleep(random.randint(0, 25) / 10)
 
 
 class EveCompatibilityMixinTestCase(unittest.TestCase):
@@ -305,17 +340,20 @@ class Neo4jDatabaseTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jDatabase class.
     """
+
     def setUp(self):
-        self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+        api_config = get_api_config()
+        #raise Exception("cconfig: {}".format(str(api_config)))
+
+        self.neo4j_database = Neo4jDatabase(
+            user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
+            host=api_config["NEO4J_HOST"], port=api_config["NEO4J_PORT"]
+        )
+        #raise Exception("uurl: " + neomodel.config.DATABASE_URL)
         self.reset_database()
 
     def tearDown(self):
         self.reset_database()
-
-    def test_init(self):
-        assert neomodel.config.DATABASE_URL == "bolt://{user}:{password}@{host}:{port}".format(
-            user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT
-        )
 
     def test_get_node_class(self):
         # Default
@@ -391,6 +429,8 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
     Testing the Neo4jLayer class.
     """
     def setUp(self):
+        api_config = get_api_config()
+
         class MockApp:
             def __init__(self, **config):
                 self.config = config
@@ -401,13 +441,13 @@ class Neo4jLayerTestCase(unittest.TestCase, Neo4jTestMixin):
                 }
 
         config = {
-            "NEO4J_USER": NEO4J_USER,
-            "NEO4J_HOST": NEO4J_HOST,
-            "NEO4J_PORT": NEO4J_PORT,
-            "NEO4J_PASSWORD": NEO4J_PASSWORD,
-            "NODE_TYPES": NODE_TYPES,
-            "NODE_BASE_CLASSES": NODE_BASE_CLASSES,
-            "RELATION_TYPES": RELATION_TYPES
+            "NEO4J_USER": api_config["NEO4J_USER"],
+            "NEO4J_HOST": api_config["NEO4J_HOST"],
+            "NEO4J_PORT": api_config["NEO4J_PORT"],
+            "NEO4J_PASSWORD": api_config["NEO4J_PASSWORD"],
+            "NODE_TYPES": api_config["NODE_TYPES"],
+            "NODE_BASE_CLASSES": api_config["NODE_BASE_CLASSES"],
+            "RELATION_TYPES": api_config["RELATION_TYPES"]
         }
         config = overwrite_local_config_with_environ(config)
         mock_app = MockApp(**config)
@@ -512,22 +552,31 @@ class Neo4jTargetTestCase(unittest.TestCase, Neo4jTestMixin):
     """
     Testing the Neo4jTarget class.
     """
+    _target = None
+
     @property
     def neo4j_target(self):
-        return Neo4jTarget(pipeline_run_info={}, user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST)
+        api_config = get_api_config()
+
+        if self._target is None:
+            self._target = Neo4jTarget(
+                pipeline_run_info={}, user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
+                host=api_config["NEO4J_HOST"]
+            )
+
+        return self._target
 
     def setUp(self):
+        api_config = get_api_config()
+
         self.reset_database()
-        self.neo4j_database = Neo4jDatabase(user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT)
+        self.neo4j_database = Neo4jDatabase(
+            user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
+            host=api_config["NEO4J_HOST"], port=api_config["NEO4J_PORT"]
+        )
 
     def tearDown(self):
         self.reset_database()
-
-    @staticmethod
-    def test_init():
-        assert neomodel.config.DATABASE_URL == "bolt://{user}:{password}@{host}:{port}".format(
-            user=NEO4J_USER, password=NEO4J_PASSWORD, host=NEO4J_HOST, port=NEO4J_PORT
-        )
 
     def test_magic_methods(self):
         neo4j_target = self.neo4j_target

@@ -3,6 +3,9 @@
 NLP Pipeline tasks for french texts.
 """
 
+# STD
+import os
+
 # EXT
 import luigi.format
 import nltk
@@ -342,6 +345,7 @@ class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
+    french_config_path = os.environ.get("FRENCH_PIPELINE_CONFIG_PATH", "./pipeline_config.py")
     # TODO (FEATURE): Use remote scheduler for server deployment [DU 18.04.17]
     french_task_config = build_task_config_for_language(
         tasks=[
@@ -357,7 +361,7 @@ if __name__ == "__main__":
             "relations_database_writing_task"
         ],
         language="french",
-        config_file_path="./pipeline_config.py"
+        config_file_path=french_config_path
     )
     luigi.build(
         [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],
