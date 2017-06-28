@@ -15,6 +15,9 @@ node("docker-builder") {
 }
 
 node("staging") {
+    stage('fetching'){
+        checkout scm
+    }
     stage('testing'){
         sh 'ls -lah'
       try {
