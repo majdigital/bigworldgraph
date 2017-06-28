@@ -1,6 +1,6 @@
 node("docker-builder") {
     stage('fetching'){
-      checkout bigworldgraph
+      checkout scm
     }
     stage('building'){
         try {
