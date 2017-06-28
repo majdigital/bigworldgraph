@@ -14,6 +14,7 @@ node("docker-builder") {
 
 node("staging") {
     stage('testing'){
+        sh 'ls -lah'
       try {
         sh 'docker-compose -f docker-compose-test.yml build --no-cache'
         sh 'docker-compose -f docker-compose-test.yml up'
