@@ -12,7 +12,7 @@ node("docker-builder") {
     }
 }
 
-node("docker-testin") {
+node("staging") {
     stage('testing'){
       try {
         sh 'docker-compose build --no-cache'
@@ -29,7 +29,7 @@ node("docker-testin") {
     }
 }
 
-node("docker-production") {
+node("production-mobidick") {
     withEnv([
       "ENV=production"
     ]) {
