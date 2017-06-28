@@ -15,8 +15,8 @@ node("docker-builder") {
 node("staging") {
     stage('testing'){
       try {
-        sh 'docker-compose build --no-cache'
-        sh 'docker-compose up'
+        sh 'docker-compose -f docker-compose-test.yml build --no-cache'
+        sh 'docker-compose -f docker-compose-test.yml up'
       } catch (e) {
         error 'staging failed'
       } finally {
