@@ -257,7 +257,8 @@ class Neo4jDatabase:
     # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
     @retry_on_condition(
         exception_class=neo4j.bolt.connection.ServiceUnavailable,
-        condition=lambda: os.environ.get("ENV", None) == "testing"
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
     )
     def __init__(self, user, password, host, port):
         neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
@@ -433,7 +434,8 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
     @retry_on_condition(
         exception_class=neo4j.bolt.connection.ServiceUnavailable,
-        condition=lambda: os.environ.get("ENV", None) == "testing"
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
     )
     def _init_db(self, app):
         Neo4jDatabase.__init__(
@@ -681,7 +683,8 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
     @retry_on_condition(
         exception_class=neo4j.bolt.connection.ServiceUnavailable,
-        condition=lambda: os.environ.get("ENV", None) == "testing"
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
     )
     def _init_db(self, user, password, host, port):
         """

@@ -28,12 +28,40 @@ NE_TAGGED_PINEAPPLE_SENTENCE = [
     ("this", "O"), ("pineapple", "I-P"), ("is", "O"), ("part", "O"), ("of", "O"), ("a", "O"), ("sample", "I-N"),
     ("sentence", "O"), ("in", "O"), ("an", "O"), ("article", "I-N")
 ]
+NE_DEPENDEMCY_PINEAPPLE_TREE = {
+    "nodes": {
+        0: {
+            "address": 0,
+            "word": "pineapples",
+            "deps": {}
+        },
+        1: {
+            "address": 1,
+            "word": "are",
+            "deps": {
+                "nsubj": [0],
+                "dobj": [3]
+            }
+        },
+        2: {
+            "address": 2,
+            "word": "juicy",
+            "deps": {}
+        },
+        3: {
+            "address": 3,
+            "word": "fruits",
+            "deps": {"adj": [2]}
+        }
+    },
+    "root": 2
+}
 
 
 class MockTokenizer:
     @staticmethod
     def tokenize(sentence_data):
-        return sentence_data.split(" ")
+        return sentence_data.split(" ")  # Yes, yes, very sophisticated
 
 
 class MockTagger:
@@ -345,7 +373,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
             self._test_word_is_ne_tagged(task)
             self._test_join_expanded_node()
             self._test_get_subj_and_obj()
-            self._test_extract_relations()
+            self._test_extract_relations(task)
 
     @staticmethod
     def _test_task(task):
@@ -354,9 +382,20 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
         assert [json.loads(content, encoding="utf-8") for content in output_mock.contents] == \
                NAIVE_OPEN_RELATION_EXTRACTION_TASK["output"]
 
-    def _test_extract_relations_from_sentence(self, task):
-        # TODO (Implement) [DU 22.06.17]
-        pass
+    @staticmethod
+    def _test_extract_relations_from_sentence(task):
+        ne_tagged_line = [("pineapples", "I-P"), ("are", "O"), ("juicy", "I-N"), ("fruits", "I-N")]
+        pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
+        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        sentence_dates = {
+            "data_ne_tagged": {"data": ne_tagged_line},
+            "data_dependency_parsed": {"data": dependency_tree},
+            "data_pos_tagged": {"data": pos_tagged_line}
+        }
+
+        assert task._extract_relations_from_sentence(sentence_dates) == (
+            [("pineapples", "are", "juicy fruits")], "pineapples are juicy fruits"
+        )
 
     @staticmethod
     def _test_get_sentence():
@@ -384,63 +423,64 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
 
     @staticmethod
     def _test_extract_verb_nodes(task):
-        dependency_tree = {
-            "nodes": {
-                0: {
-                    "address": 0,
-                    "word": "pineapples",
-                    "deps": {}
-                },
-                1: {
-                    "address": 1,
-                    "word": "are",
-                    "deps": {
-                        "nsubj": 0,
-                        "dobj": 2
-                    }
-                },
-                2: {
-                    "address": 2,
-                    "word": "fruits",
-                    "deps": {}
-                }
-            },
-            "root": 2
-        }
-        pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("fruits", "NN")]
+        dependency_tree = NE_DEPENDEMCY_PINEAPPLE_TREE
+        pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
 
         assert task._extract_verb_nodes({"nodes": {}}, []) == []
         assert task._extract_verb_nodes(dependency_tree, pos_tagged_line) == [dependency_tree["nodes"][1]]
 
     @staticmethod
     def _test_expand_node(task):
-        # TODO (Implement) [DU 22.06.17]
-        pass
+        dependecy_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        fruits_node, verb_node = dependecy_tree["nodes"][3], dependecy_tree["nodes"][1]
+        juicy_node = dependecy_tree["nodes"][2]
+        assert task._expand_node(verb_node, dependecy_tree, is_verb_node=True) == [
+            (verb_node["address"], verb_node["word"])
+        ]
+        assert task._expand_node(fruits_node, dependecy_tree) == [
+            (fruits_node["address"], fruits_node["word"]), (juicy_node["address"], juicy_node["word"])
+        ]
 
     @staticmethod
     def _test_word_is_ne_tagged(task):
-        # TODO (Implement) [DU 22.06.17]
-        pass
+        assert task._word_is_ne_tagged(0, [("word", "I-P")])
+        assert task._word_is_ne_tagged(0, [("Another word", "I-N")])
+        assert not task._word_is_ne_tagged(0, [("untagged word", "O")])
 
     @staticmethod
     def _test_expanded_node_is_ne_tagged(task):
-        # TODO (Implement) [DU 22.06.17]
-        pass
+        ne_tagged_line = [
+            ("this", "O"), ("is", "O"), ("an", "I-N"), ("expanded", "I-N"), ("node", "I-N"), ("and", "O"), ("a", "I-P"),
+            ("pineapple", "I-P")
+        ]
+        assert task._expanded_node_is_ne_tagged([(2, "an"), (3, "expanded"), (4, "node")], ne_tagged_line)
+        assert task._expanded_node_is_ne_tagged([(6, "a"), (7, "pineapple")], ne_tagged_line)
+        assert not task._expanded_node_is_ne_tagged([(0, "this"), (1, "is")], ne_tagged_line)
 
     @staticmethod
     def _test_join_expanded_node():
-        # TODO (Implement) [DU 22.06.17]
-        pass
+        assert NaiveOpenRelationExtractionTask._join_expanded_node([(6, "a"), (7, "pineapple")]) == "a pineapple"
+        assert NaiveOpenRelationExtractionTask._join_expanded_node(
+            [(3, "expanded"), (2, "an"), (4, "node")]
+        ) == "an expanded node"
+        assert NaiveOpenRelationExtractionTask._join_expanded_node([(5, "word")]) == "word"
 
     @staticmethod
     def _test_get_subj_and_obj():
-        # TODO (Implement) [DU 22.06.17]
-        pass
+        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        verb_node = dependency_tree["nodes"][1]
+        subj_node, obj_node = dependency_tree["nodes"][0], dependency_tree["nodes"][3]
+        assert NaiveOpenRelationExtractionTask._get_subj_and_obj(verb_node, dependency_tree) == (subj_node, obj_node)
 
     @staticmethod
-    def _test_extract_relations():
-        # TODO (Implement) [DU 22.06.17]
-        pass
+    def _test_extract_relations(task):
+        ne_tagged_line = [("pineapples", "I-P"), ("are", "O"), ("juicy", "I-N"), ("fruits", "I-N")]
+        pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
+        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+
+        assert task.extract_relations(ne_tagged_line, dependency_tree, pos_tagged_line) == [
+            ("pineapples", "are", "juicy fruits")
+        ]
 
 
 class ParticipationExtractionTaskTestCase(unittest.TestCase):

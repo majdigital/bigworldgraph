@@ -124,18 +124,24 @@ class Neo4jTestMixin:
             api_config = get_api_config()
             api_config = overwrite_local_config_with_environ(api_config)
 
-            while True:
+            retries = 0
+            last_exception = None
+
+            while retries < 25:
+                retries += 1
                 try:
                     neomodel.db.set_connection("bolt://{user}:{password}@{host}:{port}".format(
                         user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
                         host=api_config["NEO4J_HOST"], port=api_config["NEO4J_PORT"]
                     ))
                     self.is_connected = True
-                    break
-                except neo4j.bolt.connection.ServiceUnavailable:
-                    pass
+                    return
+                except neo4j.bolt.connection.ServiceUnavailable as exception:
+                    last_exception = exception
 
                 time.sleep(random.randint(0, 25) / 10)
+
+            raise last_exception
 
 
 class EveCompatibilityMixinTestCase(unittest.TestCase):
@@ -343,13 +349,11 @@ class Neo4jDatabaseTestCase(unittest.TestCase, Neo4jTestMixin):
 
     def setUp(self):
         api_config = get_api_config()
-        #raise Exception("cconfig: {}".format(str(api_config)))
 
         self.neo4j_database = Neo4jDatabase(
             user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"],
             host=api_config["NEO4J_HOST"], port=api_config["NEO4J_PORT"]
         )
-        #raise Exception("uurl: " + neomodel.config.DATABASE_URL)
         self.reset_database()
 
     def tearDown(self):

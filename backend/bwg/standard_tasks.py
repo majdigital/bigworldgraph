@@ -533,7 +533,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
                 continue
 
             # Ignore noun and object phrases
-            if is_verb_node and dependency in ("nsub", "dobj"):
+            if is_verb_node and dependency in ("nsubj", "dobj"):
                 continue
 
             for address in node["deps"][dependency]:
@@ -577,7 +577,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         Join all the words from an extended word into a phrase.
 
         :param expanded_node: Expanded node to be joined.
-        :type expanded_node: dict
+        :type expanded_node: list
         :return: Joined node.
         :rtype: str
         """

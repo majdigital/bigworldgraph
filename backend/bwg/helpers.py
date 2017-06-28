@@ -287,14 +287,17 @@ def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
 
             if condition:
                 retries = 0
+                last_exception = None
 
                 while retries < max_retries:
                     retries += 1
                     try:
                         return func(*args, **kwargs)
-                    except exception_class:
-                        pass
+                    except exception_class as exception:
+                        last_exception = exception
                     time.sleep(random.randint(0, 25) / 10)
+
+                raise last_exception
             else:
                 return func(*args, **kwargs)
 
