@@ -17,7 +17,10 @@ from bwg.helpers import (
     filter_dict, construct_dict_from_source, get_config_from_py_file, overwrite_local_config_with_environ,
     flatten_dictlist, is_collection, seconds_to_hms, time_function, fast_copy, get_if_exists
 )
-from fixtures import TEST_DICT
+from tests.fixtures import TEST_DICT
+
+# CONSTANTS
+TEST_PATH = "/".join(os.path.abspath(__file__).split("/")[:-1]) + "/"
 
 
 class DictionaryHelpersTestCase(unittest.TestCase):
@@ -116,15 +119,15 @@ class ConfigurationHelpersTestCase(unittest.TestCase):
     }
 
     def test_get_config_from_py_file(self):
-        assert get_config_from_py_file("./non_existing_config.py") == {}
-        raw_config = get_config_from_py_file("./dummy_pipeline_config.py")
+        assert get_config_from_py_file(TEST_PATH + "non_existing_config.py") == {}
+        raw_config = get_config_from_py_file(TEST_PATH + "dummy_pipeline_config.py")
         assert raw_config == self.original_config
 
     @staticmethod
     def test_overwrite_local_config_with_environ():
         os.environ["DEMO_LANGUAGE_ABBREVIATION"] = "do"
         os.environ["UNIMPORTANT_PARAMETER"] = "not important"
-        raw_config = get_config_from_py_file("./dummy_pipeline_config.py")
+        raw_config = get_config_from_py_file(TEST_PATH + "dummy_pipeline_config.py")
         config = overwrite_local_config_with_environ(raw_config)
         assert config["DEMO_LANGUAGE_ABBREVIATION"] == "do"
         assert "UNIMPORTANT_PARAMETER" not in config
@@ -197,6 +200,9 @@ class MiscellaneousHelpersTestCase(unittest.TestCase):
         dict_copy2 = fast_copy(TEST_DICT)
         assert TEST_DICT == dict_copy1 == dict_copy2
         assert {} == copy.deepcopy({}) == fast_copy({})
+
+
+# TODO (Testing): Test retry_on_condition
 
 
 if __name__ == "__main__":

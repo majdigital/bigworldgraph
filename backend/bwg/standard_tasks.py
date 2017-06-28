@@ -195,7 +195,7 @@ class NERTask(luigi.Task, ArticleProcessingMixin):
         Tag a single sentence with named entities.
 
         :param sentence_data: Data of the sentence that is going to be named entity tagged.
-        :type sentence_data: dict
+        :type sentence_data: str
         :param workflow_resources: Additional resources for this step.
         :type workflow_resources: dict
         :return: Processed sentence.
@@ -418,7 +418,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         Get the original (not de-tokenized) sentence from a line tagged with NE tags.
 
         :param ne_tagged_line: Sentence with Named Entity tags.
-        :type ne_tagged_line: str
+        :type ne_tagged_line: list
         :return: Raw sentence.
         :rtype: str
         """
@@ -457,6 +457,9 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         if "0" in dependency_tree["nodes"]:
             if dependency_tree["nodes"]["0"]["word"] in (None, "ROOT"):
                 del dependency_tree["nodes"]["0"]
+        elif 0 in dependency_tree["nodes"]:
+            if dependency_tree["nodes"][0]["word"] in (None, "ROOT"):
+                del dependency_tree["nodes"][0]
         else:
             # Empty tree
             return dependency_tree
@@ -498,7 +501,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         verb_node_pos_tags = self.task_config["VERB_NODE_POS_TAGS"]
         verb_nodes = []
 
-        if len(pos_tagged_line) == 0 and len(dependency_tree["nodes"]) == 1:
+        if len(pos_tagged_line) == 0 or len(dependency_tree["nodes"]) == 1:
             return verb_nodes
 
         for address, node in dependency_tree["nodes"].items():
@@ -530,7 +533,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
                 continue
 
             # Ignore noun and object phrases
-            if is_verb_node and dependency in ("nsub", "dobj"):
+            if is_verb_node and dependency in ("nsubj", "dobj"):
                 continue
 
             for address in node["deps"][dependency]:
@@ -574,7 +577,7 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
         Join all the words from an extended word into a phrase.
 
         :param expanded_node: Expanded node to be joined.
-        :type expanded_node: dict
+        :type expanded_node: list
         :return: Joined node.
         :rtype: str
         """

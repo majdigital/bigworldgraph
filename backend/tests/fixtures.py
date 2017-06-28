@@ -1,3 +1,5 @@
+import json
+
 TEST_DICT = {
     "field1": True,
     "field2": 33,
@@ -267,3 +269,371 @@ WIKIDATA_ENTITIES = [
         }
     ]
 ]
+
+#                           #########################################################
+#                           ##                NLP Pipeline Fixtures                ##
+#                           #########################################################
+
+READING_TASK = {
+    "input": [
+        '<doc id="12345" url="https://web.site" title="Sample article">',
+        '<!---',
+        'Comment in sample article',
+        '-->',
+        'Sample article',
+        '',
+        'First sample article sentence',
+        'This is the second sample article sentence',
+        '</doc>'
+    ],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "parsed"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "type": "sentence",
+                        "state": "parsed"
+                    },
+                    "data": "First sample article sentence"
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "type": "sentence",
+                        "state": "parsed"
+                    },
+                    "data": "This is the second sample article sentence"
+                }
+            }
+        }
+    ]
+}
+
+NER_TASK = {
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "ne_tagged"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "type": "sentence",
+                        "state": "ne_tagged"
+                    },
+                    "data": [
+                       ["first", "O"], ["sample", "I-N"], ["article", "I-N"], ["sentence", "O"]
+                    ]
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "type": "sentence",
+                        "state": "ne_tagged"
+                    },
+                    "data": [
+                        ["this", "O"], ["is", "O"], ["the", "O"], ["second", "O"], ["sample", "I-N"],
+                        ["article", "I-N"], ["sentence", "O"]
+                    ]
+                }
+            }
+        }
+    ]
+}
+
+DEPENDENCY_TASK = {
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "dependency_parsed"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "state": "dependency_parsed",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "root": 0,
+                        "nodes": {
+                            "0": {
+                                "address": 0,
+                                "word": "ROOT",
+                                "rel": None,
+                                "deps": {"rel": 1}
+                            },
+                            "1": {
+                                "address": 1,
+                                "word": "First",
+                                "rel": 0,
+                                "deps": {"rel": 2}
+                            },
+                            "2": {
+                                "address": 2,
+                                "word": "sample",
+                                "rel": 1,
+                                "deps": {"rel": 3}
+                            },
+                            "3": {
+                                "address": 3,
+                                "word": "article",
+                                "rel": 2,
+                                "deps": {"rel": 4}
+                            },
+                            "4": {
+                                "address": 4,
+                                "word": "sentence",
+                                "rel": 3,
+                                "deps": {"rel": 5}
+                            }
+                        }
+                    }
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "state": "dependency_parsed",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "root": 0,
+                        "nodes": {
+                            "0": {
+                                "address": 0,
+                                "word": "ROOT",
+                                "rel": None,
+                                "deps": {"rel": 1}
+                            },
+                            "1": {
+                                "address": 1,
+                                "word": "This",
+                                "rel": 0,
+                                "deps": {"rel": 2}
+                            },
+                            "2": {
+                                "address": 2,
+                                "word": "is",
+                                "rel": 1,
+                                "deps": {"rel": 3}
+                            },
+                            "3": {
+                                "address": 3,
+                                "word": "the",
+                                "rel": 2,
+                                "deps": {"rel": 4}
+                            },
+                            "4": {
+                                "address": 4,
+                                "word": "second",
+                                "rel": 3,
+                                "deps": {"rel": 5}
+                            },
+                            "5": {
+                                "address": 5,
+                                "word": "sample",
+                                "rel": 4,
+                                "deps": {"rel": 6}
+                            },
+                            "6": {
+                                "address": 6,
+                                "word": "article",
+                                "rel": 5,
+                                "deps": {"rel": 7}
+                            },
+                            "7": {
+                                "address": 7,
+                                "word": "sentence",
+                                "rel": 6,
+                                "deps": {"rel": 8}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
+
+POS_TAGGING_TASK = {
+    "input": [json.dumps(article, ensure_ascii=False) for article in READING_TASK["output"]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "pos_tagged"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "type": "sentence",
+                        "state": "pos_tagged"
+                    },
+                    "data": [
+                        ["first", "ADJ"], ["sample", "ADJ"], ["article", "NN"], ["sentence", "NN"]
+                    ]
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "type": "sentence",
+                        "state": "pos_tagged"
+                    },
+                    "data": [
+                        ["this", "DET"], ["is", "VV"], ["the", "DET"], ["second", "ADJ"], ["sample", "ADJ"],
+                        ["article", "NN"], ["sentence", "NN"]
+                    ]
+                }
+            }
+        }
+    ]
+}
+
+NAIVE_OPEN_RELATION_EXTRACTION_TASK = {
+    "input": [
+        [json.dumps(article, ensure_ascii=False) for article in NER_TASK["output"]],
+        [json.dumps(article, ensure_ascii=False) for article in DEPENDENCY_TASK["output"]],
+        [json.dumps(article, ensure_ascii=False) for article in POS_TAGGING_TASK["output"]]
+    ],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "extracted_relations"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "state": "extracted_relations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "first sample article sentence",
+                        "relations": {}
+                    }
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "state": "extracted_relations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "this is the second sample article sentence",
+                        "relations": {}
+                    }
+                }
+            }
+        }
+    ]
+}
+
+PARTICIPATION_EXTRACTION_TASK = {
+    "input": [[json.dumps(article, ensure_ascii=False) for article in NER_TASK["output"]]],
+    "output": [
+        {
+            "meta": {
+                "id": "12345",
+                "url": "https://web.site",
+                "title": "Sample article",
+                "type": "article",
+                "state": "extracted_participations"
+            },
+            "data": {
+                "12345/00001": {
+                    "meta": {
+                        "id": "12345/00001",
+                        "state": "extracted_participations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "first sample article sentence",
+                        "relations": {
+                            "12345/00001/PE00001": {
+                                "meta": {
+                                    "id": "12345/00001/PE00001",
+                                    "state": "extracted_participations",
+                                    "type": "sentence"
+                                },
+                                "data": {
+                                    "subject_phrase": "sample article",
+                                    "verb": "is related with",
+                                    "object_phrase": "Sample article"
+                                }
+                            }
+                        }
+                    }
+                },
+                "12345/00002": {
+                    "meta": {
+                        "id": "12345/00002",
+                        "state": "extracted_participations",
+                        "type": "sentence"
+                    },
+                    "data": {
+                        "sentence": "this is the second sample article sentence",
+                        "relations": {
+                            "12345/00002/PE00001": {
+                                "meta": {
+                                    "id": "12345/00002/PE00001",
+                                    "state": "extracted_participations",
+                                    "type": "sentence"
+                                },
+                                "data": {
+                                    "subject_phrase": "sample article",
+                                    "verb": "is related with",
+                                    "object_phrase": "Sample article"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
+
+# TODO (Implement) [DU 28.07.17]
+RELATION_MERGING_TASK = {
+    "input": None,
+    "output": None
+}
+
+# TODO (Implement) [DU 28.07.17]
+PIPELINE_RUN_INFO_GENERATION_TASK = {
+    "input": None,
+    "output": None
+}
+
+# TODO (Implement) [DU 28.07.17]
+RELATIONS_DATABASE_WRITING_TASK = {
+    "input": None,
+    "output": None
+}
