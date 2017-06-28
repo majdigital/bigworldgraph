@@ -22,6 +22,7 @@ from tests.fixtures import (
     PARTICIPATION_EXTRACTION_TASK, DEPENDENCY_TREE
 )
 from bwg.pipeline_config import FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN
+from bwg.utilities import get_nes_from_sentence
 
 # CONSTANTS
 NE_TAGGED_PINEAPPLE_SENTENCE = [
@@ -487,6 +488,12 @@ class ParticipationExtractionTaskTestCase(unittest.TestCase):
     """
     Testing ParticipationExtractionTask.
     """
+    participation_phrases = {
+        "I-P": "is pineappled with",
+        "I-N": "is related with",
+        "DEFAULT": "is boringly related with"
+    }
+
     @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.output')
     @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.input')
     def test_task_functions(self, input_patch, output_patch):
@@ -496,11 +503,7 @@ class ParticipationExtractionTaskTestCase(unittest.TestCase):
         ) as workflow_mock:
             task_config = {
                 "DEFAULT_NE_TAG": "O",
-                "PARTICIPATION_PHRASES": {
-                    "I-P": "is pineappled with",
-                    "I-N": "is related with",
-                    "DEFAULT": "is boringly related with"
-                },
+                "PARTICIPATION_PHRASES": self.participation_phrases,
                 "PE_OUTPUT_PATH": "",
                 "CORPUS_ENCODING": ""
             }
@@ -523,10 +526,14 @@ class ParticipationExtractionTaskTestCase(unittest.TestCase):
         assert [json.loads(content, encoding="utf-8") for content in output_mock.contents] == \
                PARTICIPATION_EXTRACTION_TASK["output"]
 
-    @staticmethod
-    def _test_build_participation_relations():
-        # TODO (Implement) [DU 22.06.17]
-        pass
+    def _test_build_participation_relations(self):
+        nes = get_nes_from_sentence(NE_TAGGED_PINEAPPLE_SENTENCE, "O", True)
+        assert ParticipationExtractionTask._build_participation_relations(
+            nes, "The pineapple affair", self.participation_phrases
+        ) == [
+            ('pineapple', 'is pineappled with', 'The pineapple affair'),
+            ('sample', 'is related with', 'The pineapple affair')
+        ]
 
     @staticmethod
     def _test_get_sentence():
