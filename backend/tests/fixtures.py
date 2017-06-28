@@ -619,3 +619,21 @@ PARTICIPATION_EXTRACTION_TASK = {
         }
     ]
 }
+
+# TODO (Implement) [DU 28.07.17]
+RELATION_MERGING_TASK = {
+    "input": None,
+    "output": None
+}
+
+# TODO (Implement) [DU 28.07.17]
+PIPELINE_RUN_INFO_GENERATION_TASK = {
+    "input": None,
+    "output": None
+}
+
+# TODO (Implement) [DU 28.07.17]
+RELATIONS_DATABASE_WRITING_TASK = {
+    "input": None,
+    "output": None
+}

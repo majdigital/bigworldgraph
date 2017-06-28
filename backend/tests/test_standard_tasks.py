@@ -4,7 +4,6 @@ Testing standard tasks for the NLP pipeline.
 """
 
 # STD
-import codecs
 import unittest
 import unittest.mock as mock
 import json
@@ -13,10 +12,10 @@ import copy
 # PROJECT
 import bwg
 from bwg.standard_tasks import (
-    SimpleReadingTask, NERTask, DependencyParseTask, PoSTaggingTask, NaiveOpenRelationExtractionTask,
+    SimpleReadingTask, NaiveOpenRelationExtractionTask,
     ParticipationExtractionTask
 )
-from tests.toolkit import MockInput, MockOutput, mock_class_method
+from tests.toolkit import MockInput, MockOutput
 from tests.fixtures import (
     READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK,
     PARTICIPATION_EXTRACTION_TASK, DEPENDENCY_TREE
