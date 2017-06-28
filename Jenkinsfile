@@ -4,7 +4,7 @@ node("docker-builder") {
     }
     stage('building'){
         try {
-          sh 'docker-compose build --no-cache -t bigworldgraph'
+          sh 'docker-compose build --no-cache'
         } catch (e) {
           error 'building failed'
         } finally {
