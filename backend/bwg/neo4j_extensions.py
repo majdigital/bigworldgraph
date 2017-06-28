@@ -6,12 +6,18 @@ Create support for the Neo4j graph database.
 # STD
 import json
 import sys
+import os
 
 # EXT
 from eve.io.base import DataLayer
 from eve.exceptions import ConfigException
+from eve.utils import ParsedRequest
 import luigi
 import neomodel
+import neo4j
+
+# PROJECT
+from bwg.helpers import get_if_exists, retry_on_condition
 
 
 class EveCompatibilityMixin:
@@ -63,10 +69,6 @@ class Neo4jResult:
     """
     Object the result of a data layer query gets wrapped in.
     """
-    relations = []
-    relation_ids = set()
-    node_ids = set()
-
     def __init__(self, selection, **kwargs):
         """
         Constructor.
@@ -76,34 +78,46 @@ class Neo4jResult:
         :param kwargs: Additional key word arguments.
         :type kwargs: dict
         """
+        self.relations = []
+        self.relation_ids = set()
+        self.node_ids = set()
         self.parsed_request = kwargs.get("parsed_request", None)
-        self.selection = selection
+        self._return_selection = self.selection = selection
 
         for node in selection:
             self.node_ids.add(node.uid)
 
-        self._clean_selection()
-        self._apply_request_parameters()
-
     def __iter__(self):
         yield {
-            "nodes": self.cleaned_selection,
+            "nodes": self.return_selection,
             "links": self.relations
         }
 
-    def __getitem__(self, start=0, stop=0, step=1):
-        stop = len(self.return_selection)
-        return self.return_selection[start:stop:step]
+    def __getitem__(self, *args):
+        if type(args[0]) in (int, slice):
+            return self.return_selection[args[0]]
+        return KeyError
+
+    def __len__(self):
+        return self.count()
+
+    @property
+    def return_selection(self):
+        return_selection = self._return_selection
+        return_selection = self._apply_request_parameters(return_selection)
+        return_selection = self._clean_selection(return_selection)
+
+        return return_selection
 
     def count(self, with_limit_and_skip=False, **kwargs):
         # TODO (Implement): Implement this in a clean way with all the features [DU 27.04.17]
         return len(self.selection)
 
-    def _clean_selection(self):
+    def _clean_selection(self, selection):
         """
         Clean all elements of this selection of fields which values are not serializable.
         """
-        self.cleaned_selection = self.return_selection = [self._clean_node(node) for node in self.selection]
+        return [self._clean_node(node) for node in selection]
 
     def _clean_node(self, node):
         """
@@ -130,11 +144,11 @@ class Neo4jResult:
         node = self.clean_unserializables(node)
 
         # Clean claims
-        if "data" in node:
-            if "claims" in node["data"]:
-                node["data"]["claims"] = {
+        for sense in get_if_exists(node, "data", "senses", default=[]):
+            if "claims" in sense:
+                sense["claims"] = {
                     claim: claim_data["target"]
-                    for claim, claim_data in node["data"]["claims"].items()
+                    for claim, claim_data in sense["claims"].items()
                 }
 
         if "relations" in node:
@@ -152,7 +166,7 @@ class Neo4jResult:
         """
         return {
             key: value
-            for key, value in vars(dictionary).items()
+            for key, value in (dictionary.items() if type(dictionary) == dict else vars(dictionary).items())
             if self.is_json_serializable(value) and not key.startswith("_")
         }
 
@@ -172,22 +186,22 @@ class Neo4jResult:
         except (TypeError, OverflowError):
             return False
 
-    def _apply_request_parameters(self):
+    def _apply_request_parameters(self, selection):
         """
         Apply additional request parameters to the current selection.
         """
         if self.parsed_request is not None:
-            aggregation = self.parsed_request.get("aggregation", None)
-            embedded = self.parsed_request.get("embedded", None)
-            if_match = self.parsed_request.get("if_match", None)
-            if_modified_since = self.parsed_request.get("if_modified_since", None)
-            if_none_match = self.parsed_request.get("if_none_match", None)
-            max_results = self.parsed_request.get("max_results", None)
-            page = self.parsed_request.get("page", None)
-            projection = self.parsed_request.get("projection", None)
-            show_deleted = self.parsed_request.get("show_deleted", None)
-            sort = self.parsed_request.get("sort", None)
-            where = self.parsed_request.get("where", None)
+            aggregation = getattr(self.parsed_request, "aggregation")
+            embedded = getattr(self.parsed_request, "embedded")
+            if_match = getattr(self.parsed_request, "if_match")
+            if_modified_since = getattr(self.parsed_request, "if_modified_since")
+            if_none_match = getattr(self.parsed_request, "if_none_match")
+            max_results = getattr(self.parsed_request, "max_results")
+            page = getattr(self.parsed_request, "page")
+            projection = getattr(self.parsed_request, "projection")
+            show_deleted = getattr(self.parsed_request, "show_deleted")
+            sort = getattr(self.parsed_request, "sort")
+            where = getattr(self.parsed_request, "where")
 
             if aggregation is not None:
                 # TODO (Implement) [DU 28.04.17]
@@ -230,7 +244,9 @@ class Neo4jResult:
                 raise NotImplementedError
 
             if max_results is not None:
-                self.return_selection = self.return_selection[:max_results]
+                selection = selection[:max_results]
+
+        return selection
 
 
 class Neo4jDatabase:
@@ -238,6 +254,12 @@ class Neo4jDatabase:
     Wrapper for a ``Neo4j`` Graph database, providing an easy way to connect to a database, querying nodes and relations as 
     well as creating new Node and Relation classes on the fly.
     """
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
+    )
     def __init__(self, user, password, host, port):
         neomodel.config.DATABASE_URL = "bolt://{user}:{password}@{host}:{port}".format(
             user=user, password=password, host=host, port=port
@@ -273,12 +295,12 @@ class Neo4jDatabase:
         :rtype: list
         """
         try:
-            if req.args:
+            if req.args not in ({}, None):
                 if "pretty" not in req.args:
                     identifier = list(req.args.keys())[0]
                     return self.find_friends_of_friends(node_class, identifier, req.args[identifier])
 
-            return node_class.nodes.get(**constraints) if constraints != {} else node_class.nodes.all()
+            return [node_class.nodes.get(**constraints)] if constraints != {} else node_class.nodes.all()
         except node_class.DoesNotExist:
             return []
 
@@ -319,6 +341,65 @@ class Neo4jDatabase:
 
         return unique_nodes
 
+    @staticmethod
+    def get_or_create_node(label, data, node_category=Entity):
+        """
+        Retrieve a node with a specific label from the database, or, if it doesn't exist, create it.
+
+        :param label: Label of target node.
+        :type label: str
+        :param data: Data of target node.
+        :type data: dict
+        :param node_category: Entity class of node if given. Otherwise it will be determined by the categorization
+        function.
+        :type node_category: Entity
+        :return: Target node.
+        :rtype: Entity
+        """
+        try:
+            entity = Entity.nodes.get(label=label)
+            entity.weight += 1
+            entity.save()
+            return entity
+        except Entity.DoesNotExist:
+            entity = node_category(category=node_category.__class__.__name__, label=label, data=data)
+            entity.save()
+            return entity
+
+    @staticmethod
+    def get_or_create_connection(subj_entity, obj_entity, label, data):
+        """
+        Retrieve a certain connection from the database, or, if it doesn't exist, create it.
+
+        :param subj_entity: Start node of connection.
+        :type subj_entity: Entity
+        :param obj_entity: End node of connection.
+        :type obj_entity: Entity
+        :param label: Label of connection.
+        :type label: str
+        :param data: Data of connection.
+        :type data: dict
+        :return: Connection.
+        :rtype: Relation
+        """
+        if obj_entity.relations.is_connected(subj_entity):
+            connection = obj_entity.relations.relationship(subj_entity)
+            connection.weight += 1
+            connection.save()
+            return connection
+        else:
+            relation = obj_entity.relations.connect(
+                subj_entity,
+                {
+                    "label": label,
+                    "data": data
+                }
+            )
+            relation.save()
+            subj_entity.refresh()
+            obj_entity.refresh()
+            return relation
+
 
 class Neo4jLayer(DataLayer, Neo4jDatabase):
     """
@@ -337,11 +418,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
     def init_app(self, app):
         self.app = app
 
-        # Init database connection
-        Neo4jDatabase.__init__(
-            self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
-            host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
-        )
+        self._init_db(app)
 
         # Determine base types for nodes and vertices
         self.node_types = app.config["NODE_TYPES"]
@@ -353,6 +430,18 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         self.node_base_classes_names = [
             node_base_class.__name__ for node_base_class in self.node_base_classes
         ]
+
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
+    )
+    def _init_db(self, app):
+        Neo4jDatabase.__init__(
+            self, user=app.config["NEO4J_USER"], password=app.config["NEO4J_PASSWORD"],
+            host=app.config["NEO4J_HOST"], port=app.config["NEO4J_PORT"]
+        )
 
     def find(self, resource, req, sub_resource_lookup):
         """
@@ -379,7 +468,7 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         else:
             raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
 
-        return Neo4jResult(results)
+        return Neo4jResult(results, parsed_request=req)
 
     def aggregate(self, resource, pipeline, options):
         """ 
@@ -409,8 +498,18 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param **lookup: the lookup fields. This will most likely be a record id or, if alternate lookup is supported by
         the API, the corresponding query.
         """
-        # TODO (Implement) [DU 26.04.17]
-        raise NotImplementedError
+        item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
+
+        if item_title in self.node_base_classes_names:
+            node_class = self.get_node_class(item_title)
+            results = self.find_nodes(node_class, req)
+        elif resource in self.node_types:
+            node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
+            results = self.find_nodes(node_class, req)
+        else:
+            raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
+
+        return Neo4jResult([results[0]], parsed_request=req)
 
     def find_one_raw(self, resource, _id):
         """ 
@@ -433,8 +532,18 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param client_projection: a specific projection to use
         :return: a list of documents matching the ids in `ids` from the collection specified in `resource` 
         """
-        # TODO (Implement) [DU 26.04.17]
-        raise NotImplementedError
+        item_title = self.app.config["DOMAIN"][resource]["item_title"].capitalize()
+
+        if item_title in self.node_base_classes_names:
+            node_class = self.get_node_class(item_title)
+            results = self.find_nodes(node_class, req=ParsedRequest())
+        elif resource in self.node_types:
+            node_class = self.get_node_class(class_name=item_title, base_classes=self.node_base_classes)
+            results = self.find_nodes(node_class)
+        else:
+            raise ConfigException("Resource {} wasn't found in neither node or relation types.".format(resource))
+
+        return Neo4jResult([result for result in results if result["id"] in ids])
 
     def insert(self, resource, doc_or_docs):
         """
@@ -496,7 +605,6 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Takes two db queries and applies db-specific syntax to produce
         the intersection.
         """
-        # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
 
     def get_value_from_query(self, query, field_name):
@@ -504,9 +612,8 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         Parses the given potentially-complex query and returns the value
         being assigned to the field given in `field_name`.
 
-        This mainly exists to deal with more complicated compound queries 
+        This mainly exists to deal with more complicated compound queries
         """
-        # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
 
     def query_contains_field(self, query, field_name):
@@ -514,7 +621,6 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         For the specified field name, does the query contain it?
         Used know whether we need to parse a compound query.
         """
-        # TODO (Implement) [DU 26.04.17]
         raise NotImplementedError
 
     def is_empty(self, resource):
@@ -531,8 +637,8 @@ class Neo4jLayer(DataLayer, Neo4jDatabase):
         :param resource: resource being accessed. You should then use the ``datasource`` helper function to retrieve the
             actual datasource name.
         """
-        # TODO (Implement) [DU 26.04.17]
-        raise NotImplementedError
+        resource_collection = self.find(resource, ParsedRequest(), None)
+        return resource_collection.count() == 0
 
 
 class Neo4jTarget(luigi.Target, Neo4jDatabase):
@@ -569,9 +675,31 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         """
         self.categories = categories
         self.pipeline_run_info = pipeline_run_info
-        Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
+
+        self._init_db(user, password, host, port)
         self.node_relevance_function = node_relevance_function
-        self.categorize_node = categorization_function
+        self._categorize_node = categorization_function
+
+    # During deployment with docker, the Python container needs to wait for the Neo4j container to start up
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
+    )
+    def _init_db(self, user, password, host, port):
+        """
+        Initialize the database.
+
+        :param user: Username to access database.
+        :type user: str
+        :param password: Password to access database.
+        :type password: str
+        :param host: Host of database.
+        :type host: str
+        :param port: Port of database.
+        :type port: str
+        """
+        Neo4jDatabase.__init__(self, user=user, password=password, host=host, port=port)
 
     def exists(self):
         """
@@ -591,6 +719,20 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
+    def categorize_node(self, label, data, entity_class="Entity"):
+        implied_entity_class_string = entity_class
+        categorized_entity_class_string = self._categorize_node(label, data)
+
+        # Define which class should be preferred in different cases by comparing the priorities of the classes
+        if self.categories[implied_entity_class_string] > self.categories[categorized_entity_class_string]:
+            entity_class = self.get_node_class(implied_entity_class_string, (Entity,))
+            entity_class_string = implied_entity_class_string
+        else:
+            entity_class = self.get_node_class(categorized_entity_class_string, (Entity,))
+            entity_class_string = categorized_entity_class_string
+
+        return entity_class, entity_class_string
+
     def add_relation(self, relation_json, sentence, entity_properties):
         """
         Add a new relation to the graph database.
@@ -607,20 +749,22 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         subj_phrase, verb, obj_phrase = relation_data["subject_phrase"], relation_data["verb"], \
                                         relation_data["object_phrase"]
         subj_data = entity_properties.get(subj_phrase, {})
-        obj_data = entity_properties.get(subj_phrase, {})
+        obj_data = entity_properties.get(obj_phrase, {})
         subj_node_is_relevant = self.node_relevance_function(subj_phrase, subj_data)
         obj_node_is_relevant = self.node_relevance_function(obj_phrase, obj_data)
 
         if subj_node_is_relevant:
-            subj_node = self._get_or_create_node(label=subj_phrase, data=subj_data)
+            node_category, _ = self.categorize_node(subj_data["senses"][0]["label"], subj_data)
+            subj_node = self.get_or_create_node(label=subj_phrase, data=subj_data, node_category=node_category)
             self._add_wikidata_relations(subj_node, subj_data)
 
         if obj_node_is_relevant:
-            obj_node = self._get_or_create_node(label=obj_phrase, data=obj_data)
+            node_category, _ = self.categorize_node(obj_data["senses"][0]["label"], obj_data)
+            obj_node = self.get_or_create_node(label=obj_phrase, data=obj_data, node_category=node_category)
             self._add_wikidata_relations(obj_node, obj_data)
 
         if subj_node_is_relevant and obj_node_is_relevant:
-            self._get_or_create_connection(
+            self.get_or_create_connection(
                 subj_node,
                 obj_node,
                 label=verb,
@@ -644,81 +788,13 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         sense_data = {} if len(sense_dates) == 0 else sense_dates[0]
         if "claims" in sense_data:
             for claim, claim_data in sense_data["claims"].items():
-                target, implies_relation, entity_class, target_data = claim_data["target"], claim_data["implies_relation"], \
+                target, implies_relation, node_category, target_data = claim_data["target"], claim_data["implies_relation"], \
                                                          claim_data["entity_class"], claim_data["target_data"]
 
                 if implies_relation and target != sense_data["label"]:
-                    obj_node = self._get_or_create_node(label=target, data=target_data, entity_class=entity_class)
-                    self._get_or_create_connection(node, obj_node, label=claim, data={})
-
-    def _get_or_create_node(self, label, data, entity_class="Entity"):
-        """
-        Retrieve a node with a specific label from the database, or, if it doesn't exist, create it.
-        
-        :param label: Label of target node.
-        :type label: str
-        :param data: Data of target node.
-        :type data: dict
-        :param entity_class: Entity class of node if given. Otherwise it will be determined by the categorization
-        function.
-        :type entity_class: Entity
-        :return: Target node.
-        :rtype: Entity
-        """
-        try:
-            entity = Entity.nodes.get(label=label)
-            entity.weight += 1
-            entity.save()
-            return entity
-        except Entity.DoesNotExist:
-            implied_entity_class_string = entity_class
-            categorized_entity_class_string = self.categorize_node(label, data)
-
-            # Define which class should be preferred in different cases by comparing the priorities of the classes
-            if self.categories[implied_entity_class_string] > self.categories[categorized_entity_class_string]:
-                entity_class = self.get_node_class(implied_entity_class_string, (Entity, ))
-                entity_class_string = implied_entity_class_string
-            else:
-                entity_class = self.get_node_class(categorized_entity_class_string, (Entity,))
-                entity_class_string = categorized_entity_class_string
-
-            entity = entity_class(category=entity_class_string, label=label, data=data)
-            entity.save()
-            return entity
-
-    @staticmethod
-    def _get_or_create_connection(subj_entity, obj_entity, label, data):
-        """
-        Retrieve a certain connection from the database, or, if it doesn't exist, create it.
-        
-        :param subj_entity: Start node of connection.
-        :type subj_entity: Entity
-        :param obj_entity: End node of connection.
-        :type obj_entity: Entity
-        :param label: Label of connection.
-        :type label: str
-        :param data: Data of connection.
-        :type data: dict
-        :return: Connection.
-        :rtype: Relation
-        """
-        if obj_entity.relations.is_connected(subj_entity):
-            connection = obj_entity.relations.relationship(subj_entity)
-            connection.weight += 1
-            connection.save()
-            return connection
-        else:
-            relation = obj_entity.relations.connect(
-                subj_entity,
-                {
-                    "label": label,
-                    "data": data
-                }
-            )
-            relation.save()
-            subj_entity.refresh()
-            obj_entity.refresh()
-            return relation
+                    entity_class = self.get_node_class(node_category, base_classes=(Entity, ))
+                    obj_node = self.get_or_create_node(label=target, data=target_data, node_category=entity_class)
+                    self.get_or_create_connection(node, obj_node, label=claim, data={})
 
     def _check_if_run_exists_and_add(self, pipeline_run_info):
         """

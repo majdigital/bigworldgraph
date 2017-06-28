@@ -87,6 +87,8 @@ DOMAIN = {
     "media": media,
     "companies": companies
 }
+PAGINATION_LIMIT = 10001
+PAGINATION_DEFAULT = 10000
 
 # RELATION_BASE_CLASSES = ()
 NODE_BASE_CLASSES = ("Entity", )
@@ -103,3 +105,4 @@ API_HOST = "localhost"
 # Logging config
 LOGGING_PATH = "../logs/api_log.txt"
 LOGGING_LEVEL = logging.DEBUG
+TEST_PARAM = "test"

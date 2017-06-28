@@ -11,6 +11,7 @@ import time
 import types
 import os
 import pickle
+import random
 
 # EXT
 import nltk
@@ -23,7 +24,7 @@ def filter_dict(dictionary, keep_fields):
     :param dictionary: Dictionary that is going to be filtered.
     :type dictionary: dict
     :param keep_fields: Dictionary keys that aren't going to be filtered.
-    :type keep_fields: dict
+    :type keep_fields: dict or list or set
     :return: Filtered dictionary.
     :rtype: dict
     """
@@ -92,7 +93,7 @@ def overwrite_local_config_with_environ(config):
     :rtype: dict
     """
     return {
-        key: (value if key not in os.environ else os.environ[key])
+        key: os.environ.get(key, value)
         for key, value in config.items()
     }
 
@@ -199,14 +200,14 @@ def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
             # Calculate result and write it
             run_time = end_time - start_time
             hours, minutes, seconds = seconds_to_hms(run_time)
-            class_name = " of '{}' ".format(args[0].__class__.__name__) if is_classmethod else ""
+            class_name = " of '{}' ".format(args[0].__class__.__name__) if is_classmethod else " "
             result = "Function '{}'{}took {:.2f} hour(s), {:.2f} minute(s) and {:.2f} second(s) to complete.\n".format(
                 func.__name__, class_name, hours, minutes, seconds
             )
 
             # Write to stdout or file
             if out is not None:
-                if out != sys.stdout:
+                if type(out) == str:
                     with codecs.open(out, "a", "utf-8") as outfile:
                         outfile.write(result)
                 else:
@@ -262,3 +263,43 @@ def get_if_exists(dictionary, *keys, default=None):
             return default
 
     return value
+
+
+def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
+    """
+    Retry a function in case an exception occurs. You can also define an additional condition that has to be met as
+    well as a maximum amount of retries.
+
+    :param exception_class: Exception class that triggers the retry.
+    :type exception_class: Exception
+    :param condition: Additional condition that has to be met.
+    :type: func
+    :param max_retries: Maximum amount of retries, -1 means infinite retries.
+    """
+    def decorator(func):
+        """
+        Actual decorator.
+        """
+        @functools.wraps(func)
+        def func_wrapper(*args, **kwargs):
+            assert callable(condition)
+            assert issubclass(exception_class, Exception)
+
+            if condition:
+                retries = 0
+                last_exception = None
+
+                while retries < max_retries:
+                    retries += 1
+                    try:
+                        return func(*args, **kwargs)
+                    except exception_class as exception:
+                        last_exception = exception
+                    time.sleep(random.randint(0, 25) / 10)
+
+                raise last_exception
+            else:
+                return func(*args, **kwargs)
+
+        return func_wrapper
+    return decorator

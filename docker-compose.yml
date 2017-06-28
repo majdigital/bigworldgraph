@@ -8,9 +8,15 @@ services:
     build: ./backend/
     ports:
       - "6050:5000"
-    #depends_on:
-    #  - neo4j
+    depends_on:
+      - neo4j
     environment:
+      - ENV=dev
+      - PYTHONPATH=/data/src/app/
+      - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
+      - PYWIKIBOT2_NO_USER_CONFIG=1
+      - API_CONFIG_PATH=/data/src/app/bwg/api_config.py
+      - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/pipeline_config.py
       - NEO4J_PORT=7687
       - API_HOST=0.0.0.0
       - NEO4J_HOST=neo4j
