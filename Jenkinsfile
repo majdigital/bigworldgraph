@@ -18,16 +18,15 @@ node("staging") {
         checkout scm
     }
     stage('testing'){
-        sh 'ls -lah'
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up'
-            sh 'while [ "$(docker ps | grep backend)" ]; do sleep 1; done'
+            sh 'while :; do if [! "$(docker ps | grep backend)" ]; then docker kill bigworldgraphr3_neo4j_1; docker kill bigworldgraphr3_backend_1; fi; break; done'
         } catch (e) {
             error 'staging failed'
         } finally {
-            sh 'docker kill bigworldgraphr3_neo4j_1'
-            sh 'docker kill bigworldgraphr3_backend_1'
+            //sh 'docker kill bigworldgraphr3_neo4j_1'
+            //sh 'docker kill bigworldgraphr3_backend_1'
         }
     }
     stage('publish'){
