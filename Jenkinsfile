@@ -23,6 +23,9 @@ node("staging") {
       try {
         sh 'docker-compose -f docker-compose-test.yml build --no-cache'
         sh 'docker-compose -f docker-compose-test.yml up'
+        sh 'while [ ! "$(docker ps -a | grep backend)" ]; do sleep 1; done'
+        sh 'docker kill $(docker ps -q)'
+        sh 'docker rm $(docker ps -a -q)'
       } catch (e) {
         error 'staging failed'
       } finally {
