@@ -22,7 +22,7 @@ node("staging") {
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up'
-            sh 'while [ "$(docker ps -a | grep backend)" ]; do sleep 1; done'
+            sh 'while [ "$(docker ps | grep backend)" ]; do sleep 1; done'
         } catch (e) {
             error 'staging failed'
         } finally {
