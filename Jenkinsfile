@@ -26,6 +26,8 @@ node("staging") {
       } catch (e) {
         error 'staging failed'
       } finally {
+        sh 'docker kill $(docker ps -q)'
+        sh 'docker rm $(docker ps -a -q)'
         //sh 'docker-compose down'
       }
     }
