@@ -4,7 +4,6 @@ Defining additional tasks for the NLP pipeline.
 """
 
 # STD
-import copy
 import datetime
 import time
 
