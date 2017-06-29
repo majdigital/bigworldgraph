@@ -28,7 +28,7 @@ NE_TAGGED_PINEAPPLE_SENTENCE = [
     ("this", "O"), ("pineapple", "I-P"), ("is", "O"), ("part", "O"), ("of", "O"), ("a", "O"), ("sample", "I-N"),
     ("sentence", "O"), ("in", "O"), ("an", "O"), ("article", "I-N")
 ]
-NE_DEPENDEMCY_PINEAPPLE_TREE = {
+NE_DEPENDENCY_PINEAPPLE_TREE = {
     "nodes": {
         0: {
             "address": 0,
@@ -386,7 +386,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     def _test_extract_relations_from_sentence(task):
         ne_tagged_line = [("pineapples", "I-P"), ("are", "O"), ("juicy", "I-N"), ("fruits", "I-N")]
         pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
-        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        dependency_tree = copy.deepcopy(NE_DEPENDENCY_PINEAPPLE_TREE)
         sentence_dates = {
             "data_ne_tagged": {"data": ne_tagged_line},
             "data_dependency_parsed": {"data": dependency_tree},
@@ -423,7 +423,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
 
     @staticmethod
     def _test_extract_verb_nodes(task):
-        dependency_tree = NE_DEPENDEMCY_PINEAPPLE_TREE
+        dependency_tree = NE_DEPENDENCY_PINEAPPLE_TREE
         pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
 
         assert task._extract_verb_nodes({"nodes": {}}, []) == []
@@ -431,7 +431,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
 
     @staticmethod
     def _test_expand_node(task):
-        dependecy_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        dependecy_tree = copy.deepcopy(NE_DEPENDENCY_PINEAPPLE_TREE)
         fruits_node, verb_node = dependecy_tree["nodes"][3], dependecy_tree["nodes"][1]
         juicy_node = dependecy_tree["nodes"][2]
         assert task._expand_node(verb_node, dependecy_tree, is_verb_node=True) == [
@@ -467,7 +467,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
 
     @staticmethod
     def _test_get_subj_and_obj():
-        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        dependency_tree = copy.deepcopy(NE_DEPENDENCY_PINEAPPLE_TREE)
         verb_node = dependency_tree["nodes"][1]
         subj_node, obj_node = dependency_tree["nodes"][0], dependency_tree["nodes"][3]
         assert NaiveOpenRelationExtractionTask._get_subj_and_obj(verb_node, dependency_tree) == (subj_node, obj_node)
@@ -476,7 +476,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     def _test_extract_relations(task):
         ne_tagged_line = [("pineapples", "I-P"), ("are", "O"), ("juicy", "I-N"), ("fruits", "I-N")]
         pos_tagged_line = [("pineapples", "NN"), ("are", "VV"), ("juicy", "ADJ"), ("fruits", "NN")]
-        dependency_tree = copy.deepcopy(NE_DEPENDEMCY_PINEAPPLE_TREE)
+        dependency_tree = copy.deepcopy(NE_DEPENDENCY_PINEAPPLE_TREE)
 
         assert task.extract_relations(ne_tagged_line, dependency_tree, pos_tagged_line) == [
             ("pineapples", "are", "juicy fruits")

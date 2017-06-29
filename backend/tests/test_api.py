@@ -19,6 +19,7 @@ import bwg
 from bwg.api_config import DOMAIN
 from bwg.run_api import set_up_api
 from bwg.neo4j_extensions import Neo4jDatabase
+from bwg.helpers import retry_on_condition
 from tests.test_neo4j_extensions import Neo4jTestMixin, get_api_config
 from tests.toolkit import make_api_request
 
@@ -30,10 +31,8 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
     def setUp(self):
         os.environ["DEBUG"] = str(False)
         api_config = get_api_config()
-        self.neo4j_database = Neo4jDatabase(
-            user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"], host=api_config["NEO4J_HOST"],
-            port=api_config["NEO4J_PORT"]
-        )
+        self._init_db(api_config)
+
         neomodel.util.logger.setLevel("WARNING")
         self.reset_database()
         self.create_and_connect_nodes()
@@ -44,6 +43,17 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
     def tearDown(self):
         del self.api
         self.reset_database()
+
+    @retry_on_condition(
+        exception_class=neo4j.bolt.connection.ServiceUnavailable,
+        condition=lambda: os.environ.get("ENV", None) == "testing",
+        max_retries=25
+    )
+    def _init_db(self, api_config):
+        self.neo4j_database = Neo4jDatabase(
+            user=api_config["NEO4J_USER"], password=api_config["NEO4J_PASSWORD"], host=api_config["NEO4J_HOST"],
+            port=api_config["NEO4J_PORT"]
+        )
 
     def test_endpoints_get(self):
         for endpoint, endpoint_data in DOMAIN.items():
