@@ -26,7 +26,7 @@ node("staging") {
       } catch (e) {
         error 'staging failed'
       } finally {
-        //sh 'docker-compose down'
+        sh 'docker-compose down'
       }
     }
      stage('publish'){
