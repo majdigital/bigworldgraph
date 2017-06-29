@@ -3,6 +3,11 @@
 Testing standard tasks for the NLP pipeline.
 """
 
+# Avoid Pywikibot exception
+import os
+os.environ["PYWIKIBOT2_DIR"] = "../bwg/user-config.py"
+os.environ["PYWIKIBOT2_NO_USER_CONFIG"] = "1"
+
 # STD
 import unittest
 import unittest.mock as mock
@@ -45,22 +50,22 @@ class RelationMergingTaskTestCase(unittest.TestCase):
             task = bwg.additional_tasks.RelationMergingTask(task_config=task_config)
 
             # Testing
-            self.test_get_relations_from_sentence_json()
-            self.test_is_relevant_article(task)
-            self.test_is_relevant_sentence(task)
+            self._test_get_relations_from_sentence_json()
+            self._test_is_relevant_article(task)
+            self._test_is_relevant_sentence(task)
 
     @staticmethod
-    def test_get_relations_from_sentence_json():
+    def _test_get_relations_from_sentence_json():
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_is_relevant_article(task):
+    def _test_is_relevant_article(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_is_relevant_sentence(task):
+    def _test_is_relevant_sentence(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
@@ -72,10 +77,6 @@ class PipelineRunInfoGenerationTaskTestCase(unittest.TestCase):
     @mock.patch('bwg.additional_tasks.PipelineRunInfoGenerationTask.output')
     @mock.patch('bwg.additional_tasks.PipelineRunInfoGenerationTask.input')
     def test_task_functions(self, input_patch, output_patch):
-        with mock.patch(
-                "bwg.additional_tasks.PipelineRunInfoGenerationTask.workflow_resources",
-                new_callable=mock.PropertyMock()
-        ) as workflow_mock:
             task_config = {
                 "CORPUS_ENCODING": "",
                 "PIPELINE_RUN_INFO_OUTPUT_PATH": ""
@@ -83,27 +84,26 @@ class PipelineRunInfoGenerationTaskTestCase(unittest.TestCase):
 
             output_patch.return_value = MockOutput()
             input_patch.return_value = MockInput(PIPELINE_RUN_INFO_GENERATION_TASK["input"])
-            workflow_mock.__get__ = mock.Mock(return_value={})
 
             task = bwg.additional_tasks.RelationMergingTask(task_config=task_config)
 
             # Testing
-            self.test_generate_run_information(task)
-            self.test_generate_run_hash()
-            self.test_generate_timestamp()
+            self._test_generate_run_information(task)
+            self._test_generate_run_hash()
+            self._test_generate_timestamp()
 
     @staticmethod
-    def test_generate_run_information(task):
+    def _test_generate_run_information(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_generate_run_hash():
+    def _test_generate_run_hash():
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_generate_timestamp():
+    def _test_generate_timestamp():
         # TODO (Implement) [DU 28.07.17]
         pass
 
@@ -115,82 +115,77 @@ class RelationsDatabaseWritingTaskTestCase(unittest.TestCase):
     @mock.patch('bwg.additional_tasks.RelationsDatabaseWritingTask.output')
     @mock.patch('bwg.additional_tasks.RelationsDatabaseWritingTask.input')
     def test_task_functions(self, input_patch, output_patch):
-        with mock.patch(
-                "bwg.additional_tasks.RelationsDatabaseWritingTask.workflow_resources",
-                new_callable=mock.PropertyMock()
-        ) as workflow_mock:
-            task_config = {
-                "NEO4J_USER": "",
-                "NEO4J_PASSWORD": "",
-                "NEO4J_HOST": "",
-                "DATABASE_CATEGORIES": {},
-                "CORPUS_ENCODING": ""
-            }
+        task_config = {
+            "NEO4J_USER": "",
+            "NEO4J_PASSWORD": "",
+            "NEO4J_HOST": "",
+            "DATABASE_CATEGORIES": {},
+            "CORPUS_ENCODING": ""
+        }
 
-            output_patch.return_value = MockOutput()
-            input_patch.return_value = MockInput(RELATIONS_DATABASE_WRITING_TASK["input"])
-            workflow_mock.__get__ = mock.Mock(return_value={})
+        output_patch.return_value = MockOutput()
+        input_patch.return_value = MockInput(RELATIONS_DATABASE_WRITING_TASK["input"])
 
-            task = bwg.additional_tasks.RelationsDatabaseWritingTask(task_config=task_config)
+        task = bwg.additional_tasks.RelationsDatabaseWritingTask(task_config=task_config)
 
-            # Testing
-            self.test_process_article(task)
-            self.test_read_properties_file(task)
-            self.test_extract_properties(task)
-            self.test_add_entity_data_to_properties_dict(task)
-            self.test_convert_entity_sense(task)
-            self.test_rename_field()
-            self.test_read_pipeline_run_info(task)
-            self.test_is_relevant(task)
-            self.test_is_relevant_node(task)
-            self.test_categorize_node(task)
+        # Testing
+        self._test_process_article(task)
+        self._test_read_properties_file(task)
+        self._test_extract_properties(task)
+        self._test_add_entity_data_to_properties_dict(task)
+        self._test_convert_entity_sense(task)
+        self._test_rename_field()
+        self._test_read_pipeline_run_info(task)
+        self._test_is_relevant(task)
+        self._test_is_relevant_node(task)
+        self._test_categorize_node(task)
 
     @staticmethod
-    def test_process_article(task):
+    def _test_process_article(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_read_properties_file(task):
+    def _test_read_properties_file(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_extract_properties(task):
+    def _test_extract_properties(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_add_entity_data_to_properties_dict(task):
+    def _test_add_entity_data_to_properties_dict(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_convert_entity_sense(task):
+    def _test_convert_entity_sense(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_rename_field():
+    def _test_rename_field():
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_read_pipeline_run_info(task):
+    def _test_read_pipeline_run_info(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_is_relevant(task):
+    def _test_is_relevant(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_is_relevant_node(task):
+    def _test_is_relevant_node(task):
         # TODO (Implement) [DU 28.07.17]
         pass
 
     @staticmethod
-    def test_categorize_node(task):
+    def _test_categorize_node(task):
         # TODO (Implement) [DU 28.07.17]s
         pass

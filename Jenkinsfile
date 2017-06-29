@@ -1,24 +1,28 @@
+// Test comment
+
 node("docker-builder") {
     stage('fetching'){
-      checkout bigworldgraph
+      checkout scm
     }
     stage('building'){
         try {
-          sh 'docker-compose build --no-cache -t bigworldgraph'
-          sh 'docker-compose up'
+          sh 'docker-compose build --no-cache'
         } catch (e) {
           error 'building failed'
         } finally {
-          sh 'docker-compose down'
         }
     }
 }
 
-node("docker-testin") {
+node("staging") {
+    stage('fetching'){
+        checkout scm
+    }
     stage('testing'){
+        sh 'ls -lah'
       try {
-        sh 'docker-compose build --no-cache'
-        sh 'docker-compose up'
+        sh 'docker-compose -f docker-compose-test.yml build --no-cache'
+        sh 'docker-compose -f docker-compose-test.yml up'
       } catch (e) {
         error 'staging failed'
       } finally {
@@ -26,15 +30,15 @@ node("docker-testin") {
       }
     }
      stage('publish'){
-        sh 'docker tag bigworldgraph 10.2.74.19:5000/bigworldgraph'
-        sh 'docker push 10.2.74.19:5000/bigworldgraph'
+        sh 'docker tag bigworldgraph 212.47.239.66:5000/bigworldgraph'
+        sh 'docker push 212.47.239.66:5000/bigworldgraph'
     }
 }
 
-node("docker-production") {
+node("production-mobidick") {
     withEnv([
       "ENV=production"
     ]) {
-      //sh 'docker service update --image  10.2.74.19:5000/bigworldgraph' bigworldgraph
+      //sh 'docker service update --image  212.47.239.66:5000/bigworldgraph' bigworldgraph
     }
 }
