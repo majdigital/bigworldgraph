@@ -22,11 +22,11 @@ node("staging") {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up'
             sh 'while :; do \
-                if [ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
+                if [ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
                 then \
                     docker kill bigworldgraphr3_neo4j_1; \
                     break; \
-                elif [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]]; ; \
+                elif [[ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]]; ; \
                 then \
                     docker kill bigworldgraphr3_neo4j_1; \
                     exit 1; \
@@ -35,10 +35,7 @@ node("staging") {
             done'
         } catch (e) {
             error 'staging failed'
-        } finally {
-            //sh 'docker kill bigworldgraphr3_neo4j_1'
-            //sh 'docker kill bigworldgraphr3_backend_1'
-        }
+        } finally {}
     }
     stage('publish'){
         sh 'docker tag bigworldgraph 212.47.239.66:5000/bigworldgraph'
