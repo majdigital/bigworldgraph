@@ -127,7 +127,7 @@ class Neo4jTestMixin:
             retries = 0
             last_exception = None
 
-            while retries < 25:
+            while retries < 50:
                 retries += 1
                 try:
                     neomodel.db.set_connection("bolt://{user}:{password}@{host}:{port}".format(
