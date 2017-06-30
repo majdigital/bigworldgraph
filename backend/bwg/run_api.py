@@ -55,6 +55,8 @@ def set_up_api(config_path="./api_config.py", log=True, screen_output=True):
         )
 
     # Set up API
+    # TODO: Remove this
+    while True: pass
     api = Eve(data=Neo4jLayer, settings=api_config)
     flask_cors.CORS(api)
     api = add_error_handlers(api)
