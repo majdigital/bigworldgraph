@@ -21,16 +21,16 @@ node("staging") {
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up'
-            sh 'while :; do
-                if  [ $(docker logs bigworldgraphr3_backend_1 2>&1 | grep "OK" | wc -l) > 1 ];
-                then
-                    docker kill bigworldgraphr3_neo4j_1;
-                    docker kill bigworldgraphr3_backend_1;
-                    break;
-                elif [ $(docker logs bigworldgraphr3_backend_1 2>&1 | grep "FAILED" | wc -l) > 1 ];
-                then
-                    exit 1;
-                fi;
+            sh 'while :; do \
+                if  [ $(docker logs bigworldgraphr3_backend_1 2>&1 | grep "OK" | wc -l) > 1 ]; \
+                then \
+                    docker kill bigworldgraphr3_neo4j_1; \
+                    docker kill bigworldgraphr3_backend_1; \
+                    break; \
+                elif [ $(docker logs bigworldgraphr3_backend_1 2>&1 | grep "FAILED" | wc -l) > 1 ]; \
+                then \
+                    exit 1; \
+                fi; \
                 done'
         } catch (e) {
             error 'staging failed'
