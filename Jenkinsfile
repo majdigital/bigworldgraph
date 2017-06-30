@@ -31,7 +31,7 @@ node("staging") {
                     docker kill bigworldgraphr3_neo4j_1; \
                     exit 1; \
                 fi; \
-                sleep 1;
+                sleep 1; \
             done'
         } catch (e) {
             error 'staging failed'
