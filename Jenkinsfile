@@ -18,6 +18,7 @@ node("staging") {
         checkout scm
     }
     stage('testing'){
+        sh 'echo password ${NEO4J_PASSWORD_TEST}'
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up'
