@@ -8,8 +8,8 @@ services:
     build: ./backend/
     ports:
       - "6050:5000"
-    depends_on:
-      - neo4j
+    #depends_on:
+    #  - neo4j
     environment:
       - ENV=testing
       - PYTHONPATH=/data/src/app/
