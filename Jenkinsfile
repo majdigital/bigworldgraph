@@ -39,7 +39,7 @@ node("staging") {
                             exit 1; \
                         fi; \
                         sleep 1; \
-                    done; &' \
+                    done;' \
             } catch (e) {
                 error 'staging failed'
             } finally {}
