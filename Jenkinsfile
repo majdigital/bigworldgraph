@@ -24,28 +24,22 @@ node("staging") {
             sh 'echo password ${NEO4J_PASSWORD_TEST}'
             try {
                 sh 'docker-compose -f docker-compose-test.yml build --no-cache'
-                parallel (
-                    "Testing" : {
-                        sh 'docker-compose -f docker-compose-test.yml up'
-                    },
-                    "Checking test status" : {
-                        sh 'while :; do \
-                            sh 'echo Checking' \
-                            if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
-                            then \
-                                sh 'echo Testing okay' \
-                                docker kill bigworldgraphr3_neo4j_1; \
-                                break; \
-                            elif [[ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]]; \
-                            then \
-                                sh 'echo Testing looks bad' \
-                                docker kill bigworldgraphr3_neo4j_1; \
-                                exit 1; \
-                            fi; \
-                            sleep 1; \
-                        done;' \
-                    }
-                )
+                sh 'docker-compose -f docker-compose-test.yml up && ' \
+                   'while :; do \
+                    sh 'echo Checking' \
+                    if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
+                    then \
+                        sh 'echo Testing okay' \
+                        docker kill bigworldgraphr3_neo4j_1; \
+                        break; \
+                    elif [[ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]]; \
+                    then \
+                        sh 'echo Testing looks bad' \
+                        docker kill bigworldgraphr3_neo4j_1; \
+                        exit 1; \
+                    fi; \
+                    sleep 1; \
+                done;' \
             } catch (e) {
                 error 'staging failed'
             } finally {}
