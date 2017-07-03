@@ -25,8 +25,8 @@ node("staging") {
             sh 'docker-compose -f docker-compose-test.yml up'
             sh 'while :; do \
                 echo Checking... \
-                echo $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "OK"); \
-                if [[ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
+                echo $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK"); \
+                if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
                 then \
                     echo Testing okay!; \
                     docker kill bigworldgraphr3_neo4j_1; \
