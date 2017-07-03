@@ -1,16 +1,16 @@
 // Test comment
 
 node("docker-builder") {
-    stage('fetching'){
-        checkout scm
-    }
-    stage('building'){
-        try {
-            sh 'docker-compose build --no-cache'
-        } catch (e) {
-            error 'building failed'
-        } finally {}
-    }
+//    stage('fetching'){
+//        checkout scm
+//    }
+//    stage('building'){
+//        try {
+//            sh 'docker-compose build --no-cache'
+//        } catch (e) {
+//            error 'building failed'
+//        } finally {}
+//    }
 }
 
 node("staging") {
@@ -26,7 +26,7 @@ node("staging") {
                 sh 'docker-compose -f docker-compose-test.yml build --no-cache'
                 sh 'docker-compose -f docker-compose-test.yml up && \
                     while :; do \
-                        echo Checking \
+                        echo Checking; \
                         if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
                         then \
                             echo Testing okay; \
