@@ -1,15 +1,15 @@
 version: '3'
-#networks:
-#  app-tier:
-#    driver: bridge
+networks:
+  app-tier:
+    driver: bridge
 
 services:
   backend:
     build: ./backend/
     ports:
       - "6050:5000"
-    #depends_on:
-    #  - neo4j
+    depends_on:
+      - neo4j
     environment:
       - ENV=testing
       - PYTHONPATH=/data/src/app/
@@ -22,15 +22,15 @@ services:
       - NEO4J_HOST=neo4j
       - NEO4J_PASSWORD=${NEO4J_PASSWORD_TESTING}
       - DUMMY_PIPELINE_CONFIG_PATH=/data/src/app/tests/dummy_pipeline_config.py
-#    networks:
-#      - app-tier
+    networks:
+      - app-tier
     entrypoint: python3 -m unittest discover ./tests/
-  #neo4j:
-  #  environment:
-  #    - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD_TESTING}
-  #  image: neo4j:3.0
-  #  ports:
-  #    - "6060:7474"
-  #    - "6070:7687"
-  #  networks:
-  #    - app-tier
+  neo4j:
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD_TESTING}
+    image: neo4j:3.0
+    ports:
+      - "6060:7474"
+      - "6070:7687"
+    networks:
+      - app-tier
