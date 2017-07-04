@@ -18,6 +18,7 @@ node("staging") {
         checkout scm
     }
     stage('testing'){
+        sh 'echo password ${NEO4J_PASSWORD_TEST}'
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up & \
@@ -47,6 +48,6 @@ node("production-mobidick") {
     withEnv([
         "ENV=production"
     ]) {
-        //sh 'docker service update --image  212.47.239.66:5000/bigworldgraph' bigworldgraph
+        //sh 'docker service update --image 212.47.239.66:5000/bigworldgraph' bigworldgraph
     }
 }
