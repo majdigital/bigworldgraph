@@ -1,14 +1,14 @@
 node("docker-builder") {
-//    stage('fetching'){
-//        checkout scm
-//    }
-//    stage('building'){
-//        try {
-//            sh 'docker-compose build --no-cache'
-//        } catch (e) {
-//            error 'building failed'
-//        } finally {}
-//    }
+    stage('fetching'){
+        checkout scm
+    }
+    stage('building'){
+        try {
+            sh 'docker-compose build --no-cache'
+        } catch (e) {
+            error 'building failed'
+        } finally {}
+    }
 }
 
 node("staging") {
