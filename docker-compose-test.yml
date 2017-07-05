@@ -6,6 +6,7 @@ networks:
 services:
   backend:
     build: ./backend/
+    image: bigworldgraph
     ports:
       - "6050:5000"
     depends_on:

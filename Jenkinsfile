@@ -1,14 +1,14 @@
 node("docker-builder") {
-    stage('fetching'){
-        checkout scm
-    }
-    stage('building'){
-        try {
-            sh 'docker-compose build --no-cache'
-        } catch (e) {
-            error 'building failed'
-        } finally {}
-    }
+//    stage('fetching'){
+//        checkout scm
+//    }
+//    stage('building'){
+//        try {
+//            sh 'docker-compose build --no-cache'
+//        } catch (e) {
+//            error 'building failed'
+//        } finally {}
+//    }
 }
 
 node("staging") {
@@ -36,7 +36,7 @@ node("staging") {
         } finally {}
     }
     stage('publish'){
-        sh 'docker tag backend 212.47.239.66:5000/bigworldgraph'
+        sh 'docker tag bigworldgraph 212.47.239.66:5000/bigworldgraph'
         sh 'docker push 212.47.239.66:5000/bigworldgraph'
     }
 }
@@ -45,7 +45,7 @@ node("production-mobidick") {
     withEnv([
         "ENV=production"
     ]) {
-        //sh 'docker service update --image 212.47.239.66:5000/bigworldgraph' bigworldgraph
-        //sh 'docker stack deploy --compose-file docker-compose.yml bigworldgraph'
+        sh 'docker service update --image 212.47.239.66:5000/bigworldgraph' bigworldgraph
+        sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
     }
 }

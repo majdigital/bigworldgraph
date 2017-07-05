@@ -5,14 +5,14 @@ networks:
 
 services:
   backend:
-    build: ./backend/
+    build: 212.47.239.66:5000/bigworldgraph:latest
     image: bigworldgraph
     ports:
       - "6050:5000"
     depends_on:
       - neo4j
     environment:
-      - ENV=dev
+      - ENV=production
       - PYTHONPATH=/data/src/app/
       - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
       - PYWIKIBOT2_NO_USER_CONFIG=1
