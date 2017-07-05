@@ -122,7 +122,6 @@ class Neo4jTestMixin:
     def _connect_to_db(self):
         if not self.is_connected:
             api_config = get_api_config()
-            api_config = overwrite_local_config_with_environ(api_config)
 
             retries = 0
             last_exception = None
