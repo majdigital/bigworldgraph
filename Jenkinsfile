@@ -42,5 +42,11 @@ node("staging") {
 }
 
 node("production-mobidick") {
-    sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
+    stage('staging_fetching'){
+        checkout scm
+    }
+
+    stage('staging_deploy') {
+        sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
+    }
 }
