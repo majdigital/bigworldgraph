@@ -27,7 +27,7 @@ node("staging") {
                     then \
                         docker kill bigworldgraphr3_neo4j_1; \
                         break; \
-                    elif [[ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]]; \
+                    elif [ $(docker logs --since 2s bigworldgraphr3_backend_1 2>&1 | grep "FAILED") ]; \
                     then \
                         docker kill bigworldgraphr3_neo4j_1; \
                         exit 1; \
