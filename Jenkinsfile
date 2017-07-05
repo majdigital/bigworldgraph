@@ -36,7 +36,7 @@ node("staging") {
         } finally {}
     }
     stage('publish'){
-        sh 'docker tag bigworldgraph 212.47.239.66:5000/bigworldgraph'
+        sh 'docker tag backend 212.47.239.66:5000/bigworldgraph'
         sh 'docker push 212.47.239.66:5000/bigworldgraph'
     }
 }
@@ -46,6 +46,6 @@ node("production-mobidick") {
         "ENV=production"
     ]) {
         //sh 'docker service update --image 212.47.239.66:5000/bigworldgraph' bigworldgraph
-        sh 'docker stack deploy --compose-file docker-compose.yml bigworldgraph'
+        //sh 'docker stack deploy --compose-file docker-compose.yml bigworldgraph'
     }
 }
