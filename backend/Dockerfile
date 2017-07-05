@@ -1,6 +1,8 @@
 FROM python:3.6
 MAINTAINER Kaleidophon (https://github.com/Kaleidophon)
 
+RUN echo password container ${NEO4J_PASSWORD}
+
 RUN mkdir -p /data/src/app
 WORKDIR /data/src/app
 
