@@ -42,10 +42,5 @@ node("staging") {
 }
 
 node("production-mobidick") {
-    withEnv([
-        "ENV=production"
-    ]) {
-        sh 'docker service update --image 212.47.239.66:5000/bigworldgraph' bigworldgraph
-        sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
-    }
+    sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
 }
