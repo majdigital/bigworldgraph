@@ -25,3 +25,4 @@ frontend/dist/*
 bwg.egg-info/*
 logs/*
 *.pyc
+.env
