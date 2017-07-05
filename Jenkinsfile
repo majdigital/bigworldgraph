@@ -23,7 +23,7 @@ node("staging") {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up & \
                 while :; do \
-                    if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep -o "OK") ]]; \
+                    if [[ $(docker logs --since 1s bigworldgraphr3_backend_1 2>&1 | grep "OK") ]]; \
                     then \
                         docker kill bigworldgraphr3_neo4j_1; \
                         break; \
