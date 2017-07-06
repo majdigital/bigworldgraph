@@ -17,6 +17,8 @@ node("staging") {
     }
     stage('testing'){
         try {
+            sh 'ls -lah'
+            sh 'ls -lah ./frontend'
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up & \
                 while :; do \
@@ -50,6 +52,7 @@ node("production-mobidick") {
     }
 
     stage('staging_deploy') {
+
         sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
     }
 }
