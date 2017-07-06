@@ -36,8 +36,11 @@ node("staging") {
         } finally {}
     }
     stage('publish'){
-        sh 'docker tag bigworldgraph 212.47.239.66:5000/bigworldgraph'
-        sh 'docker push 212.47.239.66:5000/bigworldgraph'
+        sh 'docker tag bigworldgraph_backend 212.47.239.66:5000/bigworldgraph_backend'
+        sh 'docker push 212.47.239.66:5000/bigworldgraph_backend'
+
+        sh 'docker tag bigworldgraph_frontend 212.47.239.66:5000/bigworldgraph_frontend'
+        sh 'docker push 212.47.239.66:5000/bigworldgraph_frontend'
     }
 }
 

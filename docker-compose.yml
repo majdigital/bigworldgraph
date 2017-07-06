@@ -6,7 +6,7 @@ networks:
 services:
   backend:
     build: ./backend/
-    image: bigworldgraph
+    image: bigworldgraph_backend
     ports:
       - "6050:5000"
     depends_on:
@@ -59,6 +59,7 @@ services:
       - app-tier
   frontend:
     build: ./frontend/
+    image: bigworldgraph_frontend
     ports:
         - "8080:8080"
     networks:

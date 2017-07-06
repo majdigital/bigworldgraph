@@ -2,7 +2,7 @@ version: '3'
 
 services:
   backend:
-    build: 212.47.239.66:5000/bigworldgraph:latest
+    image: 212.47.239.66:5000/bigworldgraph_backend:latest
     ports:
       - "6050:5000"
     depends_on:
@@ -50,7 +50,7 @@ services:
       - "6060:7474"
       - "6070:7687"
   frontend:
-    build: ./frontend/
+    image: 212.47.239.66:5000/bigworldgraph_frontend:latest
     ports:
         - "8080:8080"
     volumes:
