@@ -1,12 +1,8 @@
 version: '3'
-networks:
-  app-tier:
-    driver: bridge
 
 services:
   backend:
     build: 212.47.239.66:5000/bigworldgraph:latest
-    image: bigworldgraph
     ports:
       - "6050:5000"
     depends_on:
@@ -42,8 +38,6 @@ services:
       - FRENCH_STANFORD_DEPENDENCY_MODEL_PATH=/stanford_models/UD_French.gz
       - STANFORD_POSTAGGER_PATH=/stanford_models/stanford-postagger.jar
       - STANFORD_CORENLP_MODELS_PATH=/stanford_models/stanford-corenlp-3.7.0-models.jar
-    networks:
-      - app-tier
     volumes:
       - ./backend/data/corpora_french/:/french_corpora:ro
       - ./backend/data/pipeline_french/:/french_pipeline
@@ -55,14 +49,10 @@ services:
     ports:
       - "6060:7474"
       - "6070:7687"
-    networks:
-      - app-tier
   frontend:
     build: ./frontend/
     ports:
         - "8080:8080"
-    networks:
-        - app-tier
     volumes:
         - ./frontend:/frontend
         - /frontend/node_modules
