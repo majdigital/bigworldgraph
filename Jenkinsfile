@@ -52,7 +52,6 @@ node("production-mobidick") {
     }
 
     stage('staging_deploy') {
-
         sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
     }
 }

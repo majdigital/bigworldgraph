@@ -2,12 +2,14 @@ version: '3'
 
 services:
   backend:
-    image: 212.47.239.66:5000/bigworldgraph_backend:latest
+    image: 127.0.0.1:5000/bigworldgraph_backend:latest
+    #image: 212.47.239.66:5000/bigworldgraph_backend:latest
     ports:
       - "6050:5000"
     depends_on:
       - neo4j
     environment:
+      - DEBUG=0
       - ENV=production
       - PYTHONPATH=/data/src/app/
       - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
@@ -39,9 +41,9 @@ services:
       - STANFORD_POSTAGGER_PATH=/stanford_models/stanford-postagger.jar
       - STANFORD_CORENLP_MODELS_PATH=/stanford_models/stanford-corenlp-3.7.0-models.jar
     volumes:
-      - ./backend/data/corpora_french/:/french_corpora:ro
-      - ./backend/data/pipeline_french/:/french_pipeline
-      - ./pipeline/stanford/models/:/stanford_models
+      - french_corpora:/french_corpora:ro
+      - french_pipeline:/french_pipeline
+      - stanford_models:/stanford_models
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
@@ -50,9 +52,12 @@ services:
       - "6060:7474"
       - "6070:7687"
   frontend:
-    image: 212.47.239.66:5000/bigworldgraph_frontend:latest
+    image: 127.0.0.1:5000/bigworldgraph_frontend:latest
+    #image: 212.47.239.66:5000/bigworldgraph_frontend:latest
     ports:
         - "8060:3000"
-    volumes:
-        - ./frontend:/frontend
-        - /frontend/node_modules
+volumes:
+  french_corpora:
+  french_pipeline:
+  stanford_models:
+
