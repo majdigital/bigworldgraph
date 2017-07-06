@@ -20,31 +20,31 @@ services:
       - API_HOST=0.0.0.0
       - NEO4J_HOST=bigworldgraph_neo4j
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-      - FRENCH_NES_OUTPUT_PATH=french_pipeline/fr_articles_nes.json
-      - FRENCH_POS_OUTPUT_PATH=french_pipeline/fr_articles_pos.json
-      - FRENCH_DEPENDENCY_OUTPUT_PATH=french_pipeline/fr_articles_dependencies.json
-      - FRENCH_ORE_OUTPUT_PATH=french_pipeline/fr_articles_relations.json
-      - FRENCH_WIKIPEDIA_READING_OUTPUT_PATH=french_pipeline/fr_articles.json
-      - FRENCH_PE_OUTPUT_PATH=french_pipeline/fr_articles_participations.json
-      - FRENCH_RELATION_MERGING_OUTPUT_PATH=french_pipeline/fr_articles_merged_relations.json
-      - FRENCH_PC_OUTPUT_PATH=french_pipeline/fr_articles_properties.json
-      - FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH=french_pipeline/fr_info.json
-      - FRENCH_CORPUS_INPATH=french_corpora/corpus_affairs_modern_french_in_france.xml
-      - FRENCH_LUIGI_DATA_PATH=french_pipeline/
-      - FRENCH_CORPORA_PATH=french_corpora/
+      - FRENCH_NES_OUTPUT_PATH=/french_pipeline/fr_articles_nes.json
+      - FRENCH_POS_OUTPUT_PATH=/french_pipeline/fr_articles_pos.json
+      - FRENCH_DEPENDENCY_OUTPUT_PATH=/french_pipeline/fr_articles_dependencies.json
+      - FRENCH_ORE_OUTPUT_PATH=/french_pipeline/fr_articles_relations.json
+      - FRENCH_WIKIPEDIA_READING_OUTPUT_PATH=/french_pipeline/fr_articles.json
+      - FRENCH_PE_OUTPUT_PATH=/french_pipeline/fr_articles_participations.json
+      - FRENCH_RELATION_MERGING_OUTPUT_PATH=/french_pipeline/fr_articles_merged_relations.json
+      - FRENCH_PC_OUTPUT_PATH=/french_pipeline/fr_articles_properties.json
+      - FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH=/french_pipeline/fr_info.json
+      - FRENCH_CORPUS_INPATH=/french_corpora/corpus_affairs_modern_french_in_france.xml
+      - FRENCH_LUIGI_DATA_PATH=/french_pipeline/
+      - FRENCH_CORPORA_PATH=/french_corpora/
       - STANFORD_CORENLP_SERVER_ADDRESS=http://stanford:9000
-      - FRENCH_STANFORD_NER_MODEL_PATH=stanford_models/ner-model-french.ser.gz
-      - FRENCH_CORENLP_STANFORD_NER_MODEL_PATH=stanford_models/ner-model-french.ser.gz
-      - FRENCH_STANFORD_POS_MODEL_PATH=stanford_models/french.tagger
-      - FRENCH_STANFORD_MODELS_PATH=stanford_models/french.jar
-      - FRENCH_STANFORD_DEPENDENCY_MODEL_PATH=stanford_models/UD_French.gz
-      - STANFORD_POSTAGGER_PATH=stanford_models/stanford-postagger.jar
-      - STANFORD_CORENLP_MODELS_PATH=stanford_models/stanford-corenlp-3.7.0-models.jar
-      - STANFORD_CORENLP_MODELS_PATH=stanford_models/stanford-corenlp-3.7.0-models.jar
+      - FRENCH_STANFORD_NER_MODEL_PATH=/stanford_models/ner-model-french.ser.gz
+      - FRENCH_CORENLP_STANFORD_NER_MODEL_PATH=/stanford_models/ner-model-french.ser.gz
+      - FRENCH_STANFORD_POS_MODEL_PATH=/stanford_models/french.tagger
+      - FRENCH_STANFORD_MODELS_PATH=/stanford_models/french.jar
+      - FRENCH_STANFORD_DEPENDENCY_MODEL_PATH=/stanford_models/UD_French.gz
+      - STANFORD_POSTAGGER_PATH=/stanford_models/stanford-postagger.jar
+      - STANFORD_CORENLP_MODELS_PATH=/stanford_models/stanford-corenlp-3.7.0-models.jar
     volumes:
       - french_corpora:/french_corpora:ro
       - french_pipeline:/french_pipeline
       - stanford_models:/stanford_models
+    entrypoint: sh 'while :; do ls -lah; sleep 5; done'
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
