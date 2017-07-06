@@ -16,7 +16,7 @@ services:
       - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/pipeline_config.py
       - NEO4J_PORT=7687
       - API_HOST=0.0.0.0
-      - NEO4J_HOST=neo4j
+      - NEO4J_HOST=bigworldgraph_neo4j
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
       - FRENCH_NES_OUTPUT_PATH=/french_pipeline/fr_articles_nes.json
       - FRENCH_POS_OUTPUT_PATH=/french_pipeline/fr_articles_pos.json
@@ -52,7 +52,7 @@ services:
   frontend:
     image: 212.47.239.66:5000/bigworldgraph_frontend:latest
     ports:
-        - "8080:8080"
+        - "8060:3000"
     volumes:
         - ./frontend:/frontend
         - /frontend/node_modules
