@@ -44,7 +44,7 @@ services:
       - french_corpora:/french_corpora:ro
       - french_pipeline:/french_pipeline
       - stanford_models:/stanford_models
-    entrypoint: sh 'while :; do ls -lah; sleep 5; done'
+    entrypoint: /bin/sh -c "while true; do sleep 2; df -h; done"
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
