@@ -3,6 +3,9 @@
 NLP Pipeline tasks for french texts.
 """
 
+# STD
+import os
+
 # EXT
 import luigi.format
 import nltk
@@ -61,12 +64,16 @@ class FrenchPipelineRunInfoGenerationTask(PipelineRunInfoGenerationTask):
 
 class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     """
-    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
+    Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database,
     but it's specifically for the french Wikipedia.
     """
     MEDIA_TYPES = [
-        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire",
-
+        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire"
+    ]
+    JOURNALIST_TYPES = [
+        "journaliste", "rédacteur", "rédactrice", "blogueur", "blogeuse", "reporter", "écrivain", "chroniqueur",
+        "chroniqueuse", "attaché de presse", "attachee de presse", "porte-parole", "correspondant", "correspondante",
+        "chef de rubrique", "commentateur", "commentatrice", "essayiste"
     ]
 
     def requires(self):
@@ -114,11 +121,21 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         ]):
             return True
 
+        # Include reporters
+        if any([
+            any([
+                journalist_type in get_if_exists(sense, "description", default="")
+                for journalist_type in self.JOURNALIST_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return True
+
         # Include media
         if any([
             any([
-                media_term in get_if_exists(sense, "description", default="")
-                for media_term in self.MEDIA_TYPES
+                media_type in get_if_exists(sense, "description", default="")
+                for media_type in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
@@ -159,11 +176,21 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
         ]):
             return "Businessperson"
 
+        # Include reporters
+        if any([
+            any([
+                journalist_type in get_if_exists(sense, "description", default="")
+                for journalist_type in self.JOURNALIST_TYPES
+            ])
+            for sense in node_data["senses"]
+        ]):
+            return "Journalist"
+
         # Assign media category
         if any([
             any([
-                media_term in get_if_exists(sense, "description", default="")
-                for media_term in self.MEDIA_TYPES
+                media_type in get_if_exists(sense, "description", default="")
+                for media_type in self.MEDIA_TYPES
             ])
             for sense in node_data["senses"]
         ]):
@@ -302,7 +329,6 @@ class FrenchServerRelationMergingTask(RelationMergingTask):
     """
     A luigi Task that merges extracted relations from other tasks, but it's specifically for the french Wikipedia.
     """
-
     def requires(self):
         return FrenchServerParticipationExtractionTask(task_config=self.task_config), \
                FrenchServerNaiveOpenRelationExtractionTask(task_config=self.task_config)
@@ -319,6 +345,7 @@ class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
+    french_config_path = os.environ.get("FRENCH_PIPELINE_CONFIG_PATH", "./pipeline_config.py")
     # TODO (FEATURE): Use remote scheduler for server deployment [DU 18.04.17]
     french_task_config = build_task_config_for_language(
         tasks=[
@@ -334,7 +361,7 @@ if __name__ == "__main__":
             "relations_database_writing_task"
         ],
         language="french",
-        config_file_path="./pipeline_config.py"
+        config_file_path=french_config_path
     )
     luigi.build(
         [FrenchRelationsDatabaseWritingTask(task_config=french_task_config)],
