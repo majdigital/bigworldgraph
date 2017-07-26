@@ -63,6 +63,13 @@ If you are on a Windows system, replace `pwd` inside the `-v` flag with the **ab
 Afterwards, you can make requests to the API using port `6050` by default (see the documentation for `bwg/run_api.py` 
 for more information).
 
+##### Testing
+
+To test the project, execute the following commands in the project's root directory
+
+    docker-compose -f docker-compose-test.yml build --no-cache
+    docker-compose -f docker-compose-test.yml up
+
 ##### Data
 
 Theoretically, the data can be any kind of text. The only prerequisite is to provide the data in a shallow XML format, e.g.
