@@ -1,3 +1,6 @@
+
+![](./img/logo.png)
+
 # README
 
 DISCLAIMER: This project is still in development and hasn't produced a stable version yet.
@@ -15,13 +18,13 @@ The data can then be inspected afterwards using an interactive graph.
 ### General information
 
 The prototype of this project was developed during an internship at [MAJ // Digital](http://maj.digital/) in Lisbon in 2017. 
-It is open-source (see LICENSE.md) and hoped to be improved upon by other volunteers (see section Contributing for more 
+It is open-source (see `LICENSE.md`) and hoped to be improved upon by other volunteers (see section Contributing for more 
 information). 
 
 The project is intended to work with all kinds of texts in different languages; however, the prototype was developed to 
 work with a corpus composed of Wikipedia articles of (political) affairs in France since 1996.
 
-To see what future features are planned to be included in this project, check TODO.md.
+To see what future features are planned to be included in this project, check `TODO.md`.
 
 #### Project description
 
@@ -31,7 +34,7 @@ in a graph database as well as the front end using a graph visualization library
 #### Contributing
 
 Contributions of all forms, be it code contributions, bug reports or suggestions are welcome. Please read the 
-CONTRIBUTE.md file for more information or visit the [project's GitHub page](https://github.com/majdigital/bigworldgraph).
+`CONTRIBUTE.md` file for more information or visit the [project's GitHub page](https://github.com/majdigital/bigworldgraph).
 
 ### Usage
 
@@ -39,14 +42,26 @@ CONTRIBUTE.md file for more information or visit the [project's GitHub page](htt
 
 ##### Installation
 
-To install all necessary python packages to run the pipeline, execute the following command in your terminal in the projects 
-root directory:
+Installation is handled by [Docker](https://www.docker.com/), so make sure to have it installed beforehand. 
+If you need to have any passwords included, add them to a `.env` file in the project root directory in the 
+`PARAMETER_NAME=VALUE` format. **By default, you must state a password for the database using the parameter name** 
+`NEO4J_PASSWORD`.
 
-    pip3 install -r requirements.txt
-    python3 setup.py install
+Afterwards, the installation is fairly simple. Just go the root directory of the project and execute the following command:
+
+    docker-compose build && docker-compose up
     
-You also have to have [Neo4j](https://neo4j.com/download/) installed.
+The building of the docker images in this project might take a while, especially during the first time you're using this
+project. After all containers are running, you can run the pipeline by executing the following:
 
+    cd ./pipeline/
+    docker build . -t pipeline
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
+    
+If you are on a Windows system, replace `pwd` inside the `-v` flag with the **absolute** path to the `stanford/models` 
+ directory.
+Afterwards, you can make requests to the API using port `6050` by default (see the documentation for `bwg/run_api.py` 
+for more information).
 
 ##### Data
 
@@ -136,65 +151,3 @@ pre-defined task names in your pipeline file:
             [MyNewTask(task_config=task_config)],
             local_scheduler=True, workers=1, log_level="INFO"
         )
-
-
-##### Preparing
-
-As the last step before running the pipeline, make sure to run the `StanfordCoreNLP` server in case you are using a task
-from the module `nlp/corenlp_server_tasks.py`, using the following command in the directory with the appropriate Stanford
-models (in this case the `-serverProperties` argument is used to tell the Server the language of incoming texts):
-
-    java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9000 -timeout 15000 -serverProperties StanfordCoreNLP-french.properties 
-    
-You also have to include at least this config parameter:
-
-    STANFORD_CORENLP_SERVER_ADDRESS = "http://localhost:9000"
-      
-In case you are writing the data into a `Neo4j` database, make sure to include the following parameters
-
-    # Neo4j
-    NEO4J_USER = "neo4j"
-    NEO4J_PASSWORD = "neo4j"
-    NEO4J_NETAG2MODEL = {
-        "I-PER": "Person",
-        "I-LOC": "Location",
-        "I-ORG": "Organization",
-        "DATE": "Date",
-        "I-MISC": "Miscellaneous"
-    }
-    
-and remember to run the server before running the pipeline, either by running `Neo4j`'s [community edition](https://neo4j.com/download/),
-executing the [Neo4j shell](http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html) in the terminal 
-or using [docker images](https://neo4j.com/developer/docker/) etc.
-
-In case you are using any task using `bwg/wikidata.py:WikidataAPIMixin`, e.g. `bwg/nlp/wikipedia_tasks.py:PropertiesCompletionTask`,
-please include a `user-config.py` file in your directory for `pywikibot`
-
-    mylang = "wikidata"
-    family = "wikidata"
-    usernames["wikidata"]["wikidata"] = u"BigWorldGraphBot"
-
-
-##### Running the pipeline
-
-To execute your pipeline, just run your module:
-
-    python3 bwg/my_pipeline.py
-
-
-#### Graph visualization
-
-TODO: How to install and use
-
-#### Server deployment
-
-TODO: How to
-
---- 
-
-**WARNINGS**
-
-If you are using the project locally, on MacOS with Python > 3.4, you can only use one worker at a time for the 
-pipeline, otherwise running the pipeline will result in an exception being thrown.
-
----

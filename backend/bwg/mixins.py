@@ -73,6 +73,10 @@ class CoreNLPServerMixin:
             self._server = pycorenlp.StanfordCoreNLP(self.task_config["STANFORD_CORENLP_SERVER_ADDRESS"])
         return self._server
 
+    @property
+    def workflow_resources(self):
+        return {}
+
 
 class ArticleProcessingMixin:
     """
