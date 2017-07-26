@@ -6,6 +6,7 @@ Functions concerning the config management of the NLP pipeline.
 # STD
 import os
 
+# PROJECT
 from bwg.helpers import get_config_from_py_file
 
 

@@ -6,7 +6,6 @@ NLP Pipeline tasks connected to resources of the Wikimedia Foundation.
 # STD
 import codecs
 import re
-import threading
 
 # EXT
 import luigi
@@ -15,7 +14,7 @@ import luigi.format
 # PROJECT
 import bwg
 from bwg.mixins import ArticleProcessingMixin
-from bwg.wikidata import WikidataAPIMixin, RequestCache  # , WikidataScraperMixin
+from bwg.wikidata import WikidataAPIMixin
 from bwg.helpers import is_collection, time_function
 from bwg.utilities import (
     serialize_article,

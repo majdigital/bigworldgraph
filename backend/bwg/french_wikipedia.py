@@ -65,8 +65,7 @@ class FrenchRelationsDatabaseWritingTask(RelationsDatabaseWritingTask):
     but it's specifically for the french Wikipedia.
     """
     MEDIA_TYPES = [
-        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire",
-
+        "radio", "blog", "télévision", "journal", "magazine", "radiodiffuseur", "quotidien", "site web", "hebdomadaire"
     ]
 
     def requires(self):

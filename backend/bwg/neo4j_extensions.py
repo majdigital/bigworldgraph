@@ -580,7 +580,8 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         :return: Whether the above conditions apply.
         :rtype: bool
         """
-        # TODO (Bug): Only run if new hash
+        # TODO (Bug): Only run if new hash [DU 26.08.17]
+        # At the moment, this task is run every time the pipeline is run
         return False
 
     def __enter__(self):

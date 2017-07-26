@@ -4,13 +4,14 @@ Defining additional tasks for the NLP pipeline.
 """
 
 # STD
-import copy
 import datetime
 import time
 
+# EXT
 import luigi
 import luigi.format
 
+# PROJECT
 from bwg.mixins import ArticleProcessingMixin
 from bwg.standard_tasks import NaiveOpenRelationExtractionTask, ParticipationExtractionTask
 from bwg.neo4j_extensions import Neo4jTarget

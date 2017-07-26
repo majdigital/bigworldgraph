@@ -94,7 +94,7 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">bwg.wikipedia_tasks</a><ul>
-<li><a class="reference internal" href="#module-bwg.wikipedia_tasks">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -142,50 +142,8 @@
       
   <div class="section" id="bwg-wikipedia-tasks">
 <h1>bwg.wikipedia_tasks<a class="headerlink" href="#bwg-wikipedia-tasks" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-bwg.wikipedia_tasks">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.wikipedia_tasks" title="Permalink to this headline">¶</a></h2>
-<p>NLP Pipeline tasks connected to resources of the Wikimedia Foundation.</p>
-<dl class="class">
-<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask">
-<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">PropertiesCompletionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a>, <a class="reference internal" href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin" title="bwg.wikidata.WikidataAPIMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikidata.WikidataAPIMixin</span></code></a></p>
-<p>Add attributes from Wikidata to Named Entities.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="bwg.wikipedia_tasks.RequestCache">
-<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">RequestCache</code><a class="headerlink" href="#bwg.wikipedia_tasks.RequestCache" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Special class used as a Cache, so that requests being made don&#8217;t have to be repeated if they occurred in the past.</p>
-<dl class="method">
-<dt id="bwg.wikipedia_tasks.RequestCache.request">
-<code class="descname">request</code><span class="sig-paren">(</span><em>key</em>, <em>request_func</em>, <em>*request_args</em>, <em>**request_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.RequestCache.request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a request, but make a lookup to the cache first to see if you may be able to avoid it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<em>str</em><em>, </em><em>int</em>) &#8211; Key that should be used to cache the request.</li>
-<li><strong>request_func</strong> (<em>func</em>) &#8211; Function to do the request.</li>
-<li><strong>request_args</strong> (<em>tuple</em>) &#8211; Arguments for request.</li>
-<li><strong>request_kwargs</strong> (<em>dict</em>) &#8211; Key word arguments for request.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="bwg.wikipedia_tasks.WikipediaReadingTask">
-<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">WikipediaReadingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
-<p>A luigi task that reads an extracted Wikipedia corpus (see README).</p>
-</dd></dl>
-
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -202,7 +160,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
     </p>
   </div>
 </footer>

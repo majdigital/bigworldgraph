@@ -2,7 +2,7 @@
 """
 Rewriting standard tasks for the NLP pipeline using the ``Stanford CoreNLP`` server. The main motivation to do this lies
 in the following problem: When the respective Stanford tools are run through their ``NLTK`` wrappers, they load their
-necessary models from scratch every time. This slows down the pipeline quite a load. In contrast, the server loads them
+necessary models from scratch every time. This slows down the pipeline quite a lot. In contrast, the server loads them
 only once.
 
 Also, this approach comes with some other merits as well:
@@ -12,7 +12,6 @@ Also, this approach comes with some other merits as well:
 
 # PROJECT
 from bwg.mixins import CoreNLPServerMixin
-
 from bwg.standard_tasks import (
     NERTask,
     DependencyParseTask,

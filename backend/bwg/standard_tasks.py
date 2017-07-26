@@ -628,6 +628,17 @@ class NaiveOpenRelationExtractionTask(luigi.Task, ArticleProcessingMixin):
             expanded_obj_node = self._expand_node(obj_node, normalized_dependency_tree)
 
             # TODO (FEATURE): Extend definition of verb nodes? (Allow more patterns) [DU 18.04.17]
+            # At the moment, the simple extraction heuristic ist just the following:
+            # 1.) Find all verb nodes in a dependency tree
+            # 2.) Find subject and object of that verb
+            # 3.) Check if they are tagged with a Named Entity Tag
+            # 4.) If one of them is tagged, extract the hold phrase as a relation triplet
+            #
+            # Possible improvements
+            # - Use Machine Learning to learn patterns from pre-annotated corpus
+            # - Alternatively, come up with more sophisticated rules manually
+            # - Only extract relevant relationships
+            # - Only extract the relevant parts of a relationship
 
             if self._expanded_node_is_ne_tagged(expanded_subj_node, aligned_ne_tagged_line) or \
                self._expanded_node_is_ne_tagged(expanded_obj_node, aligned_ne_tagged_line):
