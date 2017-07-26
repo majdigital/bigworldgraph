@@ -25,8 +25,8 @@ General information
 
 The prototype of this project was developed during an internship at `MAJ
 // Digital <http://maj.digital/>`__ in Lisbon in 2017. It is open-source
-(see LICENSE.md) and hoped to be improved upon by other volunteers (see
-section Contributing for more information).
+(see ``LICENSE.md``) and hoped to be improved upon by other volunteers
+(see section Contributing for more information).
 
 The project is intended to work with all kinds of texts in different
 languages; however, the prototype was developed to work with a corpus
@@ -34,7 +34,7 @@ composed of Wikipedia articles of (political) affairs in France since
 1996.
 
 To see what future features are planned to be included in this project,
-check TODO.md.
+check ``TODO.md``.
 
 Project description
 ^^^^^^^^^^^^^^^^^^^
@@ -47,18 +47,15 @@ Contributing
 ^^^^^^^^^^^^
 
 Contributions of all forms, be it code contributions, bug reports or
-suggestions are welcome. Please read the CONTRIBUTE.md file for more
+suggestions are welcome. Please read the ``CONTRIBUTE.md`` file for more
 information or visit the `project's GitHub
 page <https://github.com/majdigital/bigworldgraph>`__.
 
 Usage
 ~~~~~
 
-Pipeline
-^^^^^^^^
-
 Installation
-''''''''''''
+^^^^^^^^^^^^
 
 Installation is handled by `Docker <https://www.docker.com/>`__, so make
 sure to have it installed beforehand. If you need to have any passwords
@@ -81,6 +78,7 @@ following:
 ::
 
     cd ./pipeline/
+    docker build . -t pipeline
     docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
 
 If you are on a Windows system, replace ``pwd`` inside the ``-v`` flag
@@ -89,8 +87,19 @@ Afterwards, you can make requests to the API using port ``6050`` by
 default (see the documentation for ``bwg/run_api.py`` for more
 information).
 
+Testing
+^^^^^^^
+
+To test the project, execute the following commands in the project's
+root directory
+
+::
+
+    docker-compose -f docker-compose-test.yml build --no-cache
+    docker-compose -f docker-compose-test.yml up
+
 Data
-''''
+^^^^
 
 Theoretically, the data can be any kind of text. The only prerequisite
 is to provide the data in a shallow XML format, e.g.
@@ -111,7 +120,7 @@ NLP <https://stanfordnlp.github.io/CoreNLP/download.html>`__ models are
 also required.
 
 Writing your own pipeline tasks
-'''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to modify existing pipeline tasks or write new ones, it is
 recommended to add a new module to the ``bwg`` package, see e.g.
@@ -137,7 +146,7 @@ tasks:
    :alt: 
 
 Adjusting your pipeline configuration
-'''''''''''''''''''''''''''''''''''''
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you add a new kind of task to the pipeline, make sure to include a
 description of its necessary parameters in your pipeline configuration

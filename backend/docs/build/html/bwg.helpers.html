@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bwg.helpers &#8212; BigWorldGraph 0.7 documentation</title>
+    <title>bwg.helpers &#8212; BigWorldGraph 0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
           BigWorldGraph</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -222,7 +222,7 @@ for these fields from the source dict</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dictionary</strong> (<em>dict</em>) &#8211; Dictionary that is going to be filtered.</li>
-<li><strong>keep_fields</strong> (<em>dict</em>) &#8211; Dictionary keys that aren&#8217;t going to be filtered.</li>
+<li><strong>keep_fields</strong> (<em>dict</em><em> or </em><em>list</em><em> or </em><em>set</em>) &#8211; Dictionary keys that aren&#8217;t going to be filtered.</li>
 </ul>
 </td>
 </tr>
@@ -335,6 +335,29 @@ for these fields from the source dict</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New configuration.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.helpers.retry_on_condition">
+<code class="descclassname">bwg.helpers.</code><code class="descname">retry_on_condition</code><span class="sig-paren">(</span><em>exception_class</em>, <em>condition=&lt;function &lt;lambda&gt;&gt;</em>, <em>max_retries=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.helpers.retry_on_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retry a function in case an exception occurs. You can also define an additional condition that has to be met as
+well as a maximum amount of retries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>exception_class</strong> (<em>Exception</em>) &#8211; Exception class that triggers the retry.</li>
+<li><strong>condition</strong> &#8211; Additional condition that has to be met.</li>
+<li><strong>max_retries</strong> &#8211; Maximum amount of retries, -1 means infinite retries.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">func</p>
+</td>
 </tr>
 </tbody>
 </table>

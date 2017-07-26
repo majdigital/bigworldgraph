@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>BigWorldGraph &#8212; BigWorldGraph 0.7 documentation</title>
+    <title>BigWorldGraph &#8212; BigWorldGraph 0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -51,7 +51,7 @@
         </button>
         <a class="navbar-brand" href="#"><span><img src="_static/logo_small.png"></span>
           BigWorldGraph</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -102,13 +102,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
-<li><a class="reference internal" href="#pipeline">Pipeline</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#data">Data</a></li>
 <li><a class="reference internal" href="#writing-your-own-pipeline-tasks">Writing your own pipeline tasks</a></li>
 <li><a class="reference internal" href="#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -189,14 +187,14 @@ and enriching those results with
 <h3>General information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h3>
 <p>The prototype of this project was developed during an internship at <a class="reference external" href="http://maj.digital/">MAJ
 // Digital</a> in Lisbon in 2017. It is open-source
-(see LICENSE.md) and hoped to be improved upon by other volunteers (see
-section Contributing for more information).</p>
+(see <code class="docutils literal"><span class="pre">LICENSE.md</span></code>) and hoped to be improved upon by other volunteers
+(see section Contributing for more information).</p>
 <p>The project is intended to work with all kinds of texts in different
 languages; however, the prototype was developed to work with a corpus
 composed of Wikipedia articles of (political) affairs in France since
 1996.</p>
 <p>To see what future features are planned to be included in this project,
-check TODO.md.</p>
+check <code class="docutils literal"><span class="pre">TODO.md</span></code>.</p>
 <div class="section" id="project-description">
 <h4>Project description<a class="headerlink" href="#project-description" title="Permalink to this headline">¶</a></h4>
 <p>The project consists of two main parts: The NLP pipeline, extracting
@@ -206,17 +204,15 @@ well as the front end using a graph visualization library.</p>
 <div class="section" id="contributing">
 <h4>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h4>
 <p>Contributions of all forms, be it code contributions, bug reports or
-suggestions are welcome. Please read the CONTRIBUTE.md file for more
+suggestions are welcome. Please read the <code class="docutils literal"><span class="pre">CONTRIBUTE.md</span></code> file for more
 information or visit the <a class="reference external" href="https://github.com/majdigital/bigworldgraph">project&#8217;s GitHub
 page</a>.</p>
 </div>
 </div>
 <div class="section" id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="pipeline">
-<h4>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h4>
 <div class="section" id="installation">
-<h5>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h5>
+<h4>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h4>
 <p>Installation is handled by <a class="reference external" href="https://www.docker.com/">Docker</a>, so make
 sure to have it installed beforehand. If you need to have any passwords
 included, add them to a <code class="docutils literal"><span class="pre">.env</span></code> file in the project root directory in
@@ -232,6 +228,7 @@ especially during the first time you&#8217;re using this project. After all
 containers are running, you can run the pipeline by executing the
 following:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>cd ./pipeline/
+docker build . -t pipeline
 docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
 </pre></div>
 </div>
@@ -241,8 +238,17 @@ Afterwards, you can make requests to the API using port <code class="docutils li
 default (see the documentation for <code class="docutils literal"><span class="pre">bwg/run_api.py</span></code> for more
 information).</p>
 </div>
+<div class="section" id="testing">
+<h4>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h4>
+<p>To test the project, execute the following commands in the project&#8217;s
+root directory</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">yml</span> <span class="n">build</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="data">
-<h5>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h5>
+<h4>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h4>
 <p>Theoretically, the data can be any kind of text. The only prerequisite
 is to provide the data in a shallow XML format, e.g.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">doc</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;www.url-to-text.com&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The title or headline of this text.&quot;</span><span class="o">&gt;</span>
@@ -259,7 +265,7 @@ NLP</a> models are
 also required.</p>
 </div>
 <div class="section" id="writing-your-own-pipeline-tasks">
-<h5>Writing your own pipeline tasks<a class="headerlink" href="#writing-your-own-pipeline-tasks" title="Permalink to this headline">¶</a></h5>
+<h4>Writing your own pipeline tasks<a class="headerlink" href="#writing-your-own-pipeline-tasks" title="Permalink to this headline">¶</a></h4>
 <p>If you want to modify existing pipeline tasks or write new ones, it is
 recommended to add a new module to the <code class="docutils literal"><span class="pre">bwg</span></code> package, see e.g.
 <code class="docutils literal"><span class="pre">bwg/french_wikipedia.py</span></code> as reference. You can inherit tasks from
@@ -284,7 +290,7 @@ tasks:</p>
 </div>
 </div>
 <div class="section" id="adjusting-your-pipeline-configuration">
-<h5>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h5>
+<h4>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h4>
 <p>If you add a new kind of task to the pipeline, make sure to include a
 description of its necessary parameters in your pipeline configuration
 file. You can use <code class="docutils literal"><span class="pre">bwg/raw_pipeline_config.py</span></code> as a template, which
@@ -346,7 +352,6 @@ pipeline, using the pre-defined task names in your pipeline file:</p>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
-</div>
 </div>
 </div>
 </div>
