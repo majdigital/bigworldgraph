@@ -5,17 +5,17 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bwg.run &#8212; BigWorldGraph 0.7 documentation</title>
+    <title>bwg.run_api &#8212; BigWorldGraph 0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -50,9 +50,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="index.html">
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
           BigWorldGraph</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -76,7 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -94,10 +94,10 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">bwg.run</a><ul>
+<li><a class="reference internal" href="#">bwg.run_api</a><ul>
 <li><a class="reference internal" href="#usage">Usage</a></li>
 <li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-bwg.run_api">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -123,7 +123,7 @@
             
               <li class="hidden-sm">
 <div id="sourcelink">
-  <a href="_sources/bwg.run.rst.txt"
+  <a href="_sources/bwg.run_api.rst.txt"
      rel="nofollow">Source</a>
 </div></li>
             
@@ -147,14 +147,19 @@
   <div class="row">
     <div class="col-md-12 content">
       
-  <div class="section" id="bwg-run">
-<h1>bwg.run<a class="headerlink" href="#bwg-run" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="bwg-run-api">
+<h1>bwg.run_api<a class="headerlink" href="#bwg-run-api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the API. To run the API, just run this module:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">bwg</span><span class="o">/</span><span class="n">run</span><span class="o">.</span><span class="n">py</span>
+<p>This module contains the API. To run the API, just this command in the source root folder:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 </div>
+<p>So fill the database connected to the API with data, use</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sh</span> <span class="o">./</span><span class="n">run_pipeline</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>This requires you to provide a corpus file in a directory specified in your pipeline&#8217;s config file.</p>
 </div>
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
@@ -176,8 +181,8 @@
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;_items&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;42904ca7f582449eafb98c1e94cd8b0d&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;wikidata_last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2015-12-31T03:11:20Z&quot;</span><span class="p">,</span> <span class="s2">&quot;wikidata_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Q3039421&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Dreyfus&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;pi</span><span class="se">\u00e8</span><span class="s2">ce de th</span><span class="se">\u00e9\u00e2</span><span class="s2">tre de Jean-Claude Grumberg&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;claims&quot;</span><span class="p">:</span> <span class="p">{}},</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="o">...</span><span class="p">}</span>
 </pre></div>
 </div>
-<p>To be more specific, you can query special kinds of entities like <code class="docutils literal"><span class="pre">/people/</span></code>, <code class="docutils literal"><span class="pre">/locations/</span></code>, <code class="docutils literal"><span class="pre">/organizations/</span></code> or
-<code class="docutils literal"><span class="pre">/misc/</span></code>.</p>
+<p>To be more specific, you can query special kinds of entities like <code class="docutils literal"><span class="pre">/people/</span></code>, <code class="docutils literal"><span class="pre">/locations/</span></code>, <code class="docutils literal"><span class="pre">/organizations/</span></code>,
+<code class="docutils literal"><span class="pre">/companies/</span></code>, <code class="docutils literal"><span class="pre">/parties/</span></code>, <code class="docutils literal"><span class="pre">/affairs/</span></code>, <code class="docutils literal"><span class="pre">/politicians/</span></code>, <code class="docutils literal"><span class="pre">/businesspeople/</span></code>, <code class="docutils literal"><span class="pre">/media/</span></code>, <code class="docutils literal"><span class="pre">/misc/</span></code>.</p>
 <p>To make responses more readable for humans, use the <code class="docutils literal"><span class="pre">?pretty</span></code> query parameter:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>curl -gX GET http://127.0.0.1:5000/people?pretty
 </pre></div>
@@ -231,8 +236,107 @@ implemented yet.</p>
 </div>
 <p>This will return the target node as well as its <strong>friends</strong> and its <strong>friends of friends</strong>.</p>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-bwg.run_api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.run_api" title="Permalink to this headline">¶</a></h2>
+<p>Module to run the API that connects the graph database to the frontend.</p>
+<dl class="function">
+<dt id="bwg.run_api.add_additional_endpoints">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_additional_endpoints</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_additional_endpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add additional endpoints to the current API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.add_error_handlers">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_error_handlers</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_error_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add error handlers to the current API.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.add_logger_to_app">
+<code class="descclassname">bwg.run_api.</code><code class="descname">add_logger_to_app</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_logger_to_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add logger to the current app.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app</strong> (<em>eve.Eve</em>) &#8211; Current app.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">App with logger.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.log_request">
+<code class="descclassname">bwg.run_api.</code><code class="descname">log_request</code><span class="sig-paren">(</span><em>resource</em>, <em>request</em>, <em>payload</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.log_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a request on an endpoint.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resource</strong> (<em>str</em>) &#8211; Resource being called.</li>
+<li><strong>request</strong> (<em>dict</em>) &#8211; Request information.</li>
+<li><strong>payload</strong> (<em>dict</em>) &#8211; Request payload.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.run_api.set_up_api">
+<code class="descclassname">bwg.run_api.</code><code class="descname">set_up_api</code><span class="sig-paren">(</span><em>config_path='./api_config.py'</em>, <em>log=True</em>, <em>screen_output=True</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.set_up_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the API using the following steps:</p>
+<ol class="arabic simple">
+<li>Read the configuration file.</li>
+<li>Overwrite configuration parameters if corresponding environment variables exist.</li>
+<li>Initialize the logger.</li>
+<li>Create the API.</li>
+<li>Add error handlers to the API.</li>
+<li>Add additional endpoints to the API.</li>
+<li>Connect the API to the logger.</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Completely set up API.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 

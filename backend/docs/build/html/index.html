@@ -5,17 +5,17 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>BigWorldGraph &#8212; BigWorldGraph 0.7 documentation</title>
+    <title>BigWorldGraph &#8212; BigWorldGraph 0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -49,9 +49,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="#"><span><img src="_static/logo_small.png"></span>
           BigWorldGraph</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -75,7 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -102,17 +102,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
-<li><a class="reference internal" href="#pipeline">Pipeline</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
 <li><a class="reference internal" href="#data">Data</a></li>
 <li><a class="reference internal" href="#writing-your-own-pipeline-tasks">Writing your own pipeline tasks</a></li>
 <li><a class="reference internal" href="#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
-<li><a class="reference internal" href="#preparing">Preparing</a></li>
-<li><a class="reference internal" href="#running-the-pipeline">Running the pipeline</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#graph-visualization">Graph visualization</a></li>
-<li><a class="reference internal" href="#server-deployment">Server deployment</a></li>
 </ul>
 </li>
 </ul>
@@ -171,6 +165,9 @@
 <h1>BigWorldGraph<a class="headerlink" href="#bigworldgraph" title="Permalink to this headline">¶</a></h1>
 <blockquote>
 <div>Revealing the connections that shape the world we live in.</div></blockquote>
+<div class="figure">
+<img alt="" src="_images/logo.png" />
+</div>
 </div>
 <div class="section" id="readme">
 <h1>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
@@ -190,14 +187,14 @@ and enriching those results with
 <h3>General information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h3>
 <p>The prototype of this project was developed during an internship at <a class="reference external" href="http://maj.digital/">MAJ
 // Digital</a> in Lisbon in 2017. It is open-source
-(see LICENSE.md) and hoped to be improved upon by other volunteers (see
-section Contributing for more information).</p>
+(see <code class="docutils literal"><span class="pre">LICENSE.md</span></code>) and hoped to be improved upon by other volunteers
+(see section Contributing for more information).</p>
 <p>The project is intended to work with all kinds of texts in different
 languages; however, the prototype was developed to work with a corpus
 composed of Wikipedia articles of (political) affairs in France since
 1996.</p>
 <p>To see what future features are planned to be included in this project,
-check TODO.md.</p>
+check <code class="docutils literal"><span class="pre">TODO.md</span></code>.</p>
 <div class="section" id="project-description">
 <h4>Project description<a class="headerlink" href="#project-description" title="Permalink to this headline">¶</a></h4>
 <p>The project consists of two main parts: The NLP pipeline, extracting
@@ -207,27 +204,51 @@ well as the front end using a graph visualization library.</p>
 <div class="section" id="contributing">
 <h4>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h4>
 <p>Contributions of all forms, be it code contributions, bug reports or
-suggestions are welcome. Please read the CONTRIBUTE.md file for more
+suggestions are welcome. Please read the <code class="docutils literal"><span class="pre">CONTRIBUTE.md</span></code> file for more
 information or visit the <a class="reference external" href="https://github.com/majdigital/bigworldgraph">project&#8217;s GitHub
 page</a>.</p>
 </div>
 </div>
 <div class="section" id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="pipeline">
-<h4>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h4>
 <div class="section" id="installation">
-<h5>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h5>
-<p>To install all necessary python packages to run the pipeline, execute
-the following command in your terminal in the projects root directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip3</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+<h4>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h4>
+<p>Installation is handled by <a class="reference external" href="https://www.docker.com/">Docker</a>, so make
+sure to have it installed beforehand. If you need to have any passwords
+included, add them to a <code class="docutils literal"><span class="pre">.env</span></code> file in the project root directory in
+the <code class="docutils literal"><span class="pre">PARAMETER_NAME=VALUE</span></code> format. <strong>By default, you must state a
+password for the database using the parameter name</strong> <code class="docutils literal"><span class="pre">NEO4J_PASSWORD</span></code>.</p>
+<p>Afterwards, the installation is fairly simple. Just go the root
+directory of the project and execute the following command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 </div>
-<p>You also have to have <a class="reference external" href="https://neo4j.com/download/">Neo4j</a> installed.</p>
+<p>The building of the docker images in this project might take a while,
+especially during the first time you&#8217;re using this project. After all
+containers are running, you can run the pipeline by executing the
+following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>cd ./pipeline/
+docker build . -t pipeline
+docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
+</pre></div>
+</div>
+<p>If you are on a Windows system, replace <code class="docutils literal"><span class="pre">pwd</span></code> inside the <code class="docutils literal"><span class="pre">-v</span></code> flag
+with the <strong>absolute</strong> path to the <code class="docutils literal"><span class="pre">stanford/models</span></code> directory.
+Afterwards, you can make requests to the API using port <code class="docutils literal"><span class="pre">6050</span></code> by
+default (see the documentation for <code class="docutils literal"><span class="pre">bwg/run_api.py</span></code> for more
+information).</p>
+</div>
+<div class="section" id="testing">
+<h4>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h4>
+<p>To test the project, execute the following commands in the project&#8217;s
+root directory</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">yml</span> <span class="n">build</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="data">
-<h5>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h5>
+<h4>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h4>
 <p>Theoretically, the data can be any kind of text. The only prerequisite
 is to provide the data in a shallow XML format, e.g.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">doc</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;www.url-to-text.com&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The title or headline of this text.&quot;</span><span class="o">&gt;</span>
@@ -244,7 +265,7 @@ NLP</a> models are
 also required.</p>
 </div>
 <div class="section" id="writing-your-own-pipeline-tasks">
-<h5>Writing your own pipeline tasks<a class="headerlink" href="#writing-your-own-pipeline-tasks" title="Permalink to this headline">¶</a></h5>
+<h4>Writing your own pipeline tasks<a class="headerlink" href="#writing-your-own-pipeline-tasks" title="Permalink to this headline">¶</a></h4>
 <p>If you want to modify existing pipeline tasks or write new ones, it is
 recommended to add a new module to the <code class="docutils literal"><span class="pre">bwg</span></code> package, see e.g.
 <code class="docutils literal"><span class="pre">bwg/french_wikipedia.py</span></code> as reference. You can inherit tasks from
@@ -269,7 +290,7 @@ tasks:</p>
 </div>
 </div>
 <div class="section" id="adjusting-your-pipeline-configuration">
-<h5>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h5>
+<h4>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h4>
 <p>If you add a new kind of task to the pipeline, make sure to include a
 description of its necessary parameters in your pipeline configuration
 file. You can use <code class="docutils literal"><span class="pre">bwg/raw_pipeline_config.py</span></code> as a template, which
@@ -330,73 +351,6 @@ pipeline, using the pre-defined task names in your pipeline file:</p>
     <span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="preparing">
-<h5>Preparing<a class="headerlink" href="#preparing" title="Permalink to this headline">¶</a></h5>
-<p>As the last step before running the pipeline, make sure to run the
-<code class="docutils literal"><span class="pre">StanfordCoreNLP</span></code> server in case you are using a task from the module
-<code class="docutils literal"><span class="pre">nlp/corenlp_server_tasks.py</span></code>, using the following command in the
-directory with the appropriate Stanford models (in this case the
-<code class="docutils literal"><span class="pre">-serverProperties</span></code> argument is used to tell the Server the language
-of incoming texts):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">java</span> <span class="o">-</span><span class="n">mx4g</span> <span class="o">-</span><span class="n">cp</span> <span class="s2">&quot;*&quot;</span> <span class="n">edu</span><span class="o">.</span><span class="n">stanford</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">StanfordCoreNLPServer</span> <span class="o">-</span><span class="n">port</span> <span class="mi">9000</span> <span class="o">-</span><span class="n">timeout</span> <span class="mi">15000</span> <span class="o">-</span><span class="n">serverProperties</span> <span class="n">StanfordCoreNLP</span><span class="o">-</span><span class="n">french</span><span class="o">.</span><span class="n">properties</span>
-</pre></div>
-</div>
-<p>You also have to include at least this config parameter:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">STANFORD_CORENLP_SERVER_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;http://localhost:9000&quot;</span>
-</pre></div>
-</div>
-<p>In case you are writing the data into a <code class="docutils literal"><span class="pre">Neo4j</span></code> database, make sure to
-include the following parameters</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Neo4j</span>
-<span class="n">NEO4J_USER</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
-<span class="n">NEO4J_PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
-<span class="n">NEO4J_NETAG2MODEL</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;I-PER&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;I-LOC&quot;</span><span class="p">:</span> <span class="s2">&quot;Location&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;I-ORG&quot;</span><span class="p">:</span> <span class="s2">&quot;Organization&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;Date&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;I-MISC&quot;</span><span class="p">:</span> <span class="s2">&quot;Miscellaneous&quot;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>and remember to run the server before running the pipeline, either by
-running <code class="docutils literal"><span class="pre">Neo4j</span></code>&#8216;s <a class="reference external" href="https://neo4j.com/download/">community edition</a>,
-executing the <a class="reference external" href="http://technoracle.blogspot.pt/2012/04/neo4j-installing-running-and-shell.html">Neo4j
-shell</a>
-in the terminal or using <a class="reference external" href="https://neo4j.com/developer/docker/">docker
-images</a> etc.</p>
-<p>In case you are using any task using
-<code class="docutils literal"><span class="pre">bwg/wikidata.py:WikidataAPIMixin</span></code>, e.g.
-<code class="docutils literal"><span class="pre">bwg/nlp/wikipedia_tasks.py:PropertiesCompletionTask</span></code>, please include
-a <code class="docutils literal"><span class="pre">user-config.py</span></code> file in your directory for <code class="docutils literal"><span class="pre">pywikibot</span></code></p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mylang</span> <span class="o">=</span> <span class="s2">&quot;wikidata&quot;</span>
-<span class="n">family</span> <span class="o">=</span> <span class="s2">&quot;wikidata&quot;</span>
-<span class="n">usernames</span><span class="p">[</span><span class="s2">&quot;wikidata&quot;</span><span class="p">][</span><span class="s2">&quot;wikidata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">u</span><span class="s2">&quot;BigWorldGraphBot&quot;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="running-the-pipeline">
-<h5>Running the pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this headline">¶</a></h5>
-<p>To execute your pipeline, just run your module:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">bwg</span><span class="o">/</span><span class="n">my_pipeline</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="graph-visualization">
-<h4>Graph visualization<a class="headerlink" href="#graph-visualization" title="Permalink to this headline">¶</a></h4>
-<p>TODO: How to install and use</p>
-</div>
-<div class="section" id="server-deployment">
-<h4>Server deployment<a class="headerlink" href="#server-deployment" title="Permalink to this headline">¶</a></h4>
-<p>TODO: How to</p>
-<hr class="docutils" />
-<p><strong>WARNINGS</strong></p>
-<p>If you are using the project locally, on MacOS with Python &gt; 3.4, you
-can only use one worker at a time for the pipeline, otherwise running
-the pipeline will result in an exception being thrown.</p>
-<hr class="docutils" />
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -418,7 +372,7 @@ the pipeline will result in an exception being thrown.</p>
 <li><cite>bwg.utilities</cite>: Mostly serializing functions used in pipeline tasks.</li>
 <li><cite>bwg.wikidata</cite>: Wrappers for Wikidata, using <code class="docutils literal"><span class="pre">pywikibot</span></code>.</li>
 <li><cite>bwg.wikipedia_tasks</cite>: Tasks involving the Wikidata or processing a Wikipedia corpus.</li>
-<li><cite>bwg.run</cite>: Module used to run the API.</li>
+<li><cite>bwg.run_api</cite>: Module used to run the API.</li>
 <li><cite>bwg.demo_pipeline.py</cite>: Simple example pipeline to process a minimal corpus.</li>
 </ul>
 <div class="section" id="modules">
@@ -426,63 +380,62 @@ the pipeline will result in an exception being thrown.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.additional_tasks.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.additional_tasks.html#module-bwg.additional_tasks">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#module-bwg.config_management">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#module-bwg.corenlp_server_tasks">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#module-bwg.demo_pipeline">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#backstory">Backstory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#module-bwg.french_wikipedia">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.helpers.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.helpers.html#module-bwg.helpers">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.mixins.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.mixins.html#module-bwg.mixins">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#motivation">Motivation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#module-bwg.neo4j_extensions">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run.html#features">Features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run.html#module-contents">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#module-bwg.run_api">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#module-bwg.standard_tasks">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.utilities.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.utilities.html#module-bwg.utilities">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.wikidata.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.wikidata.html#module-bwg.wikidata">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.wikipedia_tasks.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bwg.wikipedia_tasks.html#module-bwg.wikipedia_tasks">Module contents</a></li>
 </ul>
 </li>
 </ul>

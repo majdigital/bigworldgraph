@@ -38,9 +38,7 @@ Contributions of all forms, be it code contributions, bug reports or suggestions
 
 ### Usage
 
-#### Pipeline
-
-##### Installation
+#### Installation
 
 Installation is handled by [Docker](https://www.docker.com/), so make sure to have it installed beforehand. 
 If you need to have any passwords included, add them to a `.env` file in the project root directory in the 
@@ -63,14 +61,14 @@ If you are on a Windows system, replace `pwd` inside the `-v` flag with the **ab
 Afterwards, you can make requests to the API using port `6050` by default (see the documentation for `bwg/run_api.py` 
 for more information).
 
-##### Testing
+#### Testing
 
 To test the project, execute the following commands in the project's root directory
 
     docker-compose -f docker-compose-test.yml build --no-cache
     docker-compose -f docker-compose-test.yml up
 
-##### Data
+#### Data
 
 Theoretically, the data can be any kind of text. The only prerequisite is to provide the data in a shallow XML format, e.g.
 
@@ -84,7 +82,7 @@ and following the instructions of the [MW-Dumper](https://www.mediawiki.org/wiki
 For steps involving Natural Languages Processing, appropriate [Stanford NLP](https://stanfordnlp.github.io/CoreNLP/download.html) models are also required.
 
 
-##### Writing your own pipeline tasks
+#### Writing your own pipeline tasks
 
 If you want to modify existing pipeline tasks or write new ones, it is recommended to add a new module to the `bwg` package,
 see e.g. `bwg/french_wikipedia.py` as reference. You can inherit tasks from other modules to solve common problems:
@@ -102,7 +100,7 @@ With its standard configuration, the pipeline comprises the following tasks:
 ![](./img/flowchart.png)
 
 
-##### Adjusting your pipeline configuration
+#### Adjusting your pipeline configuration
 
 If you add a new kind of task to the pipeline, make sure to include a description of its necessary parameters in 
 your pipeline configuration file. You can use `bwg/raw_pipeline_config.py` as a template, which provides a minimal example.

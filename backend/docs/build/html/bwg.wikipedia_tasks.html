@@ -5,17 +5,17 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>bwg.wikipedia_tasks &#8212; BigWorldGraph 0.7 documentation</title>
+    <title>bwg.wikipedia_tasks &#8212; BigWorldGraph 0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.3.6/yeti/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.7',
+        VERSION:     '0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -49,9 +49,9 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="index.html">
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
           BigWorldGraph</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.7</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -75,7 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run.html">bwg.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
@@ -94,7 +94,7 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">bwg.wikipedia_tasks</a><ul>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-bwg.wikipedia_tasks">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -142,8 +142,23 @@
       
   <div class="section" id="bwg-wikipedia-tasks">
 <h1>bwg.wikipedia_tasks<a class="headerlink" href="#bwg-wikipedia-tasks" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-bwg.wikipedia_tasks">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.wikipedia_tasks" title="Permalink to this headline">¶</a></h2>
+<p>NLP Pipeline tasks connected to resources of the Wikimedia Foundation.</p>
+<dl class="class">
+<dt id="bwg.wikipedia_tasks.PropertiesCompletionTask">
+<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">PropertiesCompletionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.PropertiesCompletionTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code>, <a class="reference internal" href="bwg.mixins.html#bwg.mixins.ArticleProcessingMixin" title="bwg.mixins.ArticleProcessingMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.ArticleProcessingMixin</span></code></a>, <a class="reference internal" href="bwg.wikidata.html#bwg.wikidata.WikidataAPIMixin" title="bwg.wikidata.WikidataAPIMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.wikidata.WikidataAPIMixin</span></code></a></p>
+<p>Add attributes from Wikidata to Named Entities.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bwg.wikipedia_tasks.WikipediaReadingTask">
+<em class="property">class </em><code class="descclassname">bwg.wikipedia_tasks.</code><code class="descname">WikipediaReadingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.wikipedia_tasks.WikipediaReadingTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">luigi.task.Task</span></code></p>
+<p>A luigi task that reads an extracted Wikipedia corpus (see README).</p>
+</dd></dl>
+
 </div>
 </div>
 
