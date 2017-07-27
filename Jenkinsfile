@@ -1,6 +1,6 @@
 node("docker-builder") {
     commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
-    slackSend color: '#0066cc', message: 'Starting to build BigWorldGraph! :muscle: (${commitChangeset})'
+    slackSend color: '#0066cc', message: "Starting to build BigWorldGraph! :muscle: ( ${commitChangeset} )"
 
     stage('fetching'){
         checkout scm
@@ -15,11 +15,12 @@ node("docker-builder") {
 }
 
 node("staging") {
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
     stage('fetching'){
         checkout scm
     }
     stage('testing'){
-        slackSend color: '#993366', message: 'Starting to test BigWorldGraph... :alembic::bar_chart::mag: (${commitChangeset})'
+        slackSend color: '#993366', message: "Starting to test BigWorldGraph... :alembic::bar_chart::mag: ( ${commitChangeset} )"
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up & \
@@ -52,6 +53,7 @@ node("staging") {
 }
 
 node("production-mobidick") {
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
     stage('staging_fetching'){
         checkout scm
     }
