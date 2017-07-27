@@ -40,7 +40,7 @@ node("staging") {
             error 'staging failed'
             slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
         } finally {
-            slackSend color: '#993366', message: 'Testing BigWorldGraph was successful! :nerd_face::+1: (${commitChangeset})'
+            slackSend color: '#993366', message: "Testing BigWorldGraph was successful! :nerd_face::+1: ( ${commitChangeset} )"
         }
     }
     stage('publish'){
@@ -60,6 +60,6 @@ node("production-mobidick") {
 
     stage('staging_deploy') {
         sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
-        slackSend color: 'good', message: 'BigWorldGraph build successful! :triumph: (${commitChangeset})'
+        slackSend color: 'good', message: "BigWorldGraph build successful! :triumph: ( ${commitChangeset} )"
     }
 }
