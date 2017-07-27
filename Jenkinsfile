@@ -1,4 +1,6 @@
 node("docker-builder") {
+    slackSend color: '#0066cc', message: 'Starting to build BigWorldGraph! :muscle:'
+
     stage('fetching'){
         checkout scm
     }
@@ -33,6 +35,7 @@ node("staging") {
                 done;' \
         } catch (e) {
             error 'staging failed'
+            slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
         } finally {}
     }
     stage('publish'){
