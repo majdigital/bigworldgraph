@@ -58,8 +58,13 @@ node("production-mobidick") {
         checkout scm
     }
 
-    stage('staging_deploy') {
-        sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
-        slackSend color: 'good', message: "BigWorldGraph build successful! :triumph: ( ${commitChangeset} )"
+    stage('production_deploy') {
+        try {
+            sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
+            slackSend color: 'good', message: "BigWorldGraph build successful! :triumph: ( ${commitChangeset} )"
+        } catch (e) {
+            slackSend color: 'danger', message: "BigWorldGraph build failed :cry:: ${e} ( ${commitChangeset} )"
+        }
+
     }
 }
