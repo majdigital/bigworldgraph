@@ -1,5 +1,6 @@
 node("docker-builder") {
-    slackSend color: '#0066cc', message: 'Starting to build BigWorldGraph! :muscle:'
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
+    slackSend color: '#0066cc', message: 'Starting to build BigWorldGraph! :muscle: (${commitChangeset})'
 
     stage('fetching'){
         checkout scm
@@ -18,6 +19,7 @@ node("staging") {
         checkout scm
     }
     stage('testing'){
+        slackSend color: '#993366', message: 'Starting to test BigWorldGraph... :alembic::bar_chart::mag: (${commitChangeset})'
         try {
             sh 'docker-compose -f docker-compose-test.yml build --no-cache'
             sh 'docker-compose -f docker-compose-test.yml up & \
@@ -36,7 +38,9 @@ node("staging") {
         } catch (e) {
             error 'staging failed'
             slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
-        } finally {}
+        } finally {
+            slackSend color: '#993366', message: 'Testing BigWorldGraph was successful! :nerd_face::+1: (${commitChangeset})'
+        }
     }
     stage('publish'){
         sh 'docker tag bigworldgraph_backend 212.47.239.66:5000/bigworldgraph_backend'
@@ -54,6 +58,6 @@ node("production-mobidick") {
 
     stage('staging_deploy') {
         sh 'docker stack deploy --compose-file docker-compose-production.yml bigworldgraph'
-        slackSend color: 'good', message: 'BigWorldGraph build successful! :thumbsup:'
+        slackSend color: 'good', message: 'BigWorldGraph build successful! :triumph: (${commitChangeset})'
     }
 }
