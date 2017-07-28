@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bwg.config_management &#8212; BigWorldGraph 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="bwg.corenlp_server_tasks" href="bwg.corenlp_server_tasks.html" />
+    <link rel="prev" title="bwg.additional_tasks" href="bwg.additional_tasks.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">bwg.config_management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">bwg.config_management</a><ul>
+<li><a class="reference internal" href="#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
+<li><a class="reference internal" href="#module-bwg.config_management">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="bwg.additional_tasks.html" title="Previous Chapter: bwg.additional_tasks"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; bwg.additional_tasks</span>
+    </a>
+  </li>
+  <li>
+    <a href="bwg.corenlp_server_tasks.html" title="Next Chapter: bwg.corenlp_server_tasks"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">bwg.corenlp_s... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.config_management.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="bwg-config-management">
+<h1>bwg.config_management<a class="headerlink" href="#bwg-config-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="creating-your-own-pipeline-configuration">
+<h2>Creating your own pipeline configuration<a class="headerlink" href="#creating-your-own-pipeline-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Every pipeline requires a configuration file with certain parameters. It contains two parts:</p>
+<ol class="arabic simple">
+<li>A kind of &#8220;meta&#8221; configuration, specifying the parameters a task requires. This way is it secured that the pipeline
+is run with all necessary configuration parameters. Otherwise a special exception is thrown. Its is stored in a single
+parameter, called <code class="docutils literal"><span class="pre">CONFIG_DEPENDENCIES</span></code>.</li>
+<li>The &#8220;real&#8221; configuration, just how you know it - config parameters and their corresponding values.</li>
+</ol>
+<p>If you add a new kind of task to the pipeline, make sure to include a
+description of its necessary parameters in your config file&#8217;s (e.g. <code class="docutils literal"><span class="pre">my_pipeline_config.py</span></code>) meta config:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CONFIG_DEPENDENCIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="c1"># Your task</span>
+    <span class="s2">&quot;my_new_task&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="s2">&quot;</span><span class="si">{language}</span><span class="s2">_SPECIFIC_PARAMETER&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;LANGUAGE_INDEPENDENT_PARAMETER&quot;</span>
+    <span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then you have to include those declared parameters somewhere in your
+config file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My config parameters</span>
+<span class="n">ENGLISH_SPECIFIC_PARAMETER</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">LANGUAGE_INDPENENDENT_PARAMETER</span> <span class="o">=</span> <span class="s2">&quot;yada yada&quot;</span>
+</pre></div>
+</div>
+<p>If you implement tasks that extend the pipeline to support other
+language, please add it to the following list:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SUPPORTED_LANGUAGES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FRENCH&quot;</span><span class="p">,</span> <span class="s2">&quot;ENGLISH&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Finally, create a module for your own pipeline (e.g.
+<code class="docutils literal"><span class="pre">my_pipeline.py</span></code>) and build the configuration before running the
+pipeline, using the pre-defined task names in <code class="docutils literal"><span class="pre">my_pipeline_config.py</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">luigi</span>
+<span class="kn">from</span> <span class="nn">bwg.nlp.config_management</span> <span class="k">import</span> <span class="n">build_task_config_for_language</span>
+
+<span class="k">class</span> <span class="nc">MyNewTask</span><span class="p">(</span><span class="n">luigi</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">requires</span><span class="p">():</span>
+        <span class="c1"># Define task input here</span>
+
+    <span class="k">def</span> <span class="nf">output</span><span class="p">():</span>
+        <span class="c1"># Define task output here</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="c1"># Define what to do during the task here</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">task_config</span> <span class="o">=</span> <span class="n">build_task_config_for_language</span><span class="p">(</span>
+        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;my_new_task&quot;</span>
+        <span class="p">],</span>
+        <span class="n">language</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">,</span>
+        <span class="n">config_file_path</span><span class="o">=</span><span class="s2">&quot;path/to/my_pipeline_config.py&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># MyNewTask is the last task of the pipeline</span>
+    <span class="n">luigi</span><span class="o">.</span><span class="n">build</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">MyNewTask</span><span class="p">(</span><span class="n">task_config</span><span class="o">=</span><span class="n">task_config</span><span class="p">)],</span>
+        <span class="n">local_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">los</span>
+</pre></div>
+</div>
+<p>In case you are writing the data into a <code class="docutils literal"><span class="pre">Neo4j</span></code> database, make sure to
+include the following parameters</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Neo4j</span>
+<span class="n">NEO4J_USER</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
+<span class="n">NEO4J_PASSWORD</span> <span class="o">=</span> <span class="s2">&quot;neo4j&quot;</span>
+<span class="n">NEO4J_NETAG2MODEL</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;I-PER&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-LOC&quot;</span><span class="p">:</span> <span class="s2">&quot;Location&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-ORG&quot;</span><span class="p">:</span> <span class="s2">&quot;Organization&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;Date&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;I-MISC&quot;</span><span class="p">:</span> <span class="s2">&quot;Miscellaneous&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-bwg.config_management">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.config_management" title="Permalink to this headline">¶</a></h2>
+<p>Functions concerning the config management of the NLP pipeline.</p>
+<dl class="exception">
+<dt id="bwg.config_management.MissingConfigParameterException">
+<em class="property">exception </em><code class="descclassname">bwg.config_management.</code><code class="descname">MissingConfigParameterException</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.MissingConfigParameterException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception that&#8217;s being raised, when there are parameter missing in a configuration.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="bwg.config_management.UnsupportedLanguageException">
+<em class="property">exception </em><code class="descclassname">bwg.config_management.</code><code class="descname">UnsupportedLanguageException</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.UnsupportedLanguageException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Exception that&#8217;s being raised, when a user starts the NLP pipeline for a language that&#8217;s not supported yet.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.config_management.build_task_config_for_language">
+<code class="descclassname">bwg.config_management.</code><code class="descname">build_task_config_for_language</code><span class="sig-paren">(</span><em>tasks</em>, <em>language</em>, <em>config_file_path</em>, <em>include_optionals=True</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.build_task_config_for_language" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a configuration for a NLP pipeline for a specific language given a list of tasks the pipeline should include.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tasks</strong> (<em>list</em>) &#8211; List of tasks that are included in this pipeline.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Pipeline language.</li>
+<li><strong>config_file_path</strong> (<em>str</em>) &#8211; Path to config file.</li>
+<li><strong>include_optionals</strong> (<em>bool</em>) &#8211; Flag to include optional config parameters (True by default).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Dictionary with configuration parameters.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.config_management.format_config_parameter">
+<code class="descclassname">bwg.config_management.</code><code class="descname">format_config_parameter</code><span class="sig-paren">(</span><em>config_parameter</em>, <em>language</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.format_config_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the name of config parameter, adding the target language of necessary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>config_parameter</strong> (<em>str</em>) &#8211; Name of config parameter.</li>
+<li><strong>language</strong> (<em>str</em>) &#8211; Pipeline language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Formatted config parameter.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.config_management.format_task_config_key">
+<code class="descclassname">bwg.config_management.</code><code class="descname">format_task_config_key</code><span class="sig-paren">(</span><em>config_parameter</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.format_task_config_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the name of config parameter to be included as in the final task config, without any language references
+(because the names of parameters in Luigi tasks are language agnostic).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_parameter</strong> (<em>str</em>) &#8211; Name of config parameter.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Formatted config parameter.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
