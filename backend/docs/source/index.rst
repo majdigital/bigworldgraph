@@ -15,6 +15,7 @@ BigWorldGraph
    :caption: Contents
 
 .. include:: bwg.rst
+.. include:: general.rst
 
 
 

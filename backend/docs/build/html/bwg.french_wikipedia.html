@@ -82,6 +82,10 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a></li>
+</ul>
 </ul>
 </li>
               
@@ -223,8 +227,13 @@ Wikipedia.</p>
 <dt id="bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask">
 <em class="property">class </em><code class="descclassname">bwg.french_wikipedia.</code><code class="descname">FrenchRelationsDatabaseWritingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="bwg.additional_tasks.html#bwg.additional_tasks.RelationsDatabaseWritingTask" title="bwg.additional_tasks.RelationsDatabaseWritingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.additional_tasks.RelationsDatabaseWritingTask</span></code></a></p>
-<p>Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database, 
+<p>Writes relations extracted via (naive) Open Relation Extraction and Participation Extraction into a graph database,
 but it&#8217;s specifically for the french Wikipedia.</p>
+<dl class="attribute">
+<dt id="bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.JOURNALIST_TYPES">
+<code class="descname">JOURNALIST_TYPES</code><em class="property"> = ['journaliste', 'rédacteur', 'rédactrice', 'blogueur', 'blogeuse', 'reporter', 'écrivain', 'chroniqueur', 'chroniqueuse', 'attaché de presse', 'attachee de presse', 'porte-parole', 'correspondant', 'correspondante', 'chef de rubrique', 'commentateur', 'commentatrice', 'essayiste']</em><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.JOURNALIST_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.MEDIA_TYPES">
 <code class="descname">MEDIA_TYPES</code><em class="property"> = ['radio', 'blog', 'télévision', 'journal', 'magazine', 'radiodiffuseur', 'quotidien', 'site web', 'hebdomadaire']</em><a class="headerlink" href="#bwg.french_wikipedia.FrenchRelationsDatabaseWritingTask.MEDIA_TYPES" title="Permalink to this definition">¶</a></dt>

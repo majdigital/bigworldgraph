@@ -1,14 +1,17 @@
 .. figure:: ./img/logo.png
    :alt: 
 
-README
-======
+--------------
 
-DISCLAIMER: This project is still in development and hasn't produced a
-stable version yet.
+**DISCLAIMER**: **This project is still in development and hasn't
+produced a stable version yet**.
+
+--------------
+
+|Documentation Status|
 
 BigWorldGraph
--------------
+=============
 
 This project is dedicated to make today's political sphere more
 transparent, visualizing the links between entities in power. This is
@@ -21,7 +24,7 @@ and enriching those results with
 The data can then be inspected afterwards using an interactive graph.
 
 General information
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The prototype of this project was developed during an internship at `MAJ
 // Digital <http://maj.digital/>`__ in Lisbon in 2017. It is open-source
@@ -37,58 +40,37 @@ To see what future features are planned to be included in this project,
 check ``TODO.md``.
 
 Project description
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 The project consists of two main parts: The NLP pipeline, extracting
 links between entities from text and storing them in a graph database as
 well as the front end using a graph visualization library.
 
 Contributing
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 Contributions of all forms, be it code contributions, bug reports or
 suggestions are welcome. Please read the ``CONTRIBUTE.md`` file for more
 information or visit the `project's GitHub
 page <https://github.com/majdigital/bigworldgraph>`__.
 
+Documentation
+~~~~~~~~~~~~~
+
+Documentation is hosted on *Readthedocs* and can be found
+`here <http://bigworldgraph.readthedocs.io/>`__. There you can find more
+information about how the pipeline is used, how the data in your input
+corpus is supposed to look and what to expect as intermediate results
+from the pipeline tasks.
+
 Usage
-~~~~~
+-----
 
 Installation
-^^^^^^^^^^^^
-
-Installation is handled by `Docker <https://www.docker.com/>`__, so make
-sure to have it installed beforehand. If you need to have any passwords
-included, add them to a ``.env`` file in the project root directory in
-the ``PARAMETER_NAME=VALUE`` format. **By default, you must state a
-password for the database using the parameter name** ``NEO4J_PASSWORD``.
-
-Afterwards, the installation is fairly simple. Just go the root
-directory of the project and execute the following command:
-
-::
-
-    docker-compose build && docker-compose up
-
-The building of the docker images in this project might take a while,
-especially during the first time you're using this project. After all
-containers are running, you can run the pipeline by executing the
-following:
-
-::
-
-    cd ./pipeline/
-    docker build . -t pipeline
-    docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
-
-If you are on a Windows system, replace ``pwd`` inside the ``-v`` flag
-with the **absolute** path to the ``stanford/models`` directory.
-Afterwards, you can make requests to the API using port ``6050`` by
-default (see the documentation for ``bwg/run_api.py`` for more
-information).
+~~~~~~~~~~~~
 
 Testing
-^^^^^^^
+~~~~~~~
 
 To test the project, execute the following commands in the project's
 root directory
@@ -98,120 +80,123 @@ root directory
     docker-compose -f docker-compose-test.yml build --no-cache
     docker-compose -f docker-compose-test.yml up
 
-Data
-^^^^
+Quickstart
+~~~~~~~~~~
 
-Theoretically, the data can be any kind of text. The only prerequisite
-is to provide the data in a shallow XML format, e.g.
+There are two things you can do right after cloning the repository:
 
-::
+1. Running a demo pipeline to see how the pipeline in this project is
+   supposed to work.
+2. Building the project and playing around with some toy data on the
+   frontend.
 
-    <doc id="123456" url="www.url-to-text.com" title="The title or headline of this text.">
-        The text that is going to be processed comes here.
-    </doc>
+Running the demo pipeline
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You could start with creating your own corpus from Wikipedia,
-downloading a `Wikipedia XML dump <https://dumps.wikimedia.org/>`__ and
-following the instructions of the
-`MW-Dumper <https://www.mediawiki.org/wiki/Manual:MWDumper>`__.
-
-For steps involving Natural Languages Processing, appropriate `Stanford
-NLP <https://stanfordnlp.github.io/CoreNLP/download.html>`__ models are
-also required.
-
-Writing your own pipeline tasks
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you want to modify existing pipeline tasks or write new ones, it is
-recommended to add a new module to the ``bwg`` package, see e.g.
-``bwg/french_wikipedia.py`` as reference. You can inherit tasks from
-other modules to solve common problems:
-
--  ``bwg/standard_tasks.py``: Standard NLP tasks like PoS tagging,
-   Dependency Parsing etc.
--  ``bwg/corenlp_server_tasks.py``: Same standard NLP tasks, but using
-   the ``Stanford CoreNLP server`` instead to speed up cumbersome and
-   slow tasks.
--  ``bwg/wikipedia_tasks.py``: Reading an input file in the shallow
-   ``MW-Dumper`` XML format; extracting addtional information from
-   Wikidata.
--  ``bwg/additional_tasks.py``: Creating a file with information about
-   the current pipeline run, writing relationships into a graph database
-   and more.
-
-With its standard configuration, the pipeline comprises the following
-tasks:
-
-.. figure:: ./img/flowchart.png
-   :alt: 
-
-Adjusting your pipeline configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you add a new kind of task to the pipeline, make sure to include a
-description of its necessary parameters in your pipeline configuration
-file. You can use ``bwg/raw_pipeline_config.py`` as a template, which
-provides a minimal example.
+To run the demo pipeline, execute
 
 ::
 
-    CONFIG_DEPENDENCIES = {
-        ...
-        # Your task
-        "my_new_task": [
-             "{language}_SPECIFIC_PARAMETER", 
-             "LANGUAGE_INDEPENDENT_PARAMETER"
-        ],
-        ...
-    }
+    python3 backend/bwg/demo_pipeline.py
 
-Then you have to include those declared parameters somewhere in your
-config file:
+Your terminal should show you the following on successful execution:
 
 ::
 
-    # My config parameters
-    ENGLISH_SPECIFIC_PARAMETER = 42
-    LANGUAGE_INDPENENDENT_PARAMETER = "yada yada"
+    ===== Luigi Execution Summary =====
 
-If you implement tasks that extend the pipeline to support other
-language, please add it to the following list:
+    Scheduled 4 tasks of which:
+    * 4 ran successfully:
+        - 1 DemoTask1(...)
+        - 1 DemoTask2(...)
+        - 1 DemoTask3(...)
+        - 1 SimpleReadingTask(...)
+
+    This progress looks :) because there were no failed tasks or missing external dependencies
+
+    ===== Luigi Execution Summary =====
+
+To see the results of your pipeline, go to
+``backend/data/pipeline_demo``: There you can the output of different
+pipeline tasks. The output of the final task,
+``demo_corpus_replaced.json``, is written in prettified ``JSON`` to
+enhance readability.
+
+If you want to know more about how the demo pipeline works, visit this
+`site <http://bigworldgraph.readthedocs.io/bwg.demo_pipeline.html>`__ in
+the project's documentation.
+
+Building the project with toy data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+| Building is handled by `Docker <https://www.docker.com/>`__, so make
+  sure to have it installed beforehand.
+| Afterwards, the project setup is fairly simple. Just go the root
+  directory of the project and execute the following command:
 
 ::
 
-    SUPPORTED_LANGUAGES = ["FRENCH", "ENGLISH"]
+    docker-compose build && docker-compose up
 
-Finally, create a module for your own pipeline (e.g.
-``bwg/my_pipeline.py``) and build the configuration before running the
-pipeline, using the pre-defined task names in your pipeline file:
+The building of the docker images in this project might take a while,
+especially during the first time you're using this project. requests to
+the API using port ``6050`` by default (see the documentation for
+```bwg/run_api.py`` <http://bigworldgraph.readthedocs.io/bwg.run_api.html>`__
+for more information).
+
+Now you can play around on the frontend by visiting
+`127.0.0.1:8080 <127.0.0.1:8080>`__ on your browser!
+
+Getting serious: Running the real pipeline
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First of all, make sure to have the corpus file in its designated
+directory (``backend/data/corpora_french/`` by default).
+
+Set up the project like in the previous step with
 
 ::
 
-    import luigi
-    from bwg.nlp.config_management import build_task_config_for_language
+    docker-compose build && docker-compose up
 
-    class MyNewTask(luigi.Task):
-        def requires():
-            # Define task input here
-            
-        def output():
-            # Define task output here
-            
-        def run():
-            # Define what to do during the task here
-            
+After all containers are running, you can run the pipeline by executing
+the following:
 
-    if __name__ == "__main__":
-        task_config = build_task_config_for_language(
-            tasks=[
-                "my_new_task"
-            ],
-            language="english",
-            config_file_path="path/to/pipeline_config.py"
-        )
-        
-        # MyNewTask is the last task of the pipeline
-        luigi.build(
-            [MyNewTask(task_config=task_config)],
-            local_scheduler=True, workers=1, log_level="INFO"
-        )
+::
+
+    cd ./pipeline/
+    docker build . -t pipeline
+    docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
+
+If you are on a Windows system, replace ``pwd`` inside the ``-v`` flag
+with the **absolute** path to the ``stanford/models`` directory.
+
+First of all, all the necessary Stanford models will be downloaded from
+a MAJ server to ``/pipeline/stanford/models`` if necessary. This might
+take a while. Afterwards, the pipeline will be started. Depending on the
+size of the corpus file and the tasks in the pipeline, run time can also
+vary heavily.
+
+The final output of the pipeline should look something like this:
+
+::
+
+    ===== Luigi Execution Summary =====
+
+    Scheduled 4 tasks of which:
+    * 3 present dependencies were encountered:
+        - 1 FrenchPipelineRunInfoGenerationTask(...)
+        - 1 FrenchServerPropertiesCompletionTask(...)
+        - 1 FrenchServerRelationMergingTask(...)
+    * 1 ran successfully:
+        - 1 FrenchRelationsDatabaseWritingTask(...)
+
+    This progress looks :) because there were no failed tasks or missing external dependencies
+
+    ===== Luigi Execution Summary =====
+
+Now go to `127.0.0.1:8080 <127.0.0.1:8080>`__ again and marvel at your
+graph!
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/bigworldgraph/badge/?version=latest
+   :target: http://bigworldgraph.readthedocs.io/?badge=latest
