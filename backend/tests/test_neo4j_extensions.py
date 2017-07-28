@@ -24,13 +24,13 @@ from tests.fixtures import WIKIDATA_ENTITIES
 from bwg.neo4j_extensions import (
     EveCompatibilityMixin, Relation, Entity, PipelineRunInfo, Neo4jResult, Neo4jDatabase, Neo4jLayer, Neo4jTarget
 )
-from bwg.helpers import overwrite_local_config_with_environ
-import bwg.api_config
+from bwg.config_management import overwrite_local_config_with_environ
+import bwg.api.api_config
 
 
 def get_api_config():
     # Only import actual config parameters
-    _api_config = {key: value for key, value in bwg.api_config.__dict__.items() if key == key.upper()}
+    _api_config = {key: value for key, value in bwg.api.api_config.__dict__.items() if key == key.upper()}
     api_config = overwrite_local_config_with_environ(_api_config)
     return api_config
 

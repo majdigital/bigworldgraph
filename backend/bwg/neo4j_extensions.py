@@ -17,7 +17,8 @@ import neomodel
 import neo4j
 
 # PROJECT
-from bwg.helpers import get_if_exists, retry_on_condition
+from bwg.helpers import get_if_exists
+from bwg.decorators import retry_on_condition
 
 
 class EveCompatibilityMixin:

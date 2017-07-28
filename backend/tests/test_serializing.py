@@ -7,10 +7,9 @@ Testing utilities for the NLP pipeline.
 import json
 import unittest
 
-# PROJECT
-from bwg.pipeline_config import DEPENDENCY_TREE_KEEP_FIELDS
+from bwg.french_wikipedia.french_wikipedia_config import DEPENDENCY_TREE_KEEP_FIELDS
 from bwg.helpers import filter_dict
-from bwg.utilities import (
+from bwg.serializing import (
     serialize_article, serialize_dependency_parse_tree, serialize_relation, serialize_sentence,
     serialize_tagged_sentence, serialize_wikidata_entity, deserialize_line, just_dump, retry_with_fallback,
     get_nes_from_sentence

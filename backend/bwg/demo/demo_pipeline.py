@@ -3,15 +3,18 @@
 Demo pipeline to demonstrate configuration management and the way ``Luigi`` pipelines are used in this project.
 """
 
+# STD
+import os
+
 # EXT
 import luigi
 
 # PROJECT
-from bwg.mixins import ArticleProcessingMixin
-from bwg.standard_tasks import SimpleReadingTask
 from bwg.config_management import build_task_config_for_language
-from bwg.utilities import serialize_sentence
-from bwg.helpers import time_function
+from bwg.decorators import time_function
+from bwg.mixins import ArticleProcessingMixin
+from bwg.tasks.reading_tasks import SimpleReadingTask
+from bwg.serializing import serialize_sentence
 
 
 class DemoTask1(luigi.Task, ArticleProcessingMixin):
@@ -139,7 +142,7 @@ if __name__ == "__main__":
             "demo_task3"
         ],
         language="demo",
-        config_file_path="./demo_pipeline_config.py"
+        config_file_path=os.path.dirname(__file__) + "/demo_pipeline_config.py"
     )
 
     # Run the pipeline

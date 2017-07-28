@@ -5,20 +5,17 @@ Testing standard tasks for the NLP pipeline.
 
 # Avoid Pywikibot exception
 import os
+import bwg.tasks.relation_merging
+
 os.environ["PYWIKIBOT2_DIR"] = "../bwg/user-config.py"
 os.environ["PYWIKIBOT2_NO_USER_CONFIG"] = "1"
 
 # STD
 import unittest
 import unittest.mock as mock
-import json
-import copy
 
 # PROJECT
 import bwg
-from bwg.additional_tasks import (
-   RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
-)
 from tests.toolkit import MockInput, MockOutput
 from tests.fixtures import (
     RELATION_MERGING_TASK, RELATIONS_DATABASE_WRITING_TASK, PIPELINE_RUN_INFO_GENERATION_TASK
@@ -29,11 +26,11 @@ class RelationMergingTaskTestCase(unittest.TestCase):
     """
     Test RelationMergingTask.
     """
-    @mock.patch('bwg.additional_tasks.RelationMergingTask.output')
-    @mock.patch('bwg.additional_tasks.RelationMergingTask.input')
+    @mock.patch('bwg.tasks.relation_merging.RelationMergingTask.output')
+    @mock.patch('bwg.tasks.relation_merging.RelationMergingTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-                "bwg.additional_tasks.RelationMergingTask.workflow_resources", new_callable=mock.PropertyMock()
+            "bwg.tasks.relation_merging.RelationMergingTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
                 "CORPUS_ENCODING": "",
@@ -47,7 +44,7 @@ class RelationMergingTaskTestCase(unittest.TestCase):
             )
             workflow_mock.__get__ = mock.Mock(return_value={})
 
-            task = bwg.additional_tasks.RelationMergingTask(task_config=task_config)
+            task = bwg.tasks.relation_merging.RelationMergingTask(task_config=task_config)
 
             # Testing
             self._test_get_relations_from_sentence_json()
@@ -74,8 +71,8 @@ class PipelineRunInfoGenerationTaskTestCase(unittest.TestCase):
     """
     Test PipelineRunInfoGenerationTask.
     """
-    @mock.patch('bwg.additional_tasks.PipelineRunInfoGenerationTask.output')
-    @mock.patch('bwg.additional_tasks.PipelineRunInfoGenerationTask.input')
+    @mock.patch('bwg.tasks.pipeline_run_info_generation.PipelineRunInfoGenerationTask.output')
+    @mock.patch('bwg.tasks.pipeline_run_info_generation.PipelineRunInfoGenerationTask.input')
     def test_task_functions(self, input_patch, output_patch):
             task_config = {
                 "CORPUS_ENCODING": "",
@@ -85,7 +82,7 @@ class PipelineRunInfoGenerationTaskTestCase(unittest.TestCase):
             output_patch.return_value = MockOutput()
             input_patch.return_value = MockInput(PIPELINE_RUN_INFO_GENERATION_TASK["input"])
 
-            task = bwg.additional_tasks.RelationMergingTask(task_config=task_config)
+            task = bwg.tasks.relation_merging.RelationMergingTask(task_config=task_config)
 
             # Testing
             self._test_generate_run_information(task)
@@ -112,8 +109,8 @@ class RelationsDatabaseWritingTaskTestCase(unittest.TestCase):
     """
     Test RelationsDatabaseWritingTask.
     """
-    @mock.patch('bwg.additional_tasks.RelationsDatabaseWritingTask.output')
-    @mock.patch('bwg.additional_tasks.RelationsDatabaseWritingTask.input')
+    @mock.patch('bwg.tasks.relations_database_writing.RelationsDatabaseWritingTask.output')
+    @mock.patch('bwg.tasks.relations_database_writing.RelationsDatabaseWritingTask.input')
     def test_task_functions(self, input_patch, output_patch):
         task_config = {
             "NEO4J_USER": "",
@@ -126,7 +123,7 @@ class RelationsDatabaseWritingTaskTestCase(unittest.TestCase):
         output_patch.return_value = MockOutput()
         input_patch.return_value = MockInput(RELATIONS_DATABASE_WRITING_TASK["input"])
 
-        task = bwg.additional_tasks.RelationsDatabaseWritingTask(task_config=task_config)
+        task = bwg.tasks.relations_database_writing.RelationsDatabaseWritingTask(task_config=task_config)
 
         # Testing
         self._test_process_article(task)

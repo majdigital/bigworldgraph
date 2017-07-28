@@ -37,20 +37,20 @@ class ConfigManagementTest(unittest.TestCase):
     def test_building_task_config():
         dummy_pipeline_config = build_task_config_for_language(
             ["task1", "task2"], language="DEMO", config_file_path=os.environ.get(
-                "DUMMY_PIPELINE_CONFIG_PATH", "./dummy_pipeline_config.py"
+                "DUMMY_PIPELINE_CONFIG_PATH", os.path.dirname(__file__) + "/dummy_pipeline_config.py"
             )
         )
         assert dummy_pipeline_config["PARAM"] == 3.5
         assert dummy_pipeline_config["PARAM1"] == "abc"
         assert dummy_pipeline_config["PARAM2"] == 12
         assert "PARAM3" not in dummy_pipeline_config
-        assert "CONFIG_DEPENDENCIES" not in dummy_pipeline_config
+        assert "TASK_PARAMETERS" not in dummy_pipeline_config
         assert "SUPPORTED_LANGUAGES" not in dummy_pipeline_config
         assert dummy_pipeline_config["OPTIONAL_PARAMETER"] == "I am optional"
 
         dummy_pipeline_config2 = build_task_config_for_language(
             ["task1", "task2"], language="DEMO", config_file_path=os.environ.get(
-                "DUMMY_PIPELINE_CONFIG_PATH", "./dummy_pipeline_config.py"
+                "DUMMY_PIPELINE_CONFIG_PATH", os.path.dirname(__file__) + "/dummy_pipeline_config.py"
             ),
             include_optionals=False
         )

@@ -4,24 +4,28 @@ Testing standard tasks for the NLP pipeline.
 """
 
 # STD
+import copy
+import json
 import unittest
 import unittest.mock as mock
-import json
-import copy
 
-# PROJECT
 import bwg
-from bwg.standard_tasks import (
-    SimpleReadingTask, NaiveOpenRelationExtractionTask,
-    ParticipationExtractionTask
+import bwg.tasks.dependency_parsing
+import bwg.tasks.ner
+import bwg.tasks.participation_extraction
+import bwg.tasks.pos_tagging
+from bwg.french_wikipedia.french_wikipedia_config import FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN
+from bwg.tasks.naive_ore import (
+    NaiveOpenRelationExtractionTask
 )
-from tests.toolkit import MockInput, MockOutput
+from bwg.tasks.participation_extraction import ParticipationExtractionTask
+from bwg.tasks.reading_tasks import SimpleReadingTask
+from bwg.serializing import get_nes_from_sentence
 from tests.fixtures import (
     READING_TASK, NER_TASK, DEPENDENCY_TASK, POS_TAGGING_TASK, NAIVE_OPEN_RELATION_EXTRACTION_TASK,
     PARTICIPATION_EXTRACTION_TASK, DEPENDENCY_TREE
 )
-from bwg.pipeline_config import FRENCH_WIKIPEDIA_ARTICLE_TAG_PATTERN
-from bwg.utilities import get_nes_from_sentence
+from tests.toolkit import MockInput, MockOutput
 
 # CONSTANTS
 NE_TAGGED_PINEAPPLE_SENTENCE = [
@@ -110,7 +114,7 @@ class SimpleReadingTaskTestCase(unittest.TestCase):
 
         self.task = SimpleReadingTask(task_config=task_config)
 
-    @mock.patch('bwg.standard_tasks.SimpleReadingTask.output')
+    @mock.patch('bwg.tasks.reading_tasks.SimpleReadingTask.output')
     @mock.patch('codecs.open')
     def test_task(self, open_patch, output_patch):
         open_patch.return_value = MockInput(READING_TASK["input"])
@@ -128,11 +132,11 @@ class NERTaskTestCase(unittest.TestCase):
     """
     Testing NERTask.
     """
-    @mock.patch('bwg.standard_tasks.NERTask.output')
-    @mock.patch('bwg.standard_tasks.NERTask.input')
+    @mock.patch('bwg.tasks.ner.NERTask.output')
+    @mock.patch('bwg.tasks.ner.NERTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-            "bwg.standard_tasks.NERTask.workflow_resources", new_callable=mock.PropertyMock()
+            "bwg.tasks.ner.NERTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
 
             task_config = {
@@ -151,7 +155,7 @@ class NERTaskTestCase(unittest.TestCase):
                 }
             )
 
-            task = bwg.standard_tasks.NERTask(task_config=task_config)
+            task = bwg.tasks.ner.NERTask(task_config=task_config)
 
             # Testing
             self._test_task(task)
@@ -186,11 +190,11 @@ class DependencyParseTaskTestCase(unittest.TestCase):
     """
     Testing DependencyParseTask.
     """
-    @mock.patch('bwg.standard_tasks.DependencyParseTask.output')
-    @mock.patch('bwg.standard_tasks.DependencyParseTask.input')
+    @mock.patch('bwg.tasks.dependency_parsing.DependencyParseTask.output')
+    @mock.patch('bwg.tasks.dependency_parsing.DependencyParseTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-                "bwg.standard_tasks.DependencyParseTask.workflow_resources", new_callable=mock.PropertyMock()
+                "bwg.tasks.dependency_parsing.DependencyParseTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
                 "STANFORD_DEPENDENCY_MODEL_PATH": "",
@@ -207,7 +211,7 @@ class DependencyParseTaskTestCase(unittest.TestCase):
                 }
             )
 
-            task = bwg.standard_tasks.DependencyParseTask(task_config=task_config)
+            task = bwg.tasks.dependency_parsing.DependencyParseTask(task_config=task_config)
 
             # Testing
             self._test_task(task)
@@ -270,11 +274,11 @@ class PoSTaggingTaskTestCase(unittest.TestCase):
     """
     Testing PoSTaggingTask.
     """
-    @mock.patch('bwg.standard_tasks.PoSTaggingTask.output')
-    @mock.patch('bwg.standard_tasks.PoSTaggingTask.input')
+    @mock.patch('bwg.tasks.pos_tagging.PoSTaggingTask.output')
+    @mock.patch('bwg.tasks.pos_tagging.PoSTaggingTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-                "bwg.standard_tasks.PoSTaggingTask.workflow_resources", new_callable=mock.PropertyMock()
+                "bwg.tasks.pos_tagging.PoSTaggingTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
                 "STANFORD_POSTAGGER_PATH": "",
@@ -293,7 +297,7 @@ class PoSTaggingTaskTestCase(unittest.TestCase):
                 }
             )
 
-            task = bwg.standard_tasks.PoSTaggingTask(task_config=task_config)
+            task = bwg.tasks.pos_tagging.PoSTaggingTask(task_config=task_config)
 
             # Testing
             self._test_task(task)
@@ -337,11 +341,11 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     """
     Testing NaiveOpenRelatioNExtractionTask.
     """
-    @mock.patch('bwg.standard_tasks.NaiveOpenRelationExtractionTask.output')
-    @mock.patch('bwg.standard_tasks.NaiveOpenRelationExtractionTask.input')
+    @mock.patch('bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.output')
+    @mock.patch('bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-            "bwg.standard_tasks.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
+            "bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
                 "NER_TAGSET": ["I-P", "I-N"],
@@ -360,7 +364,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
             )
             workflow_mock.__get__ = mock.Mock(return_value={})
 
-            task = bwg.standard_tasks.NaiveOpenRelationExtractionTask(task_config=task_config)
+            task = bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask(task_config=task_config)
 
             # Testing
             self._test_task(task)
@@ -409,7 +413,7 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
 
         # TODO (Bug): Find a way to do this test [DU 22.06.17]
         #new_config = {"OMITTED_TOKENS_FOR_ALIGNMENT": [token for token, _ in NE_TAGGED_PINEAPPLE_SENTENCE]}
-        #with mock.patch("bwg.standard_tasks.NaiveOpenRelationExtractionTask.task_config", return_value=new_config):
+        #with mock.patch("bwg.tasks.dependency_parsing.py.NaiveOpenRelationExtractionTask.task_config", return_value=new_config):
         #    assert task._align_tagged_sentence(NE_TAGGED_PINEAPPLE_SENTENCE) == []
 
     @staticmethod
@@ -493,11 +497,11 @@ class ParticipationExtractionTaskTestCase(unittest.TestCase):
         "DEFAULT": "is boringly related with"
     }
 
-    @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.output')
-    @mock.patch('bwg.standard_tasks.ParticipationExtractionTask.input')
+    @mock.patch('bwg.tasks.participation_extraction.ParticipationExtractionTask.output')
+    @mock.patch('bwg.tasks.participation_extraction.ParticipationExtractionTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-            "bwg.standard_tasks.ParticipationExtractionTask.workflow_resources",
+            "bwg.tasks.participation_extraction.ParticipationExtractionTask.workflow_resources",
             new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
@@ -511,7 +515,7 @@ class ParticipationExtractionTaskTestCase(unittest.TestCase):
             input_patch.return_value = MockInput(PARTICIPATION_EXTRACTION_TASK["input"])
             workflow_mock.__get__ = mock.Mock(return_value={})
 
-            task = bwg.standard_tasks.ParticipationExtractionTask(task_config=task_config)
+            task = bwg.tasks.participation_extraction.ParticipationExtractionTask(task_config=task_config)
 
             # Testing
             self._test_task(task)

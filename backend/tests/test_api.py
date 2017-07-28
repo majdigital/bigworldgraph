@@ -4,22 +4,20 @@ Testing functions API endpoints and API related functionalities.
 """
 
 # STD
-import json
-import unittest
 import codecs
 import datetime
+import json
 import os
+import unittest
 
-# EXT
-import neomodel
 import neo4j
+import neomodel
 
-# PROJECT
 import bwg
-from bwg.api_config import DOMAIN
-from bwg.run_api import set_up_api
+from bwg.api.api_config import DOMAIN
+from bwg.api.run_api import set_up_api
+from bwg.decorators import retry_on_condition
 from bwg.neo4j_extensions import Neo4jDatabase
-from bwg.helpers import retry_on_condition
 from tests.test_neo4j_extensions import Neo4jTestMixin, get_api_config
 from tests.toolkit import make_api_request
 
@@ -36,7 +34,7 @@ class APIEndpointTestCase(unittest.TestCase, Neo4jTestMixin):
         neomodel.util.logger.setLevel("WARNING")
         self.reset_database()
         self.create_and_connect_nodes()
-        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api_config.py")
+        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api/api_config.py")
         self.api = set_up_api(config_path=api_config_path, log=False, screen_output=False)
         self.api = self.api.test_client()
 
@@ -110,7 +108,7 @@ class APIAdditionalFunctionsTestCase(unittest.TestCase, Neo4jTestMixin):
         os.environ["LOGGING_PATH"] = self.logging_path
         os.environ["DEBUG"] = str(True)
 
-        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api_config.py")
+        api_config_path = os.environ.get("API_CONFIG_PATH", "../bwg/api/api_config.py")
         self.api = set_up_api(config_path=api_config_path, log=True, screen_output=False)
         self.api = self.api.test_client()
 

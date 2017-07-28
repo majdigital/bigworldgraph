@@ -6,28 +6,29 @@ NLP Pipeline tasks for french texts.
 # STD
 import os
 
-# EXT
 import luigi.format
 import nltk
 
-# PROJECT
-from bwg.standard_tasks import (
-    NERTask,
-    DependencyParseTask,
-    NaiveOpenRelationExtractionTask,
-    PoSTaggingTask,
-    ParticipationExtractionTask
-)
-from bwg.additional_tasks import RelationMergingTask, PipelineRunInfoGenerationTask, RelationsDatabaseWritingTask
-from bwg.corenlp_server_tasks import (
+from bwg.config_management import build_task_config_for_language
+from bwg.helpers import download_nltk_resource_if_missing, get_if_exists
+from bwg.tasks.relations_database_writing import RelationsDatabaseWritingTask
+from bwg.tasks.pipeline_run_info_generation import PipelineRunInfoGenerationTask
+from bwg.tasks.relation_merging import RelationMergingTask
+from bwg.tasks.corenlp_server_tasks import (
     ServerNERTask,
     ServerDependencyParseTask,
     ServerPoSTaggingTask,
     ServerNaiveOpenRelationExtractionTask
 )
-from bwg.wikipedia_tasks import WikipediaReadingTask, PropertiesCompletionTask
-from bwg.config_management import build_task_config_for_language
-from bwg.helpers import download_nltk_resource_if_missing, get_if_exists
+from bwg.tasks.naive_ore import (
+    NaiveOpenRelationExtractionTask
+)
+from bwg.tasks.ner import NERTask
+from bwg.tasks.participation_extraction import ParticipationExtractionTask
+from bwg.tasks.pos_tagging import PoSTaggingTask
+from bwg.tasks.dependency_parsing import DependencyParseTask
+from bwg.tasks.reading_tasks import WikipediaReadingTask
+from bwg.tasks.properties_completion import PropertiesCompletionTask
 
 
 # ---------------------------- Default tasks for french ---------------------------------
@@ -345,7 +346,10 @@ class FrenchServerPropertiesCompletionTask(FrenchPropertiesCompletionTask):
 # --------------------------- Pipeline composition & starting ----------------------------
 
 if __name__ == "__main__":
-    french_config_path = os.environ.get("FRENCH_PIPELINE_CONFIG_PATH", "./pipeline_config.py")
+    french_config_path = os.environ.get(
+        "FRENCH_PIPELINE_CONFIG_PATH",
+        os.path.dirname(__file__) + "/french_wikipedia_config.py"
+    )
     # TODO (FEATURE): Use remote scheduler for server deployment [DU 18.04.17]
     french_task_config = build_task_config_for_language(
         tasks=[

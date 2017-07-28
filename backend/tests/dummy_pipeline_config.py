@@ -1,9 +1,20 @@
 # -*- coding: utf-8 -*-
 # WARNING: DO NOT USE SETS HERE!
+SUPPORTED_LANGUAGES = ["DEMO"]
+
+# --------------------------------- General config --------------------------------------
+PARAM1 = "abc"
+PARAM2 = 12
+PARAM3 = True
+DEMO_PARAM = 3.5
+REDUNDANT_PARAM = "yada yada"
+PIPELINE_DEBUG = True
+DEMO_LANGUAGE_ABBREVIATION = "demo"
+OPTIONAL_PARAMETER = "I am optional"
 
 # ---------------------------------- Meta config ----------------------------------------
 # Finds out which parts of the config are necessary for a specific task
-CONFIG_DEPENDENCIES = {
+TASK_PARAMETERS = {
     # Obligatory config parameter
     "all": [
         "PIPELINE_DEBUG",  # Debug mode for Pipeline, will produce more terminal output
@@ -29,15 +40,3 @@ CONFIG_DEPENDENCIES = {
         "PARAM3"
     ]
 }
-SUPPORTED_LANGUAGES = ["DEMO"]
-
-# --------------------------------- General config --------------------------------------
-PARAM1 = "abc"
-PARAM2 = 12
-PARAM3 = True
-DEMO_PARAM = 3.5
-REDUNDANT_PARAM = "yada yada"
-PIPELINE_DEBUG = True
-DEMO_LANGUAGE_ABBREVIATION = "demo"
-OPTIONAL_PARAMETER = "I am optional"
-

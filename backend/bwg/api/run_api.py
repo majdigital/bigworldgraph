@@ -15,7 +15,7 @@ import flask_cors
 
 # PROJECT
 import bwg
-from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
+from bwg.config_management import get_config_from_py_file, overwrite_local_config_with_environ
 from bwg.neo4j_extensions import Neo4jLayer
 
 
@@ -177,7 +177,7 @@ def add_logger_to_app(app):
 
 
 if __name__ == "__main__":
-    api_config_path = os.environ.get("API_CONFIG_PATH", "./api_config.py")
+    api_config_path = os.environ.get("API_CONFIG_PATH", os.path.dirname(__file__) + "/api_config.py")
 
     api = set_up_api(api_config_path)
     flask_cors.CORS(api)

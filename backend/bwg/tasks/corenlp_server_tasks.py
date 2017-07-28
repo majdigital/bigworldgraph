@@ -12,12 +12,12 @@ Also, this approach comes with some other merits as well:
 
 # PROJECT
 from bwg.mixins import CoreNLPServerMixin
-from bwg.standard_tasks import (
-    NERTask,
-    DependencyParseTask,
-    PoSTaggingTask,
+from bwg.tasks.naive_ore import (
     NaiveOpenRelationExtractionTask
 )
+from bwg.tasks.ner import NERTask
+from bwg.tasks.pos_tagging import PoSTaggingTask
+from bwg.tasks.dependency_parsing import DependencyParseTask
 
 
 class ServerNERTask(CoreNLPServerMixin, NERTask):

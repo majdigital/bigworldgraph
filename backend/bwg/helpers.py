@@ -4,14 +4,7 @@ Module for simple helper functions.
 """
 
 # STD
-import codecs
-import functools
-import sys
-import time
-import types
-import os
 import pickle
-import random
 
 # EXT
 import nltk
@@ -57,45 +50,6 @@ def construct_dict_from_source(fields, source):
             pass
 
     return new_dict
-
-
-def get_config_from_py_file(config_path):
-    """
-    Load a configuration from a .py file.
-    
-    :param config_path: Path to configuration file.
-    :type config_path: str
-    :return: Configuration parameters as a dictionary.
-    :rtype: dict
-    """
-    config = types.ModuleType('config')
-    config.__file__ = config_path
-
-    try:
-        with codecs.open(config_path, "rb", "utf-8") as config_file:
-            exec(compile(config_file.read(), config_path, 'exec'),
-                 config.__dict__)
-    except IOError:
-        pass
-
-    return {
-        key: getattr(config, key) for key in dir(config) if key.isupper()
-    }
-
-
-def overwrite_local_config_with_environ(config):
-    """
-    Overwrite a local configuration file's parameters by environment variables, if they exist.
-
-    :param config: Current configuration.
-    :type config: dict
-    :return: New configuration.
-    :rtype: dict
-    """
-    return {
-        key: os.environ.get(key, value)
-        for key, value in config.items()
-    }
 
 
 def flatten_dictlist(dictlist):
@@ -162,71 +116,6 @@ def seconds_to_hms(seconds):
     return h, m, s
 
 
-def time_function(out=sys.stdout, is_classmethod=False, return_time=False):
-    """
-    Time run time of a function and write to stdout or a log file. Also has some extra functions in case you want to
-    apply it to a ArticleProcessingMixin.
-    
-    :param out: Output of choice. None will result in no output, sys.stdout to printing to terminal and a path to the 
-        output being appended to a file.
-    :type out: None, str, _io.TextIOWrapper
-    :param is_classmethod: Declare the function being decorated a class method.
-    :type is_classmethod: bool
-    :param return_time: Flag to indicate whether the function's runtime should be returned alongside the decorated 
-        function's return value in an dictionary.
-    :return: Decorator function.
-    :rtype: func
-    
-    :Example:
-    
-    >>> @time_function(return_time=True)
-    >>> def test_func():
-    >>>    return 3
-    
-    >>> test_func()
-    {"return": 3, "runtime": 3.0994415283203125e-06}
-    """
-    def time_decorator(func):
-        """
-        Actual decorator.
-        """
-        @functools.wraps(func)
-        def func_wrapper(*args, **kwargs):
-            # Measure run time
-            start_time = time.time()
-            function_result = func(*args, **kwargs)
-            end_time = time.time()
-
-            # Calculate result and write it
-            run_time = end_time - start_time
-            hours, minutes, seconds = seconds_to_hms(run_time)
-            class_name = " of '{}' ".format(args[0].__class__.__name__) if is_classmethod else " "
-            result = "Function '{}'{}took {:.2f} hour(s), {:.2f} minute(s) and {:.2f} second(s) to complete.\n".format(
-                func.__name__, class_name, hours, minutes, seconds
-            )
-
-            # Write to stdout or file
-            if out is not None:
-                if type(out) == str:
-                    with codecs.open(out, "a", "utf-8") as outfile:
-                        outfile.write(result)
-                else:
-                    out.write(result)
-
-            # Add run time to function return value
-            if return_time:
-                return {
-                    "return": function_result,
-                    "runtime": run_time
-                }
-
-            return function_result
-
-        return func_wrapper
-
-    return time_decorator
-
-
 def fast_copy(obj):
     """
     Create a fast copy of a object.
@@ -263,43 +152,3 @@ def get_if_exists(dictionary, *keys, default=None):
             return default
 
     return value
-
-
-def retry_on_condition(exception_class, condition=lambda: True, max_retries=-1):
-    """
-    Retry a function in case an exception occurs. You can also define an additional condition that has to be met as
-    well as a maximum amount of retries.
-
-    :param exception_class: Exception class that triggers the retry.
-    :type exception_class: Exception
-    :param condition: Additional condition that has to be met.
-    :type: func
-    :param max_retries: Maximum amount of retries, -1 means infinite retries.
-    """
-    def decorator(func):
-        """
-        Actual decorator.
-        """
-        @functools.wraps(func)
-        def func_wrapper(*args, **kwargs):
-            assert callable(condition)
-            assert issubclass(exception_class, Exception)
-
-            if condition:
-                retries = 0
-                last_exception = None
-
-                while retries < max_retries:
-                    retries += 1
-                    try:
-                        return func(*args, **kwargs)
-                    except exception_class as exception:
-                        last_exception = exception
-                    time.sleep(random.randint(0, 25) / 10)
-
-                raise last_exception
-            else:
-                return func(*args, **kwargs)
-
-        return func_wrapper
-    return decorator

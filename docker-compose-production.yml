@@ -14,7 +14,7 @@ services:
       - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
       - PYWIKIBOT2_NO_USER_CONFIG=1
       - API_CONFIG_PATH=/data/src/app/bwg/api_config.py
-      - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/pipeline_config.py
+      - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/french_wikipedia_config.py
       - NEO4J_PORT=7687
       - API_HOST=0.0.0.0
       - NEO4J_HOST=bigworldgraph_neo4j

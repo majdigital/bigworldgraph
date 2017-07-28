@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 # WARNING: DO NOT USE SETS HERE!
 
+# --------------------------------- General config --------------------------------------
+PIPELINE_DEBUG = True
+ONLY_INCLUDE_RELEVANT_SENTENCES = True
+ONLY_INCLUDE_RELEVANT_ARTICLES = True
+
 # ---------------------------------- Meta config ----------------------------------------
 # Finds out which parts of the config are necessary for a specific task
-CONFIG_DEPENDENCIES = {
+TASK_PARAMETERS = {
     # Obligatory config parameter
     "all": [
         "PIPELINE_DEBUG",  # Debug mode for Pipeline, will produce more terminal output
@@ -22,8 +27,3 @@ CONFIG_DEPENDENCIES = {
     ]
 }
 SUPPORTED_LANGUAGES = ["DEMO"]
-
-# --------------------------------- General config --------------------------------------
-PIPELINE_DEBUG = True
-ONLY_INCLUDE_RELEVANT_SENTENCES = True
-ONLY_INCLUDE_RELEVANT_ARTICLES = True

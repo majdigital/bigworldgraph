@@ -1,9 +1,34 @@
 # -*- coding: utf-8 -*-
 # WARNING: DO NOT USE SETS HERE!
 
+SUPPORTED_LANGUAGES = ["DEMO"]
+
+# --------------------------------- General config --------------------------------------
+PIPELINE_DEBUG = True
+
+ONLY_INCLUDE_RELEVANT_SENTENCES = True
+ONLY_INCLUDE_RELEVANT_ARTICLES = True
+
+# ---------------------------------- Demo config -----------------------------------------
+
+DEMO_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
+DEMO_LANGUAGE_ABBREVIATION = "dm"
+CORPUS_ENCODING = "utf-8"
+DEMO_LUIGI_DATA_PATH = "../data/pipeline_demo/"
+DEMO_CORPORA_PATH = "../data/corpora_demo/"
+DEMO_CORPUS_INPATH = DEMO_CORPORA_PATH + "demo_corpus.xml"
+DEMO_SIMPLE_READING_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_read.json"
+DEMO_REPLACED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_replaced.json"
+DEMO_DUPLICATED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_duplicated.json"
+DEMO_REMOVED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_removed.json"
+
+REPLACE_CHARACTERS = ["a", "m"]
+DUPLICATE_CHARACTERS = ["b", "o", "n", "k"]
+REMOVE_CHARACTERS = ["l", "r", "p"]
+
 # ---------------------------------- Meta config ----------------------------------------
 # Finds out which parts of the config are necessary for a specific task
-CONFIG_DEPENDENCIES = {
+TASK_PARAMETERS = {
     # Obligatory config parameter
     "all": [
         "PIPELINE_DEBUG",  # Debug mode for Pipeline, will produce more terminal output
@@ -41,27 +66,3 @@ CONFIG_DEPENDENCIES = {
         "{language}_CORPUS_INPATH"
     ]
 }
-SUPPORTED_LANGUAGES = ["DEMO"]
-
-# --------------------------------- General config --------------------------------------
-PIPELINE_DEBUG = True
-
-ONLY_INCLUDE_RELEVANT_SENTENCES = True
-ONLY_INCLUDE_RELEVANT_ARTICLES = True
-
-# ---------------------------------- Demo config -----------------------------------------
-
-DEMO_WIKIPEDIA_ARTICLE_TAG_PATTERN = '<doc id="(\d+)" url="(.+?)" title="(.+?)">'
-DEMO_LANGUAGE_ABBREVIATION = "dm"
-CORPUS_ENCODING = "utf-8"
-DEMO_LUIGI_DATA_PATH = "../data/pipeline_demo/"
-DEMO_CORPORA_PATH = "../data/corpora_demo/"
-DEMO_CORPUS_INPATH = DEMO_CORPORA_PATH + "demo_corpus.xml"
-DEMO_SIMPLE_READING_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_read.json"
-DEMO_REPLACED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_replaced.json"
-DEMO_DUPLICATED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_duplicated.json"
-DEMO_REMOVED_CORPUS_OUTPUT_PATH = DEMO_LUIGI_DATA_PATH + "demo_corpus_removed.json"
-
-REPLACE_CHARACTERS = ["a", "m"]
-DUPLICATE_CHARACTERS = ["b", "o", "n", "k"]
-REMOVE_CHARACTERS = ["l", "r", "p"]

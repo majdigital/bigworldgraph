@@ -4,10 +4,11 @@ Functions concerning the config management of the NLP pipeline.
 """
 
 # STD
+import codecs
 import os
 
 # PROJECT
-from bwg.helpers import get_config_from_py_file, overwrite_local_config_with_environ
+import types
 
 
 class MissingConfigParameterException(Exception):
@@ -43,7 +44,7 @@ def build_task_config_for_language(tasks, language, config_file_path, include_op
     """
     raw_config = get_config_from_py_file(config_file_path)
     raw_config = overwrite_local_config_with_environ(raw_config)
-    dependencies = raw_config["CONFIG_DEPENDENCIES"]
+    task_parameters = raw_config["TASK_PARAMETERS"]
     target_config = {}
 
     # Check language support
@@ -55,23 +56,23 @@ def build_task_config_for_language(tasks, language, config_file_path, include_op
         )
 
     # Get task-independent config parameters
-    target_config = _add_from_config_dependencies(target_config, raw_config, language, "all", dependencies)
+    target_config = _add_from_config_dependencies(target_config, raw_config, language, "all", task_parameters)
 
     # Get optional config parameters if flag is set
     if include_optionals:
-        target_config = _add_from_config_dependencies(target_config, raw_config, language, "optional", dependencies)
+        target_config = _add_from_config_dependencies(target_config, raw_config, language, "optional", task_parameters)
 
     # Get task-specific config parameters
     for task in tasks:
         # Check if dependent config parameters were defined
-        if task not in dependencies:
+        if task not in task_parameters:
             raise MissingConfigParameterException("No config parameters found for task {}".format(task))
 
-        target_config = _add_from_config_dependencies(target_config, raw_config, language, task, dependencies)
+        target_config = _add_from_config_dependencies(target_config, raw_config, language, task, task_parameters)
 
     # Make sure everything unwanted is excluded, like...
     # ...config parameters that should intentionally be excluded
-    for config_parameter in dependencies["exclude"]:
+    for config_parameter in task_parameters["exclude"]:
         config_parameter = format_config_parameter(config_parameter, language)
         if config_parameter in target_config:
             del target_config[config_parameter]
@@ -172,3 +173,42 @@ def _add_from_config_dependencies(target_config, raw_config, language, dependenc
         }
     )
     return target_config
+
+
+def get_config_from_py_file(config_path):
+    """
+    Load a configuration from a .py file.
+
+    :param config_path: Path to configuration file.
+    :type config_path: str
+    :return: Configuration parameters as a dictionary.
+    :rtype: dict
+    """
+    config = types.ModuleType('config')
+    config.__file__ = config_path
+
+    try:
+        with codecs.open(config_path, "rb", "utf-8") as config_file:
+            exec(compile(config_file.read(), config_path, 'exec'),
+                 config.__dict__)
+    except IOError:
+        pass
+
+    return {
+        key: getattr(config, key) for key in dir(config) if key.isupper()
+    }
+
+
+def overwrite_local_config_with_environ(config):
+    """
+    Overwrite a local configuration file's parameters by environment variables, if they exist.
+
+    :param config: Current configuration.
+    :type config: dict
+    :return: New configuration.
+    :rtype: dict
+    """
+    return {
+        key: os.environ.get(key, value)
+        for key, value in config.items()
+    }

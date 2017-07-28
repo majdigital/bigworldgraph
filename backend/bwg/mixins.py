@@ -12,8 +12,9 @@ import luigi
 import pycorenlp
 
 # PROJECT
-from bwg.utilities import serialize_article, just_dump, deserialize_line
-from bwg.helpers import time_function, flatten_dictlist
+from bwg.serializing import serialize_article, just_dump, deserialize_line
+from bwg.helpers import flatten_dictlist
+from bwg.decorators import time_function
 
 
 class CoreNLPServerMixin:
