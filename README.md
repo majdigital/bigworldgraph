@@ -1,11 +1,13 @@
 
 ![](./img/logo.png)
-[![Documentation Status](https://readthedocs.org/projects/bigworldgraph/badge/?version=latest)](http://bigworldgraph.readthedocs.io/?badge=latest)
+
 ___
 
 **DISCLAIMER**: **This project is still in development and hasn't produced a stable version yet**.
 
 ___
+
+[![Documentation Status](https://readthedocs.org/projects/bigworldgraph/badge/?version=latest)](http://bigworldgraph.readthedocs.io/?badge=latest)
 
 # BigWorldGraph
 

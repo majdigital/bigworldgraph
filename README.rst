@@ -8,6 +8,8 @@ produced a stable version yet**.
 
 --------------
 
+|Documentation Status|
+
 BigWorldGraph
 =============
 
@@ -195,3 +197,6 @@ The final output of the pipeline should look something like this:
 
 Now go to `127.0.0.1:8080 <127.0.0.1:8080>`__ again and marvel at your
 graph!
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/bigworldgraph/badge/?version=latest
+   :target: http://bigworldgraph.readthedocs.io/?badge=latest
