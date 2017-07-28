@@ -81,6 +81,10 @@
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a></li>
+</ul>
 </ul>
 </li>
               
@@ -94,19 +98,20 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">BigWorldGraph</a></li>
-<li><a class="reference internal" href="#readme">README</a><ul>
 <li><a class="reference internal" href="#id1">BigWorldGraph</a><ul>
 <li><a class="reference internal" href="#general-information">General information</a><ul>
 <li><a class="reference internal" href="#project-description">Project description</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#usage">Usage</a><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#testing">Testing</a></li>
-<li><a class="reference internal" href="#data">Data</a></li>
-<li><a class="reference internal" href="#writing-your-own-pipeline-tasks">Writing your own pipeline tasks</a></li>
-<li><a class="reference internal" href="#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
+<li><a class="reference internal" href="#quickstart">Quickstart</a><ul>
+<li><a class="reference internal" href="#running-the-demo-pipeline">Running the demo pipeline</a></li>
+<li><a class="reference internal" href="#building-the-project-with-toy-data">Building the project with toy data</a></li>
+<li><a class="reference internal" href="#getting-serious-running-the-real-pipeline">Getting serious: Running the real pipeline</a></li>
 </ul>
 </li>
 </ul>
@@ -117,6 +122,7 @@
 <li><a class="reference internal" href="#modules">Modules</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#general">General</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </ul>
@@ -168,13 +174,13 @@
 <div class="figure">
 <img alt="" src="_images/logo.png" />
 </div>
+<hr class="docutils" />
+<p><strong>DISCLAIMER</strong>: <strong>This project is still in development and hasn&#8217;t
+produced a stable version yet</strong>.</p>
 </div>
-<div class="section" id="readme">
-<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
-<p>DISCLAIMER: This project is still in development and hasn&#8217;t produced a
-stable version yet.</p>
+<hr class="docutils" />
 <div class="section" id="id1">
-<h2>BigWorldGraph<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h1>BigWorldGraph<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>This project is dedicated to make today&#8217;s political sphere more
 transparent, visualizing the links between entities in power. This is
 achieved by automatically extracting those links from texts, utilizing
@@ -184,7 +190,7 @@ and enriching those results with
 <a class="reference external" href="https://www.wikidata.org/wiki/Wikidata:Main_Page">Wikidata</a>.</p>
 <p>The data can then be inspected afterwards using an interactive graph.</p>
 <div class="section" id="general-information">
-<h3>General information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h3>
+<h2>General information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h2>
 <p>The prototype of this project was developed during an internship at <a class="reference external" href="http://maj.digital/">MAJ
 // Digital</a> in Lisbon in 2017. It is open-source
 (see <code class="docutils literal"><span class="pre">LICENSE.md</span></code>) and hoped to be improved upon by other volunteers
@@ -196,50 +202,34 @@ composed of Wikipedia articles of (political) affairs in France since
 <p>To see what future features are planned to be included in this project,
 check <code class="docutils literal"><span class="pre">TODO.md</span></code>.</p>
 <div class="section" id="project-description">
-<h4>Project description<a class="headerlink" href="#project-description" title="Permalink to this headline">¶</a></h4>
+<h3>Project description<a class="headerlink" href="#project-description" title="Permalink to this headline">¶</a></h3>
 <p>The project consists of two main parts: The NLP pipeline, extracting
 links between entities from text and storing them in a graph database as
 well as the front end using a graph visualization library.</p>
 </div>
 <div class="section" id="contributing">
-<h4>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h4>
+<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h3>
 <p>Contributions of all forms, be it code contributions, bug reports or
 suggestions are welcome. Please read the <code class="docutils literal"><span class="pre">CONTRIBUTE.md</span></code> file for more
 information or visit the <a class="reference external" href="https://github.com/majdigital/bigworldgraph">project&#8217;s GitHub
 page</a>.</p>
 </div>
+<div class="section" id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
+<p>Documentation is hosted on <em>Readthedocs</em> and can be found
+<a class="reference external" href="http://bigworldgraph.readthedocs.io/">here</a>. There you can find more
+information about how the pipeline is used, how the data in your input
+corpus is supposed to look and what to expect as intermediate results
+from the pipeline tasks.</p>
+</div>
 </div>
 <div class="section" id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="installation">
-<h4>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h4>
-<p>Installation is handled by <a class="reference external" href="https://www.docker.com/">Docker</a>, so make
-sure to have it installed beforehand. If you need to have any passwords
-included, add them to a <code class="docutils literal"><span class="pre">.env</span></code> file in the project root directory in
-the <code class="docutils literal"><span class="pre">PARAMETER_NAME=VALUE</span></code> format. <strong>By default, you must state a
-password for the database using the parameter name</strong> <code class="docutils literal"><span class="pre">NEO4J_PASSWORD</span></code>.</p>
-<p>Afterwards, the installation is fairly simple. Just go the root
-directory of the project and execute the following command:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
-</pre></div>
-</div>
-<p>The building of the docker images in this project might take a while,
-especially during the first time you&#8217;re using this project. After all
-containers are running, you can run the pipeline by executing the
-following:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cd ./pipeline/
-docker build . -t pipeline
-docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
-</pre></div>
-</div>
-<p>If you are on a Windows system, replace <code class="docutils literal"><span class="pre">pwd</span></code> inside the <code class="docutils literal"><span class="pre">-v</span></code> flag
-with the <strong>absolute</strong> path to the <code class="docutils literal"><span class="pre">stanford/models</span></code> directory.
-Afterwards, you can make requests to the API using port <code class="docutils literal"><span class="pre">6050</span></code> by
-default (see the documentation for <code class="docutils literal"><span class="pre">bwg/run_api.py</span></code> for more
-information).</p>
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="testing">
-<h4>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h4>
+<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
 <p>To test the project, execute the following commands in the project&#8217;s
 root directory</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">test</span><span class="o">.</span><span class="n">yml</span> <span class="n">build</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span>
@@ -247,110 +237,104 @@ root directory</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="data">
-<h4>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h4>
-<p>Theoretically, the data can be any kind of text. The only prerequisite
-is to provide the data in a shallow XML format, e.g.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">doc</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;www.url-to-text.com&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The title or headline of this text.&quot;</span><span class="o">&gt;</span>
-    <span class="n">The</span> <span class="n">text</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">going</span> <span class="n">to</span> <span class="n">be</span> <span class="n">processed</span> <span class="n">comes</span> <span class="n">here</span><span class="o">.</span>
-<span class="o">&lt;/</span><span class="n">doc</span><span class="o">&gt;</span>
+<div class="section" id="quickstart">
+<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h3>
+<p>There are two things you can do right after cloning the repository:</p>
+<ol class="arabic simple">
+<li>Running a demo pipeline to see how the pipeline in this project is
+supposed to work.</li>
+<li>Building the project and playing around with some toy data on the
+frontend.</li>
+</ol>
+<div class="section" id="running-the-demo-pipeline">
+<h4>Running the demo pipeline<a class="headerlink" href="#running-the-demo-pipeline" title="Permalink to this headline">¶</a></h4>
+<p>To run the demo pipeline, execute</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">backend</span><span class="o">/</span><span class="n">bwg</span><span class="o">/</span><span class="n">demo_pipeline</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
-<p>You could start with creating your own corpus from Wikipedia,
-downloading a <a class="reference external" href="https://dumps.wikimedia.org/">Wikipedia XML dump</a> and
-following the instructions of the
-<a class="reference external" href="https://www.mediawiki.org/wiki/Manual:MWDumper">MW-Dumper</a>.</p>
-<p>For steps involving Natural Languages Processing, appropriate <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/download.html">Stanford
-NLP</a> models are
-also required.</p>
-</div>
-<div class="section" id="writing-your-own-pipeline-tasks">
-<h4>Writing your own pipeline tasks<a class="headerlink" href="#writing-your-own-pipeline-tasks" title="Permalink to this headline">¶</a></h4>
-<p>If you want to modify existing pipeline tasks or write new ones, it is
-recommended to add a new module to the <code class="docutils literal"><span class="pre">bwg</span></code> package, see e.g.
-<code class="docutils literal"><span class="pre">bwg/french_wikipedia.py</span></code> as reference. You can inherit tasks from
-other modules to solve common problems:</p>
-<ul class="simple">
-<li><code class="docutils literal"><span class="pre">bwg/standard_tasks.py</span></code>: Standard NLP tasks like PoS tagging,
-Dependency Parsing etc.</li>
-<li><code class="docutils literal"><span class="pre">bwg/corenlp_server_tasks.py</span></code>: Same standard NLP tasks, but using
-the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span> <span class="pre">server</span></code> instead to speed up cumbersome and
-slow tasks.</li>
-<li><code class="docutils literal"><span class="pre">bwg/wikipedia_tasks.py</span></code>: Reading an input file in the shallow
-<code class="docutils literal"><span class="pre">MW-Dumper</span></code> XML format; extracting addtional information from
-Wikidata.</li>
-<li><code class="docutils literal"><span class="pre">bwg/additional_tasks.py</span></code>: Creating a file with information about
-the current pipeline run, writing relationships into a graph database
-and more.</li>
-</ul>
-<p>With its standard configuration, the pipeline comprises the following
-tasks:</p>
-<div class="figure">
-<img alt="" src="_images/flowchart.png" />
-</div>
-</div>
-<div class="section" id="adjusting-your-pipeline-configuration">
-<h4>Adjusting your pipeline configuration<a class="headerlink" href="#adjusting-your-pipeline-configuration" title="Permalink to this headline">¶</a></h4>
-<p>If you add a new kind of task to the pipeline, make sure to include a
-description of its necessary parameters in your pipeline configuration
-file. You can use <code class="docutils literal"><span class="pre">bwg/raw_pipeline_config.py</span></code> as a template, which
-provides a minimal example.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CONFIG_DEPENDENCIES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="o">...</span>
-    <span class="c1"># Your task</span>
-    <span class="s2">&quot;my_new_task&quot;</span><span class="p">:</span> <span class="p">[</span>
-         <span class="s2">&quot;</span><span class="si">{language}</span><span class="s2">_SPECIFIC_PARAMETER&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;LANGUAGE_INDEPENDENT_PARAMETER&quot;</span>
-    <span class="p">],</span>
-    <span class="o">...</span>
-<span class="p">}</span>
+<p>Your terminal should show you the following on successful execution:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">=====</span> <span class="n">Luigi</span> <span class="n">Execution</span> <span class="n">Summary</span> <span class="o">=====</span>
+
+<span class="n">Scheduled</span> <span class="mi">4</span> <span class="n">tasks</span> <span class="n">of</span> <span class="n">which</span><span class="p">:</span>
+<span class="o">*</span> <span class="mi">4</span> <span class="n">ran</span> <span class="n">successfully</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">DemoTask1</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">DemoTask2</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">DemoTask3</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">SimpleReadingTask</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">This</span> <span class="n">progress</span> <span class="n">looks</span> <span class="p">:)</span> <span class="n">because</span> <span class="n">there</span> <span class="n">were</span> <span class="n">no</span> <span class="n">failed</span> <span class="n">tasks</span> <span class="ow">or</span> <span class="n">missing</span> <span class="n">external</span> <span class="n">dependencies</span>
+
+<span class="o">=====</span> <span class="n">Luigi</span> <span class="n">Execution</span> <span class="n">Summary</span> <span class="o">=====</span>
 </pre></div>
 </div>
-<p>Then you have to include those declared parameters somewhere in your
-config file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># My config parameters</span>
-<span class="n">ENGLISH_SPECIFIC_PARAMETER</span> <span class="o">=</span> <span class="mi">42</span>
-<span class="n">LANGUAGE_INDPENENDENT_PARAMETER</span> <span class="o">=</span> <span class="s2">&quot;yada yada&quot;</span>
+<p>To see the results of your pipeline, go to
+<code class="docutils literal"><span class="pre">backend/data/pipeline_demo</span></code>: There you can the output of different
+pipeline tasks. The output of the final task,
+<code class="docutils literal"><span class="pre">demo_corpus_replaced.json</span></code>, is written in prettified <code class="docutils literal"><span class="pre">JSON</span></code> to
+enhance readability.</p>
+<p>If you want to know more about how the demo pipeline works, visit this
+<a class="reference external" href="http://bigworldgraph.readthedocs.io/bwg.demo_pipeline.html">site</a> in
+the project&#8217;s documentation.</p>
+</div>
+<div class="section" id="building-the-project-with-toy-data">
+<h4>Building the project with toy data<a class="headerlink" href="#building-the-project-with-toy-data" title="Permalink to this headline">¶</a></h4>
+<div class="line-block">
+<div class="line">Building is handled by <a class="reference external" href="https://www.docker.com/">Docker</a>, so make
+sure to have it installed beforehand.</div>
+<div class="line">Afterwards, the project setup is fairly simple. Just go the root
+directory of the project and execute the following command:</div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 </div>
-<p>If you implement tasks that extend the pipeline to support other
-language, please add it to the following list:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SUPPORTED_LANGUAGES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FRENCH&quot;</span><span class="p">,</span> <span class="s2">&quot;ENGLISH&quot;</span><span class="p">]</span>
+<p>The building of the docker images in this project might take a while,
+especially during the first time you&#8217;re using this project. requests to
+the API using port <code class="docutils literal"><span class="pre">6050</span></code> by default (see the documentation for
+<code class="docutils literal"><span class="pre">`bwg/run_api.py</span></code> &lt;<a class="reference external" href="http://bigworldgraph.readthedocs.io/bwg.run_api.html">http://bigworldgraph.readthedocs.io/bwg.run_api.html</a>&gt;`__
+for more information).</p>
+<p>Now you can play around on the frontend by visiting
+<a class="reference external" href="127.0.0.1:8080">127.0.0.1:8080</a> on your browser!</p>
+</div>
+<div class="section" id="getting-serious-running-the-real-pipeline">
+<h4>Getting serious: Running the real pipeline<a class="headerlink" href="#getting-serious-running-the-real-pipeline" title="Permalink to this headline">¶</a></h4>
+<p>First of all, make sure to have the corpus file in its designated
+directory (<code class="docutils literal"><span class="pre">backend/data/corpora_french/</span></code> by default).</p>
+<p>Set up the project like in the previous step with</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">build</span> <span class="o">&amp;&amp;</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 </div>
-<p>Finally, create a module for your own pipeline (e.g.
-<code class="docutils literal"><span class="pre">bwg/my_pipeline.py</span></code>) and build the configuration before running the
-pipeline, using the pre-defined task names in your pipeline file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">luigi</span>
-<span class="kn">from</span> <span class="nn">bwg.nlp.config_management</span> <span class="k">import</span> <span class="n">build_task_config_for_language</span>
-
-<span class="k">class</span> <span class="nc">MyNewTask</span><span class="p">(</span><span class="n">luigi</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">requires</span><span class="p">():</span>
-        <span class="c1"># Define task input here</span>
-
-    <span class="k">def</span> <span class="nf">output</span><span class="p">():</span>
-        <span class="c1"># Define task output here</span>
-
-    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
-        <span class="c1"># Define what to do during the task here</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">task_config</span> <span class="o">=</span> <span class="n">build_task_config_for_language</span><span class="p">(</span>
-        <span class="n">tasks</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;my_new_task&quot;</span>
-        <span class="p">],</span>
-        <span class="n">language</span><span class="o">=</span><span class="s2">&quot;english&quot;</span><span class="p">,</span>
-        <span class="n">config_file_path</span><span class="o">=</span><span class="s2">&quot;path/to/pipeline_config.py&quot;</span>
-    <span class="p">)</span>
-
-    <span class="c1"># MyNewTask is the last task of the pipeline</span>
-    <span class="n">luigi</span><span class="o">.</span><span class="n">build</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">MyNewTask</span><span class="p">(</span><span class="n">task_config</span><span class="o">=</span><span class="n">task_config</span><span class="p">)],</span>
-        <span class="n">local_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
-    <span class="p">)</span>
+<p>After all containers are running, you can run the pipeline by executing
+the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>cd ./pipeline/
+docker build . -t pipeline
+docker run -v /var/run/docker.sock:/var/run/docker.sock -v `pwd`/stanford/models/:/stanford_models/ --name pipeline pipeline
 </pre></div>
 </div>
+<p>If you are on a Windows system, replace <code class="docutils literal"><span class="pre">pwd</span></code> inside the <code class="docutils literal"><span class="pre">-v</span></code> flag
+with the <strong>absolute</strong> path to the <code class="docutils literal"><span class="pre">stanford/models</span></code> directory.</p>
+<p>First of all, all the necessary Stanford models will be downloaded from
+a MAJ server to <code class="docutils literal"><span class="pre">/pipeline/stanford/models</span></code> if necessary. This might
+take a while. Afterwards, the pipeline will be started. Depending on the
+size of the corpus file and the tasks in the pipeline, run time can also
+vary heavily.</p>
+<p>The final output of the pipeline should look something like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">=====</span> <span class="n">Luigi</span> <span class="n">Execution</span> <span class="n">Summary</span> <span class="o">=====</span>
+
+<span class="n">Scheduled</span> <span class="mi">4</span> <span class="n">tasks</span> <span class="n">of</span> <span class="n">which</span><span class="p">:</span>
+<span class="o">*</span> <span class="mi">3</span> <span class="n">present</span> <span class="n">dependencies</span> <span class="n">were</span> <span class="n">encountered</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">FrenchPipelineRunInfoGenerationTask</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">FrenchServerPropertiesCompletionTask</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">FrenchServerRelationMergingTask</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="o">*</span> <span class="mi">1</span> <span class="n">ran</span> <span class="n">successfully</span><span class="p">:</span>
+    <span class="o">-</span> <span class="mi">1</span> <span class="n">FrenchRelationsDatabaseWritingTask</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">This</span> <span class="n">progress</span> <span class="n">looks</span> <span class="p">:)</span> <span class="n">because</span> <span class="n">there</span> <span class="n">were</span> <span class="n">no</span> <span class="n">failed</span> <span class="n">tasks</span> <span class="ow">or</span> <span class="n">missing</span> <span class="n">external</span> <span class="n">dependencies</span>
+
+<span class="o">=====</span> <span class="n">Luigi</span> <span class="n">Execution</span> <span class="n">Summary</span> <span class="o">=====</span>
+</pre></div>
+</div>
+<p>Now go to <a class="reference external" href="127.0.0.1:8080">127.0.0.1:8080</a> again and marvel at your
+graph!</p>
 <div class="toctree-wrapper compound">
 </div>
 </div>
@@ -440,6 +424,25 @@ pipeline, using the pre-defined task names in your pipeline file:</p>
 </li>
 </ul>
 </div>
+</div>
+</div>
+<div class="section" id="general">
+<h1>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h1>
+<p>Some general pieces of information about the project.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="general.data.html#input-data">Input data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.data.html#task-outputs">Task outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="general.pipeline.html#writing-your-own-pipeline-tasks">Writing your own pipeline tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.pipeline.html#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.pipeline.html#running-the-pipeline">Running the pipeline</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
