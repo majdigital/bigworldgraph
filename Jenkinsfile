@@ -1,10 +1,11 @@
 node("docker-builder") {
-    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
-    slackSend color: '#0066cc', message: "Starting to build BigWorldGraph! :muscle: ( ${commitChangeset} )"
-
     stage('fetching'){
         checkout scm
     }
+
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
+    slackSend color: '#0066cc', message: "Starting to build BigWorldGraph! :muscle: ( ${commitChangeset} )"
+
     stage('building'){
         try {
             sh 'docker-compose build --no-cache'
@@ -16,10 +17,12 @@ node("docker-builder") {
 }
 
 node("staging") {
-    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
     stage('fetching'){
         checkout scm
     }
+
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
+
     stage('testing'){
         slackSend color: '#993366', message: "Starting to test BigWorldGraph... :alembic::bar_chart::mag: ( ${commitChangeset} )"
         try {
@@ -37,11 +40,11 @@ node("staging") {
                     fi; \
                     sleep 1; \
                 done;' \
-            slackSend color: '#993366', message: "Testing BigWorldGraph was successful! :nerd_face::+1: ( ${commitChangeset} )"
         } catch (e) {
             slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
             error 'staging failed'
         } finally {}
+        slackSend color: '#993366', message: "Testing BigWorldGraph was successful! :nerd_face::+1: ( ${commitChangeset} )"
     }
     stage('publish'){
         sh 'docker tag bigworldgraph_backend 212.47.239.66:5000/bigworldgraph_backend:0.0.1'
@@ -53,10 +56,11 @@ node("staging") {
 }
 
 node("production-mobidick") {
-    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
     stage('staging_fetching'){
         checkout scm
     }
+
+    commitChangeset = sh(returnStdout: true, script: 'git log --oneline -n 1').trim()
 
     stage('production_deploy') {
         try {
