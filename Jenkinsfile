@@ -9,6 +9,7 @@ node("docker-builder") {
         try {
             sh 'docker-compose build --no-cache'
         } catch (e) {
+            slackSend color: 'danger', message: "BigWorldGraph build failed :cry:: ${e} ( ${commitChangeset} )"
             error 'building failed'
         } finally {}
     }
@@ -36,18 +37,17 @@ node("staging") {
                     fi; \
                     sleep 1; \
                 done;' \
-        } catch (e) {
-            error 'staging failed'
-            slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
-        } finally {
             slackSend color: '#993366', message: "Testing BigWorldGraph was successful! :nerd_face::+1: ( ${commitChangeset} )"
-        }
+        } catch (e) {
+            slackSend color: 'danger', message: 'BigWorldGraph tests failed :cry:'
+            error 'staging failed'
+        } finally {}
     }
     stage('publish'){
-        sh 'docker tag bigworldgraph_backend 212.47.239.66:5000/bigworldgraph_backend'
+        sh 'docker tag bigworldgraph_backend 212.47.239.66:5000/bigworldgraph_backend:0.0.1'
         sh 'docker push 212.47.239.66:5000/bigworldgraph_backend'
 
-        sh 'docker tag bigworldgraph_frontend 212.47.239.66:5000/bigworldgraph_frontend'
+        sh 'docker tag bigworldgraph_frontend 212.47.239.66:5000/bigworldgraph_frontend:0.0.1'
         sh 'docker push 212.47.239.66:5000/bigworldgraph_frontend'
     }
 }
