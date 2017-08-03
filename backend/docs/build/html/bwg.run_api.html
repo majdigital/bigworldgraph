@@ -101,7 +101,7 @@
 <li><a class="reference internal" href="#">bwg.run_api</a><ul>
 <li><a class="reference internal" href="#usage">Usage</a></li>
 <li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#module-bwg.run_api">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -240,107 +240,8 @@ implemented yet.</p>
 </div>
 <p>This will return the target node as well as its <strong>friends</strong> and its <strong>friends of friends</strong>.</p>
 </div>
-<div class="section" id="module-bwg.run_api">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.run_api" title="Permalink to this headline">¶</a></h2>
-<p>Module to run the API that connects the graph database to the frontend.</p>
-<dl class="function">
-<dt id="bwg.run_api.add_additional_endpoints">
-<code class="descclassname">bwg.run_api.</code><code class="descname">add_additional_endpoints</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_additional_endpoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add additional endpoints to the current API.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="bwg.run_api.add_error_handlers">
-<code class="descclassname">bwg.run_api.</code><code class="descname">add_error_handlers</code><span class="sig-paren">(</span><em>api</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_error_handlers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add error handlers to the current API.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api</strong> (<em>eve.Eve</em>) &#8211; Current api.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">API with additional error handlers.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="bwg.run_api.add_logger_to_app">
-<code class="descclassname">bwg.run_api.</code><code class="descname">add_logger_to_app</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.add_logger_to_app" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add logger to the current app.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>app</strong> (<em>eve.Eve</em>) &#8211; Current app.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">App with logger.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="bwg.run_api.log_request">
-<code class="descclassname">bwg.run_api.</code><code class="descname">log_request</code><span class="sig-paren">(</span><em>resource</em>, <em>request</em>, <em>payload</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.log_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Log a request on an endpoint.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>resource</strong> (<em>str</em>) &#8211; Resource being called.</li>
-<li><strong>request</strong> (<em>dict</em>) &#8211; Request information.</li>
-<li><strong>payload</strong> (<em>dict</em>) &#8211; Request payload.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="bwg.run_api.set_up_api">
-<code class="descclassname">bwg.run_api.</code><code class="descname">set_up_api</code><span class="sig-paren">(</span><em>config_path='./api_config.py'</em>, <em>log=True</em>, <em>screen_output=True</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.run_api.set_up_api" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set up the API using the following steps:</p>
-<ol class="arabic simple">
-<li>Read the configuration file.</li>
-<li>Overwrite configuration parameters if corresponding environment variables exist.</li>
-<li>Initialize the logger.</li>
-<li>Create the API.</li>
-<li>Add error handlers to the API.</li>
-<li>Add additional endpoints to the API.</li>
-<li>Connect the API to the logger.</li>
-</ol>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Completely set up API.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">eve.Eve</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

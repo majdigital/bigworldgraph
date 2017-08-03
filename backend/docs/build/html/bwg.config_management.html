@@ -319,6 +319,42 @@ include the following parameters</p>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="bwg.config_management.get_config_from_py_file">
+<code class="descclassname">bwg.config_management.</code><code class="descname">get_config_from_py_file</code><span class="sig-paren">(</span><em>config_path</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.get_config_from_py_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a configuration from a .py file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_path</strong> (<em>str</em>) &#8211; Path to configuration file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Configuration parameters as a dictionary.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bwg.config_management.overwrite_local_config_with_environ">
+<code class="descclassname">bwg.config_management.</code><code class="descname">overwrite_local_config_with_environ</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.config_management.overwrite_local_config_with_environ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite a local configuration file&#8217;s parameters by environment variables, if they exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<em>dict</em>) &#8211; Current configuration.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New configuration.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 

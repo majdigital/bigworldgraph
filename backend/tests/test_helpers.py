@@ -85,7 +85,7 @@ class ConfigurationHelpersTestCase(unittest.TestCase):
     Test all functions concerning configuration.
     """
     original_config = {
-        "CONFIG_DEPENDENCIES": {
+        "TASK_PARAMETERS": {
             "all": [
                 "PIPELINE_DEBUG",
                 "{language}_LANGUAGE_ABBREVIATION"

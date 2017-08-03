@@ -8,6 +8,9 @@ ___
 ___
 
 [![Documentation Status](https://readthedocs.org/projects/bigworldgraph/badge/?version=latest)](http://bigworldgraph.readthedocs.io/?badge=latest)
+[![Code Health](https://landscape.io/github/majdigital/bigworldgraph/develop/landscape.svg?style=flat)](https://landscape.io/github/majdigital/bigworldgraph/develop)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://img.shields.io/badge/license-MIT-blue.svg)
+[![Open Issues](https://img.shields.io/github/issues/majdigital/bigworldgraph.svg)](https://img.shields.io/github/issues/majdigital/bigworldgraph.svg)
 
 # BigWorldGraph
 
@@ -50,6 +53,9 @@ look and what to expect as intermediate results from the pipeline tasks.
 
 ### Installation
 
+Clone the project from Github using the following command:
+
+    git clone https://github.com/majdigital/bigworldgraph.git
 
 ### Testing
 

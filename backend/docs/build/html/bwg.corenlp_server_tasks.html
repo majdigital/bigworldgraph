@@ -100,7 +100,7 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">bwg.corenlp_server_tasks</a><ul>
 <li><a class="reference internal" href="#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
-<li><a class="reference internal" href="#module-bwg.corenlp_server_tasks">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -162,67 +162,8 @@ corresponding dockerfile at <code class="docutils literal"><span class="pre">bac
 <code class="docutils literal"><span class="pre">-serverProperties</span></code> argument appropriately (consult the  <a class="reference external" href="https://stanfordnlp.github.io/CoreNLP/corenlp-server.html">official documentation</a>
 for more help).</p>
 </div>
-<div class="section" id="module-bwg.corenlp_server_tasks">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bwg.corenlp_server_tasks" title="Permalink to this headline">¶</a></h2>
-<p>Rewriting standard tasks for the NLP pipeline using the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span></code> server. The main motivation to do this lies
-in the following problem: When the respective Stanford tools are run through their <code class="docutils literal"><span class="pre">NLTK</span></code> wrappers, they load their
-necessary models from scratch every time. This slows down the pipeline quite a lot. In contrast, the server loads them
-only once.</p>
-<dl class="docutils">
-<dt>Also, this approach comes with some other merits as well:</dt>
-<dd><ul class="first last simple">
-<li>Reducing the number of necessary Stanford model files</li>
-<li>Avoiding using bulk operations like <code class="docutils literal"><span class="pre">parse_sents()</span></code> which complicate the current architecture of the pipeline.</li>
-</ul>
-</dd>
-</dl>
-<dl class="class">
-<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask">
-<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerDependencyParseTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.DependencyParseTask" title="bwg.standard_tasks.DependencyParseTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.DependencyParseTask</span></code></a></p>
-<p>Luigi task that dependency-parses sentences in a corpus, but using a Stanford CoreNLP server.</p>
-<dl class="method">
-<dt id="bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes">
-<code class="descname">edges_to_nodes</code><span class="sig-paren">(</span><em>edges</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerDependencyParseTask.edges_to_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turn a dependency tree representation based on nodes to a representation based on edges.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>edges</strong> (<em>list</em>) &#8211; List of tree edges.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with the root node and a list of all nodes.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="bwg.corenlp_server_tasks.ServerNERTask">
-<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNERTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNERTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NERTask" title="bwg.standard_tasks.NERTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NERTask</span></code></a></p>
-<p>Luigi task that performs Named Entity Recognition on a corpus, but using a Stanford CoreNLP server.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask">
-<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerNaiveOpenRelationExtractionTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerNaiveOpenRelationExtractionTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.NaiveOpenRelationExtractionTask" title="bwg.standard_tasks.NaiveOpenRelationExtractionTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.NaiveOpenRelationExtractionTask</span></code></a></p>
-<p>Luigi task that performs Open Relation extraction on a corpus. The only adjustment in this case are the requirements
-for this task, this task doesn&#8217;t use the CoreNLP server at all.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="bwg.corenlp_server_tasks.ServerPoSTaggingTask">
-<em class="property">class </em><code class="descclassname">bwg.corenlp_server_tasks.</code><code class="descname">ServerPoSTaggingTask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bwg.corenlp_server_tasks.ServerPoSTaggingTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="bwg.mixins.html#bwg.mixins.CoreNLPServerMixin" title="bwg.mixins.CoreNLPServerMixin"><code class="xref py py-class docutils literal"><span class="pre">bwg.mixins.CoreNLPServerMixin</span></code></a>, <a class="reference internal" href="bwg.standard_tasks.html#bwg.standard_tasks.PoSTaggingTask" title="bwg.standard_tasks.PoSTaggingTask"><code class="xref py py-class docutils literal"><span class="pre">bwg.standard_tasks.PoSTaggingTask</span></code></a></p>
-<p>Luigi task that PoS tags a sentence in a corpus, but using a Stanford CoreNLP server.</p>
-</dd></dl>
-
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

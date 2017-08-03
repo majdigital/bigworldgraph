@@ -1,0 +1,8 @@
+ignore-paths:
+  - backend/docs/
+ignore-patterns:
+  - ^.*user-config.py.*$
+requirements:
+  - backend/requirements.txt
+python-targets:
+  - 3

@@ -8,7 +8,7 @@ produced a stable version yet**.
 
 --------------
 
-|Documentation Status|
+|Documentation Status| |Code Health|
 
 BigWorldGraph
 =============
@@ -68,6 +68,12 @@ Usage
 
 Installation
 ~~~~~~~~~~~~
+
+Clone the project from Github using the following command:
+
+::
+
+    git clone https://github.com/majdigital/bigworldgraph.git
 
 Testing
 ~~~~~~~
@@ -200,3 +206,5 @@ graph!
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/bigworldgraph/badge/?version=latest
    :target: http://bigworldgraph.readthedocs.io/?badge=latest
+.. |Code Health| image:: https://landscape.io/github/majdigital/bigworldgraph/develop/landscape.svg?style=flat
+   :target: https://landscape.io/github/majdigital/bigworldgraph/develop
