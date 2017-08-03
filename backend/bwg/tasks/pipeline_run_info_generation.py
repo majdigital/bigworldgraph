@@ -1,8 +1,11 @@
+# STD
 import datetime
 import time
 
+# EXT
 import luigi
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.serializing import deserialize_line, just_dump
 from bwg.tasks.reading_tasks import WikipediaReadingTask

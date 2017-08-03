@@ -7,6 +7,7 @@ Testing utilities for the NLP pipeline.
 import json
 import unittest
 
+# PROJECT
 from bwg.french_wikipedia.french_wikipedia_config import DEPENDENCY_TREE_KEEP_FIELDS
 from bwg.helpers import filter_dict
 from bwg.serializing import (

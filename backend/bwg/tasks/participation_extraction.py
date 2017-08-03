@@ -1,5 +1,7 @@
+# EXT
 import luigi
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.serializing import serialize_relation, get_nes_from_sentence

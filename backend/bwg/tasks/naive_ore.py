@@ -6,9 +6,11 @@ Defining standard tasks for the NLP pipeline.
 # STD
 import collections
 
+# EXT
 import luigi
 import luigi.format
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.serializing import (

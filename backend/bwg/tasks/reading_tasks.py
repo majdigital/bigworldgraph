@@ -7,9 +7,11 @@ NLP Pipeline tasks connected to resources of the Wikimedia Foundation.
 import codecs
 import re
 
+# EXT
 import luigi
 import luigi.format
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.helpers import is_collection
 from bwg.serializing import (

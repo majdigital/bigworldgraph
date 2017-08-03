@@ -1,9 +1,11 @@
+# STD
 import codecs
 import functools
 import random
 import sys
 import time
 
+# PROJECT
 from bwg.helpers import seconds_to_hms
 
 

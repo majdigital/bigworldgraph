@@ -640,3 +640,35 @@ RELATIONS_DATABASE_WRITING_TASK = {
     "input": [],
     "output": []
 }
+NE_TAGGED_PINEAPPLE_SENTENCE = [
+    ("this", "O"), ("pineapple", "I-P"), ("is", "O"), ("part", "O"), ("of", "O"), ("a", "O"), ("sample", "I-N"),
+    ("sentence", "O"), ("in", "O"), ("an", "O"), ("article", "I-N")
+]
+NE_DEPENDENCY_PINEAPPLE_TREE = {
+    "nodes": {
+        0: {
+            "address": 0,
+            "word": "pineapples",
+            "deps": {}
+        },
+        1: {
+            "address": 1,
+            "word": "are",
+            "deps": {
+                "nsubj": [0],
+                "dobj": [3]
+            }
+        },
+        2: {
+            "address": 2,
+            "word": "juicy",
+            "deps": {}
+        },
+        3: {
+            "address": 3,
+            "word": "fruits",
+            "deps": {"adj": [2]}
+        }
+    },
+    "root": 2
+}

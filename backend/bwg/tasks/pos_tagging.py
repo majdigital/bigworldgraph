@@ -1,6 +1,8 @@
+# EXT
 import luigi
 from nltk import StanfordTokenizer, StanfordPOSTagger
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.serializing import serialize_tagged_sentence

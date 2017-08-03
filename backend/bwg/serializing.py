@@ -7,6 +7,7 @@ Utilities for the NLP pipeline.
 import functools
 import json
 
+# PROJECT
 from bwg.french_wikipedia.french_wikipedia_config import DEPENDENCY_TREE_KEEP_FIELDS
 from bwg.helpers import filter_dict
 

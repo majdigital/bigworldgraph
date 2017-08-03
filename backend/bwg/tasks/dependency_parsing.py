@@ -1,6 +1,8 @@
+# EXT
 import luigi
 from nltk.parse.stanford import StanfordDependencyParser
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.serializing import serialize_dependency_parse_tree

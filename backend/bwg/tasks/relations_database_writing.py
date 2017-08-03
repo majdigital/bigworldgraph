@@ -3,11 +3,11 @@
 Defining additional tasks for the NLP pipeline.
 """
 
-# STD
-
+# EXT
 import luigi
 import luigi.format
 
+# PROJECT
 from bwg.decorators import time_function
 from bwg.helpers import fast_copy
 from bwg.neo4j_extensions import Neo4jTarget

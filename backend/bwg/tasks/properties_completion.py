@@ -1,5 +1,7 @@
+# EXT
 import luigi
 
+# PROJECT
 import bwg
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin

@@ -6,9 +6,11 @@ NLP Pipeline tasks for french texts.
 # STD
 import os
 
+# EXT
 import luigi.format
 import nltk
 
+# PROJECT
 from bwg.config_management import build_task_config_for_language
 from bwg.helpers import download_nltk_resource_if_missing, get_if_exists
 from bwg.tasks.relations_database_writing import RelationsDatabaseWritingTask

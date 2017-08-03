@@ -10,9 +10,11 @@ import json
 import os
 import unittest
 
+# EXT
 import neo4j
 import neomodel
 
+# PROJECT
 import bwg
 from bwg.api.api_config import DOMAIN
 from bwg.api.run_api import set_up_api
