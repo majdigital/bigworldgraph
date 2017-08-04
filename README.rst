@@ -8,10 +8,7 @@ produced a stable version yet**.
 
 --------------
 
-|Documentation Status| |Code Health|
-
-BigWorldGraph
-=============
+|Documentation Status| |Code Health| |License| |Open Issues|
 
 This project is dedicated to make today's political sphere more
 transparent, visualizing the links between entities in power. This is
@@ -103,7 +100,7 @@ To run the demo pipeline, execute
 
 ::
 
-    python3 backend/bwg/demo_pipeline.py
+    python3 backend/bwg/demo/demo_pipeline.py
 
 Your terminal should show you the following on successful execution:
 
@@ -147,7 +144,7 @@ Building the project with toy data
 The building of the docker images in this project might take a while,
 especially during the first time you're using this project. requests to
 the API using port ``6050`` by default (see the documentation for
-```bwg/run_api.py`` <http://bigworldgraph.readthedocs.io/bwg.run_api.html>`__
+```bwg/api/run_api.py`` <http://bigworldgraph.readthedocs.io/bwg.run_api.html>`__
 for more information).
 
 Now you can play around on the frontend by visiting
@@ -208,3 +205,7 @@ graph!
    :target: http://bigworldgraph.readthedocs.io/?badge=latest
 .. |Code Health| image:: https://landscape.io/github/majdigital/bigworldgraph/develop/landscape.svg?style=flat
    :target: https://landscape.io/github/majdigital/bigworldgraph/develop
+.. |License| image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://img.shields.io/badge/license-MIT-blue.svg
+.. |Open Issues| image:: https://img.shields.io/github/issues/majdigital/bigworldgraph.svg
+   :target: https://img.shields.io/github/issues/majdigital/bigworldgraph.svg

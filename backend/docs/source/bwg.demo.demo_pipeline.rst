@@ -1,5 +1,5 @@
-bwg.demo_pipeline
-=================
+bwg.demo.demo_pipeline
+======================
 
 This module illustrates how pipelines in the context of this project are used. For this purpose, the pipeline in this
 module comprises three very simple tasks:
@@ -69,7 +69,7 @@ Should result in ``data/pipeline_demo/demo_corpus_removed.json`` looking like th
 The pipeline is simply run by running the module:
 ::
 
-      python3 bwg/demo_pipeline.py
+      python3 bwg/demo/demo_pipeline.py
 
 Adjusting your pipeline configuration
 -------------------------------------
@@ -144,7 +144,7 @@ pipeline, using the pre-defined task names in your pipeline file:
 Module contents
 ---------------
 
-.. automodule:: bwg.demo_pipeline
+.. automodule:: bwg.demo.demo_pipeline
    :members:
    :undoc-members:
    :show-inheritance:

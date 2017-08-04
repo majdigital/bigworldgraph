@@ -1,10 +1,10 @@
-bwg.standard_tasks
-==================
+bwg.tasks.properties_completion
+===============================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.standard_tasks
+.. automodule:: bwg.tasks.properties_completion
    :members:
    :undoc-members:
    :show-inheritance:

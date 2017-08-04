@@ -1,5 +1,5 @@
-bwg.french_wikipedia
-====================
+bwg.french_wikipedia.french_wikipedia_pipeline
+==============================================
 
 Backstory
 ---------
@@ -19,7 +19,7 @@ If you want to work with the original data, get in touch with `MAJ // Digital <i
 Module contents
 ---------------
 
-.. automodule:: bwg.french_wikipedia
+.. automodule:: bwg.french_wikipedia.french_wikipedia_pipeline
    :members:
    :undoc-members:
    :show-inheritance:

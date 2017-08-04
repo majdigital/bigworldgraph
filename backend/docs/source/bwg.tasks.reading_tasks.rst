@@ -1,10 +1,10 @@
-bwg.additional_tasks
-====================
+bwg.tasks.reading_tasks
+=======================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.additional_tasks
+.. automodule:: bwg.tasks.reading_tasks
    :members:
    :undoc-members:
    :show-inheritance:

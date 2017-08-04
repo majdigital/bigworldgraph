@@ -66,23 +66,11 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a></li>
-</ul>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bwg.modules.html">Modules</a></li>
 </ul>
 </ul>
 </li>
@@ -96,10 +84,7 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Main project contents</a><ul>
-<li><a class="reference internal" href="#modules">Modules</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Main project contents</a></li>
 </ul>
 </ul>
 </li>
@@ -143,86 +128,59 @@
 <h1>Main project contents<a class="headerlink" href="#main-project-contents" title="Permalink to this headline">¶</a></h1>
 <p>The project contains the following modules:</p>
 <ul class="simple">
-<li><cite>bwg.additional_tasks</cite>: Tasks that can be helpful to include in the pipeline, but are not obligatory.</li>
 <li><cite>bwg.config_management</cite>: Functions used to create the configuration for the pipeline.</li>
-<li><cite>bwg.corenlp_server_tasks</cite>: NLP pipeline tasks that use the <cite>Stanford CoreNLP Server`</cite>.</li>
-<li><cite>bwg.french_wikipedia</cite>: Example pipeline tasks to specifically process the french wikipedia.</li>
+<li><cite>bwg.corenlp_server_tasks</cite>: NLP pipeline tasks that use the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span> <span class="pre">Server</span></code>.</li>
 <li><cite>bwg.helpers</cite>: Helper functions used throughout the project.</li>
 <li><cite>bwg.mixins</cite>: Mixin classes used in the projects.</li>
 <li><cite>neo4j_extensions</cite>: Extensions to the <code class="docutils literal"><span class="pre">Neo4j</span></code> database, to make it compatible to <code class="docutils literal"><span class="pre">Luigi</span></code> and <code class="docutils literal"><span class="pre">Eve</span></code>.</li>
-<li><cite>bwg.standard_tasks</cite>: Standard tasks often uses in pipelines.</li>
 <li><cite>bwg.utilities</cite>: Mostly serializing functions used in pipeline tasks.</li>
-<li><cite>bwg.wikidata</cite>: Wrappers for Wikidata, using <code class="docutils literal"><span class="pre">pywikibot</span></code>.</li>
-<li><cite>bwg.wikipedia_tasks</cite>: Tasks involving the Wikidata or processing a Wikipedia corpus.</li>
-<li><cite>bwg.run_api</cite>: Module used to run the API.</li>
-<li><cite>bwg.demo_pipeline.py</cite>: Simple example pipeline to process a minimal corpus.</li>
+<li><cite>bwg.wikidata_mixins</cite>: Wrappers for Wikidata, using <code class="docutils literal"><span class="pre">pywikibot</span></code>.</li>
 </ul>
-<div class="section" id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="bwg.additional_tasks.html">bwg.additional_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.additional_tasks.html#module-contents">Module contents</a></li>
+<p>It also includes the following packages with their own modules:</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><cite>bwg.api</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.api.run_api</cite>: Module used to run the API.</li>
 </ul>
+</dd>
+</dl>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.config_management.html">bwg.config_management</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#creating-your-own-pipeline-configuration">Creating your own pipeline configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.config_management.html#module-bwg.config_management">Module contents</a></li>
+<li><dl class="first docutils">
+<dt><cite>bwg.demo</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.demo.demo_pipeline.py</cite>: Simple example pipeline to process a minimal corpus.</li>
 </ul>
+</dd>
+</dl>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.corenlp_server_tasks.html">bwg.corenlp_server_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#using-corenlp-server-tasks">Using <code class="docutils literal"><span class="pre">CoreNLP</span> <span class="pre">Server</span></code> tasks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.corenlp_server_tasks.html#module-contents">Module contents</a></li>
+<li><dl class="first docutils">
+<dt><cite>bwg.french_wikipedia</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.french_wikipedia.rench_wikipedia_pipeline</cite>: Example pipeline tasks to specifically process the french wikipedia.</li>
 </ul>
+</dd>
+</dl>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.demo_pipeline.html">bwg.demo_pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#adjusting-your-pipeline-configuration">Adjusting your pipeline configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.demo_pipeline.html#module-contents">Module contents</a></li>
+<li><dl class="first docutils">
+<dt><cite>bwg.tasks</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.tasks.corenlp_server_tasks.py</cite>: Extending NLP tasks using the <cite>Stanford CoreNLP Server`</cite>.</li>
+<li><cite>bwg.tasks.dependency_parsing.py</cite>: Performing dependency parsing.</li>
+<li><cite>bwg.tasks.naive_ore.py</cite>: Performing a naive version of open relation extraction.</li>
+<li><cite>bwg.tasks.ner.py</cite>: Performing named entity recognition.</li>
+<li><cite>bwg.tasks.participation_extraction.py</cite>: Linking named entities in an article to its headline.</li>
+<li><cite>bwg.tasks.pipeline_run_info_generation.py</cite>: Generating information about the current run.</li>
+<li><cite>bwg.tasks.pos_tagging.py</cite>: Performing Part-of-Speech tagging.</li>
+<li><cite>bwg.tasks.properties_completion.py</cite>: Enriching named entities with information from Wikidata.</li>
+<li><cite>bwg.tasks.reading_tasks.py</cite>: Tasks in order to read in corpora.</li>
+<li><cite>bwg.tasks.relation_merging.py</cite>: Mergig extracted relations from various other tasks.</li>
+<li><cite>bwg.tasks.relations_database_writing.py</cite>: Writing relations into a <code class="docutils literal"><span class="pre">Neo4j</span></code> graph database.</li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.french_wikipedia.html">bwg.french_wikipedia</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#backstory">Backstory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.french_wikipedia.html#module-bwg.french_wikipedia">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.helpers.html">bwg.helpers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.helpers.html#module-bwg.helpers">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.mixins.html">bwg.mixins</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.mixins.html#module-bwg.mixins">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.neo4j_extensions.html">bwg.neo4j_extensions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#motivation">Motivation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.neo4j_extensions.html#module-bwg.neo4j_extensions">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.run_api.html">bwg.run_api</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#features">Features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bwg.run_api.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.standard_tasks.html">bwg.standard_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.standard_tasks.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.utilities.html">bwg.utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.utilities.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.wikidata.html">bwg.wikidata</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.wikidata.html#module-bwg.wikidata">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="bwg.wikipedia_tasks.html">bwg.wikipedia_tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="bwg.wikipedia_tasks.html#module-contents">Module contents</a></li>
-</ul>
+</dd>
+</dl>
 </li>
 </ul>
-</div>
-</div>
 </div>
 
 

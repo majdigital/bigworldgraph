@@ -12,8 +12,6 @@ ___
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Open Issues](https://img.shields.io/github/issues/majdigital/bigworldgraph.svg)](https://img.shields.io/github/issues/majdigital/bigworldgraph.svg)
 
-# BigWorldGraph
-
 This project is dedicated to make today's political sphere more transparent, visualizing the links between entities in 
 power. This is achieved by automatically extracting those links from texts, utilizing techniques from [Natural Language 
 Processing](https://en.wikipedia.org/wiki/Natural_language_processing) and enriching those results with 
@@ -75,7 +73,7 @@ There are two things you can do right after cloning the repository:
 
 To run the demo pipeline, execute 
 
-    python3 backend/bwg/demo_pipeline.py
+    python3 backend/bwg/demo/demo_pipeline.py
     
 Your terminal should show you the following on successful execution:
 
@@ -106,7 +104,7 @@ Afterwards, the project setup is fairly simple. Just go the root directory of th
     docker-compose build && docker-compose up
     
 The building of the docker images in this project might take a while, especially during the first time you're using this
-project. requests to the API using port `6050` by default (see the documentation for [`bwg/run_api.py`](http://bigworldgraph.readthedocs.io/bwg.run_api.html)
+project. requests to the API using port `6050` by default (see the documentation for [`bwg/api/run_api.py`](http://bigworldgraph.readthedocs.io/bwg.run_api.html)
 for more information).
 
 Now you can play around on the frontend by visiting [127.0.0.1:8080](127.0.0.1:8080) on your browser!

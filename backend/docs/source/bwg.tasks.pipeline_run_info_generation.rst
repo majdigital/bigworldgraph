@@ -1,10 +1,10 @@
-bwg.wikipedia_tasks
-===================
+bwg.tasks.pipeline_run_info_generation
+======================================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.wikipedia_tasks
+.. automodule:: bwg.tasks.pipeline_run_info_generation
    :members:
    :undoc-members:
    :show-inheritance:

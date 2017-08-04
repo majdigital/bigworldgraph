@@ -1,10 +1,10 @@
-bwg.additional_tasks
-====================
+bwg.tasks.relations_database_writing
+====================================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.additional_tasks
+.. automodule:: bwg.tasks.relations_database_writing
    :members:
    :undoc-members:
    :show-inheritance:

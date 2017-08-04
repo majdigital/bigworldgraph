@@ -1,10 +1,10 @@
-bwg.wikipedia_tasks
-===================
+bwg.tasks.dependency_parsing
+============================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.wikipedia_tasks
+.. automodule:: bwg.tasks.dependency_parsing
    :members:
    :undoc-members:
    :show-inheritance:

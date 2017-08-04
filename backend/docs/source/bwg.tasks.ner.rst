@@ -1,10 +1,10 @@
-bwg.standard_tasks
-==================
+bwg.tasks.ner
+=============
 
 Module contents
 ---------------
 
-.. automodule:: bwg.standard_tasks
+.. automodule:: bwg.tasks.ner
    :members:
    :undoc-members:
    :show-inheritance:

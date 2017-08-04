@@ -1,5 +1,5 @@
-bwg.run_api
-===========
+bwg.api.run_api
+===============
 
 Usage
 -----
@@ -100,7 +100,7 @@ This will return the target node as well as its **friends** and its **friends of
 Module contents
 ---------------
 
-.. automodule:: bwg.run_api
+.. automodule:: bwg.api.run_api
    :members:
    :undoc-members:
    :show-inheritance:

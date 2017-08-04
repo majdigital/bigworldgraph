@@ -1,10 +1,10 @@
-bwg.utilities
-=============
+bwg.serializing
+===============
 
 Module contents
 ---------------
 
-.. automodule:: bwg.utilities
+.. automodule:: bwg.serializing
    :members:
    :undoc-members:
    :show-inheritance:

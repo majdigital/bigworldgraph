@@ -17,4 +17,4 @@ fi
 cd ./stanford/
 docker build -t stanford .
 docker run -d --volumes-from $(docker ps --filter name=backend --format "{{.Names}}") -p 6080:9000 --network="bigworldgraph_app-tier" --name stanford stanford
-clear && docker exec `docker ps --filter name=backend --format "{{.Names}}"` python3 /data/src/app/bwg/french_wikipedia.py
+clear && docker exec `docker ps --filter name=backend --format "{{.Names}}"` python3 /data/src/app/bwg/french_wikipedia/french_wikipedia_pipeline.py

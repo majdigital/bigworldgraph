@@ -1,5 +1,5 @@
-bwg.corenlp_server_tasks
-========================
+bwg.tasks.corenlp_server_tasks
+==============================
 
 Using ``CoreNLP Server`` tasks
 ------------------------------
@@ -16,7 +16,7 @@ for more help).
 Module contents
 ---------------
 
-.. automodule:: bwg.corenlp_server_tasks
+.. automodule:: bwg.tasks.corenlp_server_tasks
    :members:
    :undoc-members:
    :show-inheritance:

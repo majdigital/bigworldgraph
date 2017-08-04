@@ -6,12 +6,11 @@ Define a pipeline task that enriches named entities from a sentence with informa
 # EXT
 import luigi
 
-# PROJECT
 import bwg
 from bwg.decorators import time_function
 from bwg.mixins import ArticleProcessingMixin
 from bwg.serializing import serialize_wikidata_entity, get_nes_from_sentence
-from bwg.wikidata.wikidata_mixins import WikidataAPIMixin
+from bwg.wikidata_mixins import WikidataAPIMixin
 
 
 class PropertiesCompletionTask(luigi.Task, ArticleProcessingMixin, WikidataAPIMixin):

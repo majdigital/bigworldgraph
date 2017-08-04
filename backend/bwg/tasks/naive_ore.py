@@ -2,10 +2,11 @@
 """
 Defining a task that performs a very naive approach to open relation extraction. At the moment, the simple extraction
 heuristic ist just the following:
-    1.) Find all verb nodes in a dependency tree
-    2.) Find subject and object of that verb
-    3.) Check if they are tagged with a Named Entity Tag
-    4.) If one of them is tagged, extract the hold phrase as a relation triplet
+
+    1. Find all verb nodes in a dependency tree
+    2. Find subject and object of that verb
+    3. Check if they are tagged with a Named Entity Tag
+    4. If one of them is tagged, extract the hold phrase as a relation triplet
 """
 
 # STD

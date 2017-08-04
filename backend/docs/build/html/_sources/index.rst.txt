@@ -3,11 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-BigWorldGraph
-=============
-
-   Revealing the connections that shape the world we live in.
-
 .. include:: ../../../README.rst
 
 .. toctree::
@@ -16,6 +11,7 @@ BigWorldGraph
 
 .. include:: bwg.rst
 .. include:: general.rst
+.. include:: modules.rst
 
 
 

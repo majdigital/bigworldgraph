@@ -1,10 +1,10 @@
-bwg.utilities
-=============
+bwg.wikidata_mixins
+===================
 
 Module contents
 ---------------
 
-.. automodule:: bwg.utilities
+.. automodule:: bwg.wikidata_mixins
    :members:
    :undoc-members:
    :show-inheritance:

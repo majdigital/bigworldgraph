@@ -13,4 +13,4 @@ COPY ./setup.py .
 RUN pip3 install -r ./requirements.txt
 
 EXPOSE 5000
-CMD python3 ./bwg/run_api.py
+CMD python3 ./bwg/api/run_api.py

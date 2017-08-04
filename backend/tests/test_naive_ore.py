@@ -16,11 +16,11 @@ class NaiveOpenRelationExtractionTaskTestCase(unittest.TestCase):
     """
     Testing NaiveOpenRelatioNExtractionTask.
     """
-    @mock.patch('bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.output')
-    @mock.patch('bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.input')
+    @mock.patch('bwg.tasks.naive_ore.rst.NaiveOpenRelationExtractionTask.output')
+    @mock.patch('bwg.tasks.naive_ore.rst.NaiveOpenRelationExtractionTask.input')
     def test_task_functions(self, input_patch, output_patch):
         with mock.patch(
-            "bwg.tasks.naive_ore.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
+            "bwg.tasks.naive_ore.rst.NaiveOpenRelationExtractionTask.workflow_resources", new_callable=mock.PropertyMock()
         ) as workflow_mock:
             task_config = {
                 "NER_TAGSET": ["I-P", "I-N"],
