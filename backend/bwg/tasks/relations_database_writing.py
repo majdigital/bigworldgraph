@@ -46,7 +46,7 @@ class RelationsDatabaseWritingTask(luigi.Task):
     @time_function(is_classmethod=True)
     def run(self):
         with self.input()[0].open("r") as mr_file, self.input()[1].open("r") as pc_file,\
-                self.input()[1].open("r") as pri_file:
+                self.input()[2].open("r") as pri_file:
             self._read_pipeline_run_info(pri_file)
             entity_properties = self._read_properties_file(pc_file)
             with self.output() as database:

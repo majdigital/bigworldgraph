@@ -39,6 +39,7 @@ services:
       - FRENCH_STANFORD_DEPENDENCY_MODEL_PATH=/stanford_models/UD_French.gz
       - STANFORD_POSTAGGER_PATH=/stanford_models/stanford-postagger.jar
       - STANFORD_CORENLP_MODELS_PATH=/stanford_models/stanford-corenlp-3.7.0-models.jar
+      - LOAD_DEMO_DATA=0
     volumes:
       - french_corpora:/french_corpora:ro
       - french_pipeline:/french_pipeline

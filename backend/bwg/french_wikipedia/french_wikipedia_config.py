@@ -34,11 +34,11 @@ FRENCH_DEPENDENCY_OUTPUT_PATH = "../data/pipeline_french/fr_articles_dependencie
 FRENCH_ORE_OUTPUT_PATH = "../data/pipeline_french/fr_articles_relations.json"
 FRENCH_WIKIPEDIA_READING_OUTPUT_PATH = "../data/pipeline_french/fr_articles.json"
 FRENCH_PE_OUTPUT_PATH = "../data/pipeline_french/fr_articles_participations.json"
-FRENCH_RELATION_MERGING_OUTPUT_PATH = "../data/pipeline_french/fr_articles_merged_relations.json"
+FRENCH_RELATION_MERGING_OUTPUT_PATH = "../data/pipeline_french/demo_relations.json"
 FRENCH_PC_OUTPUT_PATH = "../data/pipeline_french/fr_articles_properties.json"
 FRENCH_PIPELINE_RUN_INFO_OUTPUT_PATH = "../data/pipeline_french/fr_info.json"
-#FRENCH_CORPUS_INPATH = "../data/corpora_french/corpus_affairs_modern_french_in_france.xml"
-FRENCH_CORPUS_INPATH = "../data/corpora_french/coverage_corpus.xml"
+FRENCH_CORPUS_INPATH = "../data/corpora_french/corpus_affairs_modern_french_in_france.xml"
+#FRENCH_CORPUS_INPATH = "../data/corpora_french/french_demo_corpus.xml"
 
 # Paths for french Stanford models
 FRENCH_STANFORD_NER_MODEL_PATH = "../data/stanford/models/ner-model-french.ser.gz"

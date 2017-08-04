@@ -2,7 +2,7 @@
 import logging
 
 # General config
-DEBUG = False
+DEBUG = True
 
 # API resource config
 # TODO (Improve) Add more methods for resources [DU 28.04.17]
@@ -106,3 +106,10 @@ API_HOST = "localhost"
 LOGGING_PATH = "../logs/api_log.txt"
 LOGGING_LEVEL = logging.DEBUG
 TEST_PARAM = "test"
+
+# Demo data
+import os
+LOAD_DEMO_DATA = True
+DEMO_RELATIONS_PATH = os.path.dirname(__file__).replace("/bwg/api", "/data/pipeline_demo/demo_relations.json")
+DEMO_PROPERTIES_PATH = os.path.dirname(__file__).replace("/bwg/api", "/data/pipeline_demo/demo_properties.json")
+DEMO_INFO_PATH = os.path.dirname(__file__).replace("/bwg/api", "/data/pipeline_demo/demo_info.json")

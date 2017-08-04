@@ -12,21 +12,23 @@ services:
     depends_on:
       - neo4j
     environment:
-      - ENV=testing
+      - ENV=demo
       - PYTHONPATH=/data/src/app/
       - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
       - PYWIKIBOT2_NO_USER_CONFIG=1
       - API_CONFIG_PATH=/data/src/app/bwg/api/api_config.py
-      - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/french_wikipedia/french_wikipedia_config.py
       - NEO4J_PORT=7687
       - API_HOST=0.0.0.0
       - NEO4J_HOST=neo4j
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-      - DUMMY_PIPELINE_CONFIG_PATH=/data/src/app/tests/dummy_pipeline_config.py
-      - LOAD_DEMO_DATA=0
+      - LOAD_DEMO_DATA=1
+      - DEMO_RELATIONS_PATH=/demo_pipeline/demo_relations.json
+      - DEMO_PROPERTIES_PATH=/demo_pipeline/demo_properties.json
+      - DEMO_INFO_PATH=/demo_pipeline/demo_info.json
     networks:
       - app-tier
-    entrypoint: python3 -m unittest discover ./tests/
+    volumes:
+      - ./backend/data/pipeline_demo/:/demo_pipeline
   neo4j:
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
@@ -36,3 +38,13 @@ services:
       - "6070:7687"
     networks:
       - app-tier
+  frontend:
+    build: ./frontend/
+    image: bigworldgraph_frontend
+    ports:
+        - "8080:8080"
+    networks:
+        - app-tier
+    volumes:
+        - ./frontend:/frontend
+        - /frontend/node_modules

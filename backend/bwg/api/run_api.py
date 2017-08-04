@@ -8,18 +8,22 @@ import json
 import logging
 import traceback
 import os
+import codecs
 
 # EXT
 from eve import Eve
 import flask_cors
+import luigi
 
 # PROJECT
 import bwg
 from bwg.config_management import get_config_from_py_file, overwrite_local_config_with_environ
 from bwg.neo4j_extensions import Neo4jLayer
+from bwg.french_wikipedia.french_wikipedia_pipeline import FrenchRelationsDatabaseWritingTask
+from bwg.french_wikipedia.french_wikipedia_config import NEO4J_USER, NEO4J_HOST, NEO4J_PASSWORD, FRENCH_DATABASE_CATEGORIES
 
 
-def set_up_api(config_path="./api_config.py", log=True, screen_output=True):
+def set_up_api(config_path="./api_config.py", log=True, screen_output=True, load_demo_data_func=lambda path: None):
     """
     Set up the API using the following steps:
 
@@ -52,6 +56,15 @@ def set_up_api(config_path="./api_config.py", log=True, screen_output=True):
             level=api_config["LOGGING_LEVEL"],
             format="%(asctime)s %(levelname)s:%(message)s",
             datefmt="%d.%m.%Y %I:%M:%S"
+        )
+
+    if api_config["LOAD_DEMO_DATA"]:
+        load_demo_data_func(
+            paths={
+                "DEMO_RELATIONS_PATH": api_config["DEMO_RELATIONS_PATH"],
+                "DEMO_PROPERTIES_PATH": api_config["DEMO_PROPERTIES_PATH"],
+                "DEMO_INFO_PATH": api_config["DEMO_INFO_PATH"]
+            }
         )
 
     # Set up API
@@ -176,10 +189,51 @@ def add_logger_to_app(app):
     return app
 
 
+def load_french_demo_data(paths):
+    class FrenchDemoRelationsDatabaseWritingTask(FrenchRelationsDatabaseWritingTask):
+        def requires(self):
+            pass
+
+        def input(self):
+            return self.task_config["RELATIONS_PATH"], self.task_config["PROPERTIES_PATH"], self.task_config["INFO_PATH"]
+
+        def run(self):
+            with codecs.open(self.input()[0], "r", "utf-8") as mr_file, \
+                 codecs.open(self.input()[1], "r", "utf-8") as pc_file, \
+                 codecs.open(self.input()[2], "r", "utf-8") as pri_file:
+                self._read_pipeline_run_info(pri_file)
+                entity_properties = self._read_properties_file(pc_file)
+                with self.output() as database:
+                    for mr_line in mr_file:
+                        self.process_article(mr_line, database, entity_properties)
+
+    assert "DEMO_RELATIONS_PATH" in paths
+    assert "DEMO_PROPERTIES_PATH" in paths
+    assert "DEMO_INFO_PATH" in paths
+
+    task_config = {
+        "NEO4J_USER": NEO4J_USER,
+        "NEO4J_PASSWORD": NEO4J_PASSWORD,
+        "NEO4J_HOST": NEO4J_HOST,
+        "DATABASE_CATEGORIES": FRENCH_DATABASE_CATEGORIES,
+        "RELATIONS_PATH": paths["DEMO_RELATIONS_PATH"],
+        "PROPERTIES_PATH": paths["DEMO_PROPERTIES_PATH"],
+        "INFO_PATH": paths["DEMO_INFO_PATH"],
+        "CORPUS_ENCODING": "utf-8"
+    }
+    task_config = overwrite_local_config_with_environ(task_config)
+
+    logging.info("Adding sample data to the database.")
+    luigi.build(
+        [FrenchDemoRelationsDatabaseWritingTask(task_config=task_config)],
+        local_scheduler=True, workers=1, log_level="INFO"
+    )
+
+
 if __name__ == "__main__":
     api_config_path = os.environ.get("API_CONFIG_PATH", os.path.dirname(__file__) + "/api_config.py")
 
-    api = set_up_api(api_config_path)
+    api = set_up_api(api_config_path, load_demo_data_func=load_french_demo_data)
     flask_cors.CORS(api)
     logging.info("API is being run now!")
     logging.debug(
