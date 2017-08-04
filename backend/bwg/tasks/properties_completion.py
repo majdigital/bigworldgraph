@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Define a pipeline task that enriches named entities from a sentence with information from Wikidata.
+"""
+
 # EXT
 import luigi
 

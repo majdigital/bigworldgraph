@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Defining additional tasks for the NLP pipeline.
+Defining a pipeline tasks that writes extracted relations into a Neo4j graph database.
 """
 
 # EXT

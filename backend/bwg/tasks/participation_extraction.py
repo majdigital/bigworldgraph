@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task that creates relations between named entities in an article and its title.
+"""
+
 # EXT
 import luigi
 

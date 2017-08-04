@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Module that includes multipe helpful decorator functions.
+"""
+
 # STD
 import codecs
 import functools

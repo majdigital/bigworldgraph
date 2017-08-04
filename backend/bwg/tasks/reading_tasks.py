@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-NLP Pipeline tasks connected to resources of the Wikimedia Foundation.
+NLP Pipeline tasks for reading in corpora.
 """
 
 # STD

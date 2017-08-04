@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task that merges relation extracted from different tasks, e.g. participation extraction or naive
+open relation extraction.
+"""
+
 # EXT
 import luigi
 

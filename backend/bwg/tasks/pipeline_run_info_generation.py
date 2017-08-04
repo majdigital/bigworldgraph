@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task that generates information about the current run.
+"""
+
 # STD
 import datetime
 import time

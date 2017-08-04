@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task that dependency-parses a sentence.
+"""
+
 # EXT
 import luigi
 from nltk.parse.stanford import StanfordDependencyParser

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task to perform named entity recognition on a sentence.
+"""
+
 # EXT
 import luigi
 from nltk import StanfordTokenizer, StanfordNERTagger

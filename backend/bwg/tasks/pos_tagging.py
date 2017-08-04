@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+Defining a pipeline task that that performs Part-of-Speech tagging on a sentence.
+"""
+
 # EXT
 import luigi
 from nltk import StanfordTokenizer, StanfordPOSTagger
