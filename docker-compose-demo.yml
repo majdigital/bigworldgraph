@@ -24,7 +24,6 @@ services:
       - LOAD_DEMO_DATA=1
       - DEMO_RELATIONS_PATH=/demo_pipeline/demo_relations.json
       - DEMO_PROPERTIES_PATH=/demo_pipeline/demo_properties.json
-      - DEMO_INFO_PATH=/demo_pipeline/demo_info.json
     networks:
       - app-tier
     volumes:

@@ -9,6 +9,7 @@ import logging
 import traceback
 import os
 import codecs
+import time
 
 # EXT
 from eve import Eve
@@ -195,21 +196,18 @@ def load_french_demo_data(paths):
             pass
 
         def input(self):
-            return self.task_config["RELATIONS_PATH"], self.task_config["PROPERTIES_PATH"], self.task_config["INFO_PATH"]
+            return self.task_config["RELATIONS_PATH"], self.task_config["PROPERTIES_PATH"]
 
         def run(self):
             with codecs.open(self.input()[0], "r", "utf-8") as mr_file, \
-                 codecs.open(self.input()[1], "r", "utf-8") as pc_file, \
-                 codecs.open(self.input()[2], "r", "utf-8") as pri_file:
-                self._read_pipeline_run_info(pri_file)
-                entity_properties = self._read_properties_file(pc_file)
+                 codecs.open(self.input()[1], "r", "utf-8") as pc_file:
+                entity_properties = self._read_properties_file(pc_file.readlines())
                 with self.output() as database:
                     for mr_line in mr_file:
                         self.process_article(mr_line, database, entity_properties)
 
     assert "DEMO_RELATIONS_PATH" in paths
     assert "DEMO_PROPERTIES_PATH" in paths
-    assert "DEMO_INFO_PATH" in paths
 
     task_config = {
         "NEO4J_USER": NEO4J_USER,
@@ -218,7 +216,6 @@ def load_french_demo_data(paths):
         "DATABASE_CATEGORIES": FRENCH_DATABASE_CATEGORIES,
         "RELATIONS_PATH": paths["DEMO_RELATIONS_PATH"],
         "PROPERTIES_PATH": paths["DEMO_PROPERTIES_PATH"],
-        "INFO_PATH": paths["DEMO_INFO_PATH"],
         "CORPUS_ENCODING": "utf-8"
     }
     task_config = overwrite_local_config_with_environ(task_config)
@@ -232,6 +229,9 @@ def load_french_demo_data(paths):
 
 if __name__ == "__main__":
     api_config_path = os.environ.get("API_CONFIG_PATH", os.path.dirname(__file__) + "/api_config.py")
+
+    # TODO (Improvement): Find better solution for this [DU 07.08.17]
+    time.sleep(20)  # Give neo4j container time to start up when using docker
 
     api = set_up_api(api_config_path, load_demo_data_func=load_french_demo_data)
     flask_cors.CORS(api)
