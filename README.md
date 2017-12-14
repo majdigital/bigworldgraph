@@ -109,6 +109,8 @@ for more information).
 
 Now you can play around on the frontend by visiting [127.0.0.1:8080](127.0.0.1:8080) on your browser!
 
+(Comment 14.12.17: Toy data hasn't been selected yet, but the necessary code is in place)
+
 #### Getting serious: Running the real pipeline
 
 First of all, make sure to have the corpus file in its designated directory (``backend/data/corpora_french/`` by default).
