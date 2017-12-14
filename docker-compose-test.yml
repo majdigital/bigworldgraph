@@ -1,0 +1,38 @@
+version: '3'
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  backend:
+    build: ./backend/
+    image: bigworldgraph_backend
+    ports:
+      - "6050:5000"
+    depends_on:
+      - neo4j
+    environment:
+      - ENV=testing
+      - PYTHONPATH=/data/src/app/
+      - PYWIKIBOT2_DIR=/data/src/app/bwg/user-config.py
+      - PYWIKIBOT2_NO_USER_CONFIG=1
+      - API_CONFIG_PATH=/data/src/app/bwg/api/api_config.py
+      - FRENCH_PIPELINE_CONFIG_PATH=/data/src/app/bwg/french_wikipedia/french_wikipedia_config.py
+      - NEO4J_PORT=7687
+      - API_HOST=0.0.0.0
+      - NEO4J_HOST=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - DUMMY_PIPELINE_CONFIG_PATH=/data/src/app/tests/dummy_pipeline_config.py
+      - LOAD_DEMO_DATA=0
+    networks:
+      - app-tier
+    entrypoint: python3 -m unittest discover ./tests/
+  neo4j:
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
+    image: neo4j:3.0
+    ports:
+      - "6060:7474"
+      - "6070:7687"
+    networks:
+      - app-tier

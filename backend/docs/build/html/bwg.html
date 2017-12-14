@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Main project contents &#8212; BigWorldGraph 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/lumen/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_small.png"></span>
+          BigWorldGraph</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.9</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="general.data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="general.pipeline.html">The Pipeline</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="bwg.modules.html">Modules</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Main project contents</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/bwg.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="main-project-contents">
+<h1>Main project contents<a class="headerlink" href="#main-project-contents" title="Permalink to this headline">¶</a></h1>
+<p>The project contains the following modules:</p>
+<ul class="simple">
+<li><cite>bwg.config_management</cite>: Functions used to create the configuration for the pipeline.</li>
+<li><cite>bwg.corenlp_server_tasks</cite>: NLP pipeline tasks that use the <code class="docutils literal"><span class="pre">Stanford</span> <span class="pre">CoreNLP</span> <span class="pre">Server</span></code>.</li>
+<li><cite>bwg.helpers</cite>: Helper functions used throughout the project.</li>
+<li><cite>bwg.mixins</cite>: Mixin classes used in the projects.</li>
+<li><cite>neo4j_extensions</cite>: Extensions to the <code class="docutils literal"><span class="pre">Neo4j</span></code> database, to make it compatible to <code class="docutils literal"><span class="pre">Luigi</span></code> and <code class="docutils literal"><span class="pre">Eve</span></code>.</li>
+<li><cite>bwg.utilities</cite>: Mostly serializing functions used in pipeline tasks.</li>
+<li><cite>bwg.wikidata_mixins</cite>: Wrappers for Wikidata, using <code class="docutils literal"><span class="pre">pywikibot</span></code>.</li>
+</ul>
+<p>It also includes the following packages with their own modules:</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><cite>bwg.api</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.api.run_api</cite>: Module used to run the API.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>bwg.demo</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.demo.demo_pipeline.py</cite>: Simple example pipeline to process a minimal corpus.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>bwg.french_wikipedia</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.french_wikipedia.rench_wikipedia_pipeline</cite>: Example pipeline tasks to specifically process the french wikipedia.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>bwg.tasks</cite></dt>
+<dd><ul class="first last">
+<li><cite>bwg.tasks.corenlp_server_tasks.py</cite>: Extending NLP tasks using the <cite>Stanford CoreNLP Server`</cite>.</li>
+<li><cite>bwg.tasks.dependency_parsing.py</cite>: Performing dependency parsing.</li>
+<li><cite>bwg.tasks.naive_ore.py</cite>: Performing a naive version of open relation extraction.</li>
+<li><cite>bwg.tasks.ner.py</cite>: Performing named entity recognition.</li>
+<li><cite>bwg.tasks.participation_extraction.py</cite>: Linking named entities in an article to its headline.</li>
+<li><cite>bwg.tasks.pipeline_run_info_generation.py</cite>: Generating information about the current run.</li>
+<li><cite>bwg.tasks.pos_tagging.py</cite>: Performing Part-of-Speech tagging.</li>
+<li><cite>bwg.tasks.properties_completion.py</cite>: Enriching named entities with information from Wikidata.</li>
+<li><cite>bwg.tasks.reading_tasks.py</cite>: Tasks in order to read in corpora.</li>
+<li><cite>bwg.tasks.relation_merging.py</cite>: Mergig extracted relations from various other tasks.</li>
+<li><cite>bwg.tasks.relations_database_writing.py</cite>: Writing relations into a <code class="docutils literal"><span class="pre">Neo4j</span></code> graph database.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Malabalistalicious Unipessoal Lda..<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

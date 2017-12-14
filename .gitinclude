@@ -1,0 +1,4 @@
+./backend/data/stanford/Dockerfile
+./backend/data/pipeline_demo/demo_info.json
+./backend/data/pipeline_demo/demo_properties.json
+./backend/data/pipeline_demo/demo_relations.json
