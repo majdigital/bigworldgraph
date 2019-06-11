@@ -24,7 +24,7 @@ from bwg.french_wikipedia.french_wikipedia_pipeline import FrenchRelationsDataba
 from bwg.french_wikipedia.french_wikipedia_config import NEO4J_USER, NEO4J_HOST, NEO4J_PASSWORD, FRENCH_DATABASE_CATEGORIES
 
 
-def set_up_api(config_path="./api_config.py", log=True, screen_output=True, load_demo_data_func=lambda path: None):
+def set_up_api(config_path="./api_config.py", log=True, screen_output=True, load_demo_data_func=lambda paths: None):
     """
     Set up the API using the following steps:
 
@@ -61,7 +61,7 @@ def set_up_api(config_path="./api_config.py", log=True, screen_output=True, load
 
     if api_config["LOAD_DEMO_DATA"]:
         load_demo_data_func(
-            path={
+            paths={
                 "DEMO_RELATIONS_PATH": api_config["DEMO_RELATIONS_PATH"],
                 "DEMO_PROPERTIES_PATH": api_config["DEMO_PROPERTIES_PATH"],
                 "DEMO_INFO_PATH": api_config["DEMO_INFO_PATH"]
