@@ -61,7 +61,7 @@ def set_up_api(config_path="./api_config.py", log=True, screen_output=True, load
 
     if api_config["LOAD_DEMO_DATA"]:
         load_demo_data_func(
-            paths={
+            path={
                 "DEMO_RELATIONS_PATH": api_config["DEMO_RELATIONS_PATH"],
                 "DEMO_PROPERTIES_PATH": api_config["DEMO_PROPERTIES_PATH"],
                 "DEMO_INFO_PATH": api_config["DEMO_INFO_PATH"]
