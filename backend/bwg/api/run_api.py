@@ -146,7 +146,7 @@ def add_additional_endpoints(api):
         return json.dumps(
             {
                 "version": bwg.__version__,
-                "license": "Copyright (c) 2017 Malabaristalicious Unipessoal, Lda.\nFor more information read "
+                "license": "Copyright (c) 2019 Malabaristalicious Unipessoal, Lda.\nFor more information read "
                 "LICENSE.md on https://github.com/majdigital/bigworldgraph"
             }
         )
