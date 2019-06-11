@@ -363,7 +363,7 @@ class Neo4jDatabase:
             entity.save()
             return entity
         except Entity.DoesNotExist:
-            entity = node_category(category=node_category.__class__.__name__, label=label, data=data)
+            entity = node_category(category=node_category.__name__, label=label, data=data)
             entity.save()
             return entity
 
@@ -792,7 +792,6 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
             for claim, claim_data in sense_data["claims"].items():
                 target, implies_relation, node_category, target_data = claim_data["target"], claim_data["implies_relation"], \
                                                          claim_data["entity_class"], claim_data["target_data"]
-
                 if implies_relation and target != sense_data["label"]:
                     entity_class = self.get_node_class(node_category, base_classes=(Entity, ))
                     obj_node = self.get_or_create_node(label=target, data=target_data, node_category=entity_class)
