@@ -1,0 +1,224 @@
+@keyframes textol {
+  0% {
+    left: -100%;
+  }
+  30% {
+    left: 0%;
+  }
+  70% {
+    left: 0%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+#contentLayer {
+  position: fixed;
+  height: 100%;
+  width: 500px;
+  top: 0;
+  right: 0;
+  background-color: #fff;
+  transform: matrix(1, 0, 0, 1, 500, 0);
+  transition: all 0.7s;
+  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+
+  .pull {
+    width: 40px;
+    height: 60px;
+    position: absolute;
+    right: 460px;
+    top: 20px;
+    cursor: pointer;
+    transform: matrix(1, 0, 0, 1, 0, 0);
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 30px 40px 30px 0;
+      border-color: transparent #373737 transparent transparent;
+      transition: border 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+      cursor: pointer;
+    }
+
+    .info {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      top: 50%;
+      left: calc(50% + 8px);
+      transform: translate(-50%, -50%);
+      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+
+      svg {
+        display: block;
+        width: 20px;
+        height: auto;
+
+        * {
+          fill: #ffffff;
+          transition: all 0.3s;
+        }
+      }
+    }
+  }
+
+  .closeBtn {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    width: 22px;
+    height: 15px;
+    cursor: pointer;
+
+    .bar {
+      width: 100%;
+      height: 3px;
+      margin-bottom: 1px;
+      transform-origin: 50%;
+      background-color: $black;
+
+      &.top {
+        transform: rotate(43deg) matrix(1, 0, 0, 1, 2, 4);
+      }
+
+      &.medium {
+        opacity: 0;
+      }
+
+      &.bottom {
+        transform: rotate(-43deg) matrix(1, 0, 0, 1, 2, -4);
+      }
+    }
+  }
+
+  .inner {
+    box-sizing: border-box;
+    position: absolute;
+    padding: 80px 40px 40px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scrollable {
+    position: absolute;
+    width: calc(100% - 80px);
+    height: calc(100% - 80px);
+    overflow: hidden;
+  }
+
+  .content {
+    .image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50px;
+      overflow: hidden;
+      position: relative;
+
+      img {
+        display: block;
+        width: 100%;
+      }
+    }
+
+    h2 {
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      position: relative;
+      overflow: hidden;
+      color: #ffffff;
+      background-color: transparent;
+      transition: color 0s 0.6s;
+
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: -100%;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    h1 {
+      font-family: Arial, sans-serif;
+      font-size: 30px;
+      transition: color 0s 0.8s;
+      position: relative;
+      overflow: hidden;
+      color: #ffffff;
+
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: -100%;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  &.on {
+    .pull {
+      transform: matrix(1, 0, 0, 1, -40, 0);
+      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    &.open {
+      transform: matrix(1, 0, 0, 1, 0, 0);
+
+      .pull {
+        transform: matrix(1, 0, 0, 1, 0, 0);
+        transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+
+        .triangle {
+          border-color: transparent #ffffff transparent transparent;
+          border-width: 30px 0px 30px 0;
+        }
+
+        .info {
+          transform: translate(0%, -50%);
+
+          svg {
+            * {
+              fill: #000000;
+            }
+          }
+        }
+      }
+
+      .content {
+        h2 {
+          &.politician {
+            background-color: transparent;
+            color: $politician;
+
+            &:after {
+              background-color: $politician;
+              animation: textol;
+              animation-duration: 1.3s;
+              animation-iteration-count: 1;
+            }
+          }
+        }
+
+        h1 {
+          color: #000000;
+
+          &:after {
+            animation: textol;
+            animation-duration: 1.3s;
+            animation-delay: 0.2s;
+            animation-iteration-count: 1;
+            background-color: #000000;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+#loader {
+  position: absolute;
+  top: calc(50% + 180px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s;
+  pointer-events: none;
+
+  &.done {
+    transform: translate(-50%, -50%) matrix(1, 0, 0, 1, 0, 40);
+    opacity: 0;
+  }
+
+  .label {
+    font-family: Arial, sans-serif;
+    font-size: 40px;
+    color: #fff;
+  }
+}
