@@ -2,42 +2,14 @@
 
 @import './logo';
 @import './loader';
-@import './contentLayer';
-@import './infoInterface';
+@import './details';
+@import './settings';
 
 html {
   background-color: $black;
   position: fixed;
   width: 100%;
   height: 100%;
-}
-.affair {
-  color: $affair;
-  background-color: $affair;
-}
-.politician {
-  color: $politician;
-  background-color: $politician;
-}
-.party {
-  color: $party;
-  background-color: $party;
-}
-.company {
-  color: $company;
-  background-color: $company;
-}
-.organization {
-  color: $organization;
-  background-color: $organization;
-}
-.media {
-  color: $media;
-  background-color: $media;
-}
-.person {
-  color: $person;
-  background-color: $person;
 }
 
 .link {
@@ -81,11 +53,6 @@ html {
   pointer-events: none;
 }
 
-text {
-  font: 10px sans-serif;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-}
-
 #graphDiv {
   position: absolute;
   top: 0;
@@ -93,8 +60,14 @@ text {
   width: 100%;
   height: 100%;
   background-color: $black;
+
   svg {
     width: 100%;
     height: 100%;
+  }
+
+  text {
+    font: 10px sans-serif;
+    fill: #fff;
   }
 }

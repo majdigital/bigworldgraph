@@ -1,19 +1,24 @@
 #loader {
-  position: absolute;
-  top: calc(50% + 180px);
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transition: all 0.4s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   pointer-events: none;
+  font-family: Arial, sans-serif;
+  transition: all 0.4s;
+  font-size: 40px;
+  color: #fff;
+  background-color: inherit;
 
   &.done {
-    transform: translate(-50%, -50%) matrix(1, 0, 0, 1, 0, 40);
+    transform: matrix(1, 0, 0, 1, 0, 40);
     opacity: 0;
   }
 
   .label {
-    font-family: Arial, sans-serif;
-    font-size: 40px;
-    color: #fff;
+    position: relative;
+    top: calc(50% + 180px);
+    text-align: center;
   }
 }

@@ -1,14 +1,14 @@
-#infoInterface {
+#settings {
   position: fixed;
   width: 100%;
-  height: 200px;
+  height: 135px;
   bottom: 0;
   left: 0;
   background-color: #191919;
-  transform: matrix(1, 0, 0, 1, 0, 240);
+  transform: matrix(1, 0, 0, 1, 0, 175);
 
   &.on {
-    transform: matrix(1, 0, 0, 1, 0, 200);
+    transform: matrix(1, 0, 0, 1, 0, 135);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 
     &.open {
@@ -17,7 +17,7 @@
     }
 
     &.close {
-      transform: matrix(1, 0, 0, 1, 0, 200);
+      transform: matrix(1, 0, 0, 1, 0, 135);
       transition: transform 0.5s cubic-bezier(0.95, 0.05, 0.795, 0.035);
     }
   }
@@ -61,23 +61,16 @@
   }
 
   .inner {
-    padding: 40px;
-  }
-
-  .categories-container {
-    width: 40%;
+    padding: 60px 40px 40px;
   }
 
   .categories {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
     flex-flow: row wrap;
 
     .category {
-      flex-grow: 1;
-      min-width: 100px;
-      margin-bottom: 25px;
+      margin-bottom: 15px;
+      margin-left: 20px;
       cursor: pointer;
 
       .marker {
@@ -86,7 +79,7 @@
         border-radius: 10px;
         display: inline-block;
         vertical-align: middle;
-        margin-right: 20px;
+        margin-right: 5px;
       }
 
       span {
