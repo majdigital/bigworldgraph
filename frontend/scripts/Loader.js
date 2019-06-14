@@ -75,7 +75,7 @@ export default class Loader {
 
   hide() {
     DOMElement.addClass('done');
-    $('.logo').addClass('loaded');
+    $('.app-logo').addClass('loaded');
     settings.on();
   }
 }

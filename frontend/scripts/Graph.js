@@ -5,7 +5,7 @@ import Loader from './loader';
 import { details } from './Details';
 import { settings } from './Settings';
 
-import categories, { colors } from './config/categories';
+import categories, { categoriesColor } from './config/categories';
 
 export default class Graph {
   constructor(graphData) {
@@ -19,7 +19,7 @@ export default class Graph {
     this.generateGraph();
     const data = categories.map(slug => ({
       slug,
-      color: colors[slug],
+      color: categoriesColor[slug],
       label: i18n.categories[slug],
     }));
     settings.populate(data);
@@ -116,6 +116,10 @@ export default class Graph {
     console.log('Run Precompute');
 
     this.precompute(500, this.renderGraph);
+
+    setTimeout(() => {
+      this.renderer.pause();
+    }, 1000);
   }
 
   precompute(iterations, cb) {
@@ -207,7 +211,8 @@ export default class Graph {
     let nodeUi = this.graphics.getNodeUI(nodeId);
     nodeUi.attr('fill', this.getNodeColor(node));
     $(nodeUi).addClass('active');
-    this.showContent(node.data);
+
+    details.data = node.data;
     // this.renderer.resume();
 
     // setTimeout(() => {
@@ -215,11 +220,8 @@ export default class Graph {
     // },2000);
   }
 
-  showContent(data) {
-    console.log(data);
-    var _data = data;
-    details.currentData = _data;
-    details.element.addClass('on');
+  updateDetails(data) {
+    details.update(data);
   }
 
   filterNodes(data) {
@@ -306,6 +308,6 @@ export default class Graph {
   }
 
   getNodeColor(node) {
-    return colors[node.data.category] || '#FFFFFF';
+    return categoriesColor[node.data.category] || '#FFFFFF';
   }
 }

@@ -2,6 +2,7 @@ export const fallback = 'fr';
 
 export const data = {
   fr: {
+    wikipediaArticles: 'Articles Wikipédia',
     categories: {
       label: 'Catégories',
       Affair: 'Affaire',
@@ -15,6 +16,7 @@ export const data = {
     },
   },
   en: {
+    wikipediaArticles: 'Wikipedia articles',
     categories: {
       label: 'Categories',
       Affair: 'Affair',

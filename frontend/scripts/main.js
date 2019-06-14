@@ -1,32 +1,41 @@
 'use stric';
 
-import { dataloader } from './DataLoader';
 import Graph from './Graph';
-import { loader } from './Loader';
-import Loader from './Loader';
-
+import { dataloader } from './DataLoader';
+import Loader, { loader } from './Loader';
 import i18n from './config/i18n';
+import fakeData from '../assets/fakeData.json';
 
-export default class BigWorldGraph {
+class BigWorldGraph {
   constructor() {
-    window.i18n = i18n('fr');
+    this.graph = null;
+  }
 
-    this.url = 'http://localhost';
-    this.port = '6050';
-    this.service = 'entities';
-    this.graph = void 0;
-    dataloader.loadData(this.url + ':' + this.port + '/' + this.service);
-    loader.addListener(
-      Loader.STATES.PREBUILDING_GRAPH,
-      this.onChange.bind(this)
+  init(locale, fetchFakeData = false) {
+    window.i18n = i18n(locale);
+
+    loader.addListener(Loader.STATES.PREBUILDING_GRAPH, data =>
+      this.onDataLoaded(data)
     );
+
+    if (fetchFakeData) {
+      console.warn(
+        '⚠️Fake data is currently being loaded in order to minimize loading time on development'
+      );
+      loader.emit(Loader.STATES.PREBUILDING_GRAPH, fakeData);
+    } else {
+      const url = 'http://localhost:6050/entities';
+      dataloader.loadData(url).then(response => {
+        loader.emit(Loader.STATES.PREBUILDING_GRAPH, response);
+      });
+    }
   }
-  onChange(data) {
-    this.graph = new Graph(data);
-  }
-  createGraph(data) {
+
+  onDataLoaded(data) {
     this.graph = new Graph(data);
   }
 }
 
-new BigWorldGraph();
+const bwg = new BigWorldGraph();
+
+bwg.init('fr', false);

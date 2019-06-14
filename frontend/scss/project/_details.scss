@@ -1,16 +1,70 @@
-@keyframes textol {
+@keyframes textReveal {
   0% {
-    left: -100%;
+    transform: translateX(-101%);
   }
   30% {
-    left: 0%;
+    transform: translateX(0%);
   }
   70% {
-    left: 0%;
+    transform: translateX(0%);
   }
   100% {
-    left: 100%;
+    transform: translateX(101%);
   }
+}
+
+%reveal-start {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  visibility: hidden;
+  transition: visibility 0s 0.6s;
+
+  &:after {
+    content: '';
+    visibility: visible;
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-101%);
+    background-color: currentColor;
+  }
+}
+
+%reveal-end {
+  color: inherit;
+  visibility: visible;
+
+  &:after {
+    animation: textReveal;
+    animation-duration: 1.3s;
+    animation-iteration-count: 1;
+  }
+}
+
+@keyframes wikiReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+%reveal-wiki-start {
+  opacity: 0;
+}
+
+%reveal-wiki-end {
+  animation: wikiReveal;
+  animation-duration: 0.5s;
+  animation-delay: 1.2s;
+  animation-fill-mode: both;
 }
 
 #details {
@@ -24,13 +78,18 @@
   transition: all 0.7s;
   transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
 
-  .pull {
+  .openBtn,
+  .closeBtn {
+    position: absolute;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .openBtn {
     width: 40px;
     height: 60px;
-    position: absolute;
     right: 460px;
     top: 20px;
-    cursor: pointer;
     transform: matrix(1, 0, 0, 1, 0, 0);
     transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 
@@ -67,12 +126,10 @@
   }
 
   .closeBtn {
-    position: absolute;
     top: 40px;
     right: 20px;
     width: 22px;
     height: 15px;
-    cursor: pointer;
 
     .bar {
       width: 100%;
@@ -95,84 +152,112 @@
     }
   }
 
-  .inner {
-    box-sizing: border-box;
-    position: absolute;
-    padding: 80px 40px 40px;
-    width: 100%;
-    height: 100%;
-  }
-
-  .scrollable {
-    position: absolute;
-    width: calc(100% - 80px);
-    height: calc(100% - 80px);
-    overflow: hidden;
-  }
-
   .content {
-    .image {
-      width: 100px;
-      height: 100px;
-      border-radius: 50px;
-      overflow: hidden;
-      position: relative;
+    padding: 80px 40px 40px;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
 
-      img {
-        display: block;
-        width: 100%;
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 20px;
+      height: 95px;
+      background: linear-gradient(#fff 70%, transparent);
+    }
+
+    h1, h2 {
+      span {
+        @extend %reveal-start;
       }
     }
 
     h2 {
-      font-family: Arial, sans-serif;
+      margin-bottom: 0;
       font-size: 20px;
-      position: relative;
-      overflow: hidden;
-      color: #ffffff;
-      background-color: transparent;
-      transition: color 0s 0.6s;
-
-      &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        left: -100%;
-        top: 0;
-        width: 100%;
-        height: 100%;
-      }
     }
 
     h1 {
-      font-family: Arial, sans-serif;
+      margin-top: 0;
       font-size: 30px;
-      transition: color 0s 0.8s;
-      position: relative;
-      overflow: hidden;
-      color: #ffffff;
+    }
 
-      &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        left: -100%;
-        top: 0;
+  }
+
+  .wikipedia {
+    @extend %reveal-wiki-start;
+
+    .logo {
+      width: 18px;
+      height: 18px;
+      background: #4e4e4e;
+      display: inline-flex;
+      padding: 8px;
+      border-radius: 50%;
+      margin-right: 10px;
+
+      svg {
         width: 100%;
-        height: 100%;
+        fill: #fff;
+      }
+    }
+
+    .article {
+      display: flex;
+      margin-bottom: 20px;
+      padding: 16px;
+      background-color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+      border-radius: 6px;
+      color: inherit;
+      text-decoration: none;
+
+      img {
+        width: 130px;
+        flex-basis: 130px;
+        height: 130px;
+        margin-right: 16px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: inherit;
+      }
+
+      h4, h5 {
+        margin: 0;
+      }
+
+      h4 {
+        margin-bottom: 5px;
+      }
+
+      dl {
+        margin-bottom: 0;
+      }
+
+      dt {
+        color: #adadad;
+        font-weight: 200;
+        font-size: 0.8em;
+      }
+
+      dd {
+        margin: 0 0 5px;
       }
     }
   }
 
-  &.on {
-    .pull {
+  &.is-active {
+    .openBtn {
       transform: matrix(1, 0, 0, 1, -40, 0);
       transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
     }
-    &.open {
+
+    &.is-open {
       transform: matrix(1, 0, 0, 1, 0, 0);
 
-      .pull {
+      .openBtn {
         transform: matrix(1, 0, 0, 1, 0, 0);
         transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 
@@ -186,7 +271,7 @@
 
           svg {
             * {
-              fill: #000000;
+              fill: $black;
             }
           }
         }
@@ -194,30 +279,24 @@
 
       .content {
         h2 {
-          &.politician {
-            background-color: transparent;
-            color: $politician;
-
-            &:after {
-              background-color: $politician;
-              animation: textol;
-              animation-duration: 1.3s;
-              animation-iteration-count: 1;
-            }
+          span {
+            @extend %reveal-end;
           }
         }
 
         h1 {
-          color: #000000;
+          span {
+            @extend %reveal-end;
 
-          &:after {
-            animation: textol;
-            animation-duration: 1.3s;
-            animation-delay: 0.2s;
-            animation-iteration-count: 1;
-            background-color: #000000;
+            &:after {
+              animation-delay: 0.2s;
+            }
           }
         }
+      }
+
+      .wikipedia {
+        @extend %reveal-wiki-end;
       }
     }
   }

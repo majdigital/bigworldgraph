@@ -9,7 +9,7 @@ export default [
   'Journalist',
 ];
 
-export const colors = {
+export const categoriesColor = {
   Affair: '#bb1b66',
   Politician: '#9565f1',
   Party: '#6579f1',
