@@ -756,12 +756,14 @@ class Neo4jTarget(luigi.Target, Neo4jDatabase):
         obj_node_is_relevant = self.node_relevance_function(obj_phrase, obj_data)
 
         if subj_node_is_relevant:
-            node_category, _ = self.categorize_node(subj_data["senses"][0]["label"], subj_data)
+            subj_label = subj_data["senses"][0].get("label", "No label available")  # Get label if available
+            node_category, _ = self.categorize_node(subj_label, subj_data)
             subj_node = self.get_or_create_node(label=subj_phrase, data=subj_data, node_category=node_category)
             self._add_wikidata_relations(subj_node, subj_data)
 
         if obj_node_is_relevant:
-            node_category, _ = self.categorize_node(obj_data["senses"][0]["label"], obj_data)
+            obj_label = obj_data["senses"][0].get("label", "No label available")  # Get label if available
+            node_category, _ = self.categorize_node(obj_label, obj_data)
             obj_node = self.get_or_create_node(label=obj_phrase, data=obj_data, node_category=node_category)
             self._add_wikidata_relations(obj_node, obj_data)
 
