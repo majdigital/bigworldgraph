@@ -16,18 +16,26 @@ html {
 
 .link {
   opacity: 0.2;
+  transition: opacity 0.3s ease-in-out;
 
   &.on {
     opacity: 0.8;
   }
 
   &.hide {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
 .nodeGroup {
   cursor: pointer;
+
+  .text {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+  }
 
   &.on {
     .text {
@@ -40,19 +48,15 @@ html {
     }
   }
   &.hide {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
   }
   &.active {
     circle {
-      transition: all 0.3s;
+      transition: all 0.3s ease-in-out;
       transform: scale(2) matrix(1, 0, 0, 1, -6, -6);
     }
   }
-}
-
-.text {
-  opacity: 0;
-  pointer-events: none;
 }
 
 #graphDiv {
@@ -62,6 +66,7 @@ html {
   width: 100%;
   height: 100%;
   background-color: #000000;
+  cursor: grab;
 
   svg {
     width: 100%;

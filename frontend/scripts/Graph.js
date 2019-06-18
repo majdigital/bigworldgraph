@@ -1,7 +1,6 @@
 'use strict';
 import Viva from './vendor/vivagraphjs';
-import { loader } from './Loader';
-import Loader from './loader';
+import { loader, STATES } from './Loader';
 import { details } from './Details';
 import { settings } from './Settings';
 
@@ -26,7 +25,12 @@ export default class Graph {
 
     settings.addListener('reset', this.resetNodes.bind(this));
     settings.addListener('filter', this.filterNodes.bind(this));
-    loader.addListener(Loader.STATES.DONE, this.renderGraph.bind(this));
+    loader.addListener(STATES.DONE, () => {
+      loader.hide();
+      settings.on();
+      this.renderGraph();
+      setTimeout(() => this.pauseGraph(), 0);
+    });
   }
 
   generateGraph() {
@@ -112,19 +116,19 @@ export default class Graph {
       prerender: false,
     });
 
-    //this.renderer.run();
-    console.log('Run Precompute');
+    // console.log('Run Precompute');
 
-    this.precompute(500, this.renderGraph);
+    this.precompute(500, () => this.renderGraph());
 
-    setTimeout(() => {
-      this.renderer.pause();
-    }, 1000);
+    // setTimeout(() => {
+    //   console.log('pause');
+    //   this.renderer.pause();
+    // }, 1000);
   }
 
   precompute(iterations, cb) {
     var i = 0;
-    console.log('precompute');
+    // console.log('precompute');
     while (iterations > 0 && i < 10) {
       this.layout.step();
       iterations--;
@@ -136,19 +140,17 @@ export default class Graph {
         this.precompute(iterations, cb);
       }, 0);
     } else {
-      loader.emit(Loader.STATES.DONE, this);
+      loader.emit(STATES.DONE, this);
+      if (cb) { cb(); }
     }
   }
 
-  renderGraph(context) {
-    loader.hide();
-    context.renderer.run();
-    // setTimeout(function() {
-    // }, 3000);
+  renderGraph() {
+    this.renderer.run();
+  }
 
-    // setTimeout(function() {
-    //   context.renderer.pause();
-    // }, 8000);
+  pauseGraph() {
+    this.renderer.pause();
   }
 
   highlightRelated(nodeId, isOn) {
@@ -178,7 +180,7 @@ export default class Graph {
   }
 
   nodeClicked(nodeId) {
-    console.log('node clicked', nodeId);
+    // console.log('node clicked', nodeId);
     var toKeep = this.getLinkedNodes(nodeId);
     // var linksToKeep = this.getLinks(nodeId);
     var node = this.graph.getNode(nodeId);
@@ -205,8 +207,8 @@ export default class Graph {
     //     $(linkUi).removeClass('hide').addClass('show');
     // });
 
-    let pos = this.layout.getNodePosition(nodeId);
-    this.renderer.moveTo(pos.x, pos.y);
+    // let pos = this.layout.getNodePosition(nodeId);
+    // this.renderer.moveTo(pos.x, pos.y);
 
     let nodeUi = this.graphics.getNodeUI(nodeId);
     nodeUi.attr('fill', this.getNodeColor(node));

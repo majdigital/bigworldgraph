@@ -1,9 +1,8 @@
 'use strict';
-import { settings } from './Settings';
 
-const STATES = {
+export const STATES = {
   FETCHING_DATA: 'fetching',
-  PREBUILDING_GRAPH: 'prebuilding',
+  BUILDING_GRAPH: 'building',
   DONE: 'done',
   IDDLE: 'iddle',
 };
@@ -12,13 +11,11 @@ let isFunction = function(obj) {
   return typeof obj == 'function' || false;
 };
 
-let DOMElement = $('#loader');
-
 export default class Loader {
   constructor() {
-    this.currentState = Loader.STATES.IDDLE;
+    this.element = $('#loader');
+    this._state = STATES.IDDLE;
     this.listeners = new Map();
-    DOMElement = $('#loader');
   }
 
   addListener(label, cb) {
@@ -30,7 +27,7 @@ export default class Loader {
     let listeners = this.listeners.get(label),
       index;
 
-    if (listners && listeners.length) {
+    if (listeners && listeners.length) {
       index = listeners.reduce((i, listeners, index) => {
         return isFunction(listener) && listener === cb ? (i = index) : i;
       }, -1);
@@ -45,9 +42,9 @@ export default class Loader {
     return false;
   }
 
-  emit(label, ...args) {
-    let listeners = this.listeners.get(label);
-    Loader.changeState(label);
+  emit(state, ...args) {
+    let listeners = this.listeners.get(state);
+    this.state = state;
 
     if (listeners && listeners.length) {
       listeners.forEach(listener => {
@@ -58,25 +55,20 @@ export default class Loader {
     return false;
   }
 
-  static get STATES() {
-    return STATES;
+  get state() {
+    return this._state;
   }
 
-  static changeState(newState) {
-    console.log('Change to new state:', newState);
-    for (var state in Loader.STATES) {
-      if (Loader.STATES[state] == newState) {
-        console.log('Change State');
-        this.currentState = newState;
-        DOMElement.find('.label').text(this.currentState);
-      }
+  set state(value) {
+    if (Object.values(STATES).includes(value)) {
+      this._state = value;
+      this.element.find('.label').text(i18n.loaderStates[value]);
     }
   }
 
   hide() {
-    DOMElement.addClass('done');
+    this.element.addClass('done');
     $('.app-logo').addClass('loaded');
-    settings.on();
   }
 }
 

@@ -1,11 +1,11 @@
 'use stric';
 
-import Loader from './loader';
+import { loader, STATES } from './Loader';
 export default class DataLoader {
   constructor() {}
 
   loadData(endpoint, cb) {
-    Loader.changeState(Loader.STATES.FETCHING_DATA);
+    loader.state = STATES.FETCHING_DATA;
     return $.ajax({
       url: endpoint,
       method: 'GET',
