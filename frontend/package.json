@@ -5,7 +5,7 @@
   "scripts": {
     "build": "webpack --config webpack/webpack.config.prod.js  --colors",
     "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
-    "serve": "http-server build 8080"
+    "serve": "http-server build 3000"
   },
   "repository": {
     "type": "git",

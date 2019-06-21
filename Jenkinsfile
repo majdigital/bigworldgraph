@@ -114,7 +114,7 @@ pipeline {
         // Waiting app to be ready (log like 'Listening on http://172.18.0.2:3000')
         // TODO: create service 'frontend'
         sh """
-          while ! docker logs ${COMPOSE_PROJECT_NAME}_frontend | grep 'Project is running at http://0.0.0.0:${PORT}/'
+          while ! docker logs ${COMPOSE_PROJECT_NAME}_frontend | grep 'Available on:'
               do sleep 10
           done
         """
