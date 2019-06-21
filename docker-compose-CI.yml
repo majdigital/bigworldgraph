@@ -5,5 +5,6 @@ services:
     image: majdigital/${COMPOSE_PROJECT_NAME}_frontend
     container_name: ${COMPOSE_PROJECT_NAME}_frontend
     build: ./frontend/
+    command: sh -c 'npm run build && npm run serve'
     ports:
-      - "8080:8080"
+      - "3000:8080"

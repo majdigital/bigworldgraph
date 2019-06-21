@@ -43,6 +43,4 @@ export const data = {
   },
 };
 
-export default locale => ({
-  ...(data[locale] || data[fallback]),
-});
+export default locale => data[locale] || data[fallback];

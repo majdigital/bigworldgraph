@@ -1,4 +1,4 @@
-'use stric';
+'use strict';
 
 import { loader, STATES } from './Loader';
 export default class DataLoader {
@@ -6,14 +6,13 @@ export default class DataLoader {
 
   loadData(endpoint, cb) {
     loader.state = STATES.FETCHING_DATA;
-    return $.ajax({
-      url: endpoint,
-      method: 'GET',
-      contentType: 'text/plain',
-      error: function(textStatus) {
-        console.error(textStatus);
-      },
-    });
+    return fetch(endpoint)
+      .catch(error => {
+        console.error(error);
+      })
+      .then(response => {
+        return response.json();
+      });
   }
 }
 

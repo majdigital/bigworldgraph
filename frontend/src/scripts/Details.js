@@ -6,17 +6,17 @@ const wikipediaLogo = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 458.
 
 export default class Details {
   constructor() {
-    this.element = $('#details');
+    this.element = document.getElementById('details');
     this._isActive = false;
     this._isOpen = false;
     this._data = null;
 
-    this.element.find('.openBtn').on('click', () => this.open());
-    this.element.find('.closeBtn').on('click', () => this.close());
+    this.element.querySelector('.openBtn').addEventListener('click', () => this.open());
+    this.element.querySelector('.closeBtn').addEventListener('click', () => this.close());
   }
 
   get contentContainer() {
-    return this.element.find('.content');
+    return this.element.querySelector('.content');
   }
 
   get isOpen() {
@@ -25,9 +25,9 @@ export default class Details {
 
   set isOpen(value) {
     if (value) {
-      this.element.addClass('is-open');
+      this.element.classList.add('is-open');
     } else {
-      this.element.removeClass('is-open');
+      this.element.classList.remove('is-open');
     }
 
     this._isOpen = value;
@@ -39,9 +39,9 @@ export default class Details {
 
   set isActive(value) {
     if (value) {
-      this.element.addClass('is-active');
+      this.element.classList.add('is-active');
     } else {
-      this.element.removeClass('is-active');
+      this.element.classList.remove('is-active');
     }
 
     this._isActive = value;
@@ -64,14 +64,13 @@ export default class Details {
     const color = categoriesColor[category];
     const categoryLabel = i18n.categories[category];
 
-    this.contentContainer.empty();
     let content = '';
     content += `<h2 style="color: ${color}"><span>${categoryLabel}</span></h2>`;
     content += `<h1><span>${label}</span></h1>`;
 
     if (all.senses.length) {
       content += `<section class="wikipedia">`;
-      content += `<h3><span class="logo">${wikipediaLogo}</span>${i18n.wikipediaArticles}</h3>`
+      content += `<h3><span class="logo">${wikipediaLogo}</span>${i18n.wikipediaArticles}</h3>`;
 
       all.senses.forEach(sense => {
         content += `<a data-wikipedia="${sense.wikidata_id}" href="" target="_blank" class="article">`;
@@ -87,7 +86,7 @@ export default class Details {
         if (claims.length) {
           content += '<dl>';
           claims.forEach(([key, value]) => {
-            content += `<dt>${key}</dt><dd>${value}</dd>`
+            content += `<dt>${key}</dt><dd>${value}</dd>`;
           });
           content += '</dl>';
         }
@@ -96,34 +95,35 @@ export default class Details {
       });
       content += `</section>`;
     }
-    this.contentContainer.append(content);
+    this.contentContainer.innerHTML = content;
 
     this.populateLinks();
   }
 
   populateLinks() {
-    const articles = this.contentContainer.find('a');
-    articles.each((index, article) => {
+    const articles = this.contentContainer.querySelectorAll('a');
+    articles.forEach((article, index) => {
       const wikiId = article.getAttribute('data-wikipedia');
-      this.getWikipediaLink(wikiId).then(url => article.setAttribute('href', url))
-    })
+      this.getWikipediaLink(wikiId).then(url => article.setAttribute('href', url));
+    });
   }
 
   getWikipediaLink(id) {
-    return $.ajax({
-      url: `https://www.wikidata.org/wiki/Special:EntityData/${id}.json`,
-      method: 'GET',
-      error: function(error) {
+    return fetch(`https://www.wikidata.org/wiki/Special:EntityData/${id}.json`)
+      .catch(error => {
         console.error(error);
-      },
-    }).then(result => {
-      const data = Object.values(result.entities)[0].sitelinks;
-      if (data.frwiki) return data.frwiki.url;
-      if (data.frwikinews) return data.frwikinews.url;
-      if (data.enwiki) return data.enwiki.url;
-      if (data.enwikinews) return data.enwikinews.url;
-      return null;
-    });
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(result => {
+        const data = Object.values(result.entities)[0].sitelinks;
+        if (data.frwiki) return data.frwiki.url;
+        if (data.frwikinews) return data.frwikinews.url;
+        if (data.enwiki) return data.enwiki.url;
+        if (data.enwikinews) return data.enwikinews.url;
+        return null;
+      });
   }
 
   open() {

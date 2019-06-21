@@ -7,17 +7,17 @@ let isFunction = function(obj) {
 export default class Settings {
   constructor() {
     this.listeners = new Map();
-    this.element = $('#settings');
+    this.element = document.getElementById('settings');
     this.state = false;
-    this.openBtn = this.element.find('.pullup');
-    this.categoriesContainer = this.element.find('.categories');
-    this.resetBtn = this.element.find('.resetBtn');
+    this.openBtn = this.element.querySelector('.pullup');
+    this.categoriesContainer = this.element.querySelector('.categories');
+    this.resetBtn = this.element.querySelector('.resetBtn');
 
-    this.resetBtn.on('click', () => {
+    this.resetBtn.addEventListener('click', () => {
       this.emit('reset');
     });
 
-    this.openBtn.on('click', () => {
+    this.openBtn.addEventListener('click', () => {
       if (this.state) {
         this.close();
       } else {
@@ -65,33 +65,33 @@ export default class Settings {
   populate(data) {
     this.categoriesContainer.innerHTML = `<h2>${i18n.categories.label}</h2>`;
     data.forEach(category => {
-      this.categoriesContainer.append(`
+      this.categoriesContainer.innerHTML += `
         <div class="category" data-category="${category.slug}">
             <div class="marker" style="background-color: ${
               category.color
             };"></div>
             <span>${category.label}</span>
-        </div>`);
+        </div>`;
     });
-    var cats = this.categoriesContainer.find('.category');
-    cats.on('click', () => {
-      var choosen = $(this).attr('data-category');
-      this.emit('filter', { cat: choosen });
+    var cats = this.categoriesContainer.querySelector('.category');
+    cats.addEventListener('click', event => {
+      const cat = event.target.getAttribute('data-category');
+      this.emit('filter', { cat });
     });
   }
 
   open() {
     this.state = true;
-    this.element.addClass('open');
+    this.element.classList.add('open');
   }
 
   close() {
     this.state = false;
-    this.element.removeClass('open');
+    this.element.classList.remove('open');
   }
 
   on() {
-    this.element.addClass('on');
+    this.element.classList.add('on');
   }
 }
 

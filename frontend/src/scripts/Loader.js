@@ -13,7 +13,7 @@ let isFunction = function(obj) {
 
 export default class Loader {
   constructor() {
-    this.element = $('#loader');
+    this.element = document.getElementById('loader');
     this._state = STATES.IDDLE;
     this.listeners = new Map();
   }
@@ -62,13 +62,13 @@ export default class Loader {
   set state(value) {
     if (Object.values(STATES).includes(value)) {
       this._state = value;
-      this.element.find('.label').text(i18n.loaderStates[value]);
+      this.element.querySelector('.label').innerHTML = i18n.loaderStates[value];
     }
   }
 
   hide() {
-    this.element.addClass('done');
-    $('.app-logo').addClass('loaded');
+    this.element.classList.add('done');
+    document.querySelector('.app-logo').classList.add('loaded');
   }
 }
 

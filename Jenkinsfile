@@ -29,7 +29,7 @@ pipeline {
 
   options {
     disableConcurrentBuilds()
-    buildsDiscarder(logRotator(numToKeepStr: '15'))
+    buildDiscarder(logRotator(numToKeepStr: '15'))
     ansiColor('xterm')
     timeout(time: 15, unit: 'MINUTES')
   }
@@ -69,7 +69,7 @@ pipeline {
 
         // Build image, here only express
         // TODO: check this
-        sh "docker-compose -f docker/docker-compose-CI.yml build"
+        sh "docker-compose -f docker-compose-CI.yml build"
       }
 
       post {
@@ -91,7 +91,7 @@ pipeline {
       steps {
         // Start application serivces (-d: run in background)
         // TODO: check this
-        sh "docker-compose -f docker/docker-compose-CI.yml up -d"
+        sh "docker-compose -f docker-compose-CI.yml up -d"
         sleep 15
         sh "docker ps -a"
       }
@@ -136,7 +136,7 @@ pipeline {
       post {
         always {
           echo "##### Remove stack #####"
-          sh "docker-compose -f docker/docker-compose-CI.yml down"
+          sh "docker-compose -f docker-compose-CI.yml down"
           sleep 10
         }
 
@@ -186,7 +186,7 @@ pipeline {
           sh """
             docker -H $IP_MANAGER_SWARM:2375 stack rm $REPO
             docker -H $IP_MANAGER_SWARM:2375 service ls
-            docker -H $IP_MANAGER_SWARM:2375 stack deploy -c docker/docker-compose-deploy.yml $REPO --with-registry-auth
+            docker -H $IP_MANAGER_SWARM:2375 stack deploy -c docker-compose-deploy.yml $REPO --with-registry-auth
             sleep 5
             docker -H $IP_MANAGER_SWARM:2375 stack ls
             docker -H $IP_MANAGER_SWARM:2375 service ls
@@ -309,8 +309,7 @@ def slackNotify(String buildStatus = 'STARTED') {
     colorCode = '#EB3831'
   }
 
-  // def msg = "${buildStatus}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
-  def msg = "Here is the env: ${env}"
+  def msg = "${buildStatus}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
 
   slackSend(color: colorCode, message: msg)
 }

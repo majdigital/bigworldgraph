@@ -68,10 +68,10 @@ services:
       placement:
         constraints: [node.role == worker]
       labels:
-        traefik.port: ${PORT}
+        traefik.port: 8080
         traefik.docker.network: 'TRAEFIK_traefik-net'
         traefik.frontend.rule: 'Host:${DEPLOY_URL}'
-      command: sh -c 'yarn run build'
-      networks:
-        - default
-        - TRAEFIK_traefik-net
+    command: sh -c 'npm run build && npm run serve'
+    networks:
+      - default
+      - TRAEFIK_traefik-net
