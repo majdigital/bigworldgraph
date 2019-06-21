@@ -1,10 +1,14 @@
-'use stric';
+'use strict';
+
+import '../styles/index.scss';
+
+import 'whatwg-fetch'; // polyfill fetch
 
 import Graph from './Graph';
 import { dataloader } from './DataLoader';
 import { loader, STATES } from './Loader';
 import i18n from './config/i18n';
-import fakeData from '../assets/fakeData.json';
+import fakeData from './fakeData.json';
 
 class BigWorldGraph {
   constructor() {
@@ -12,7 +16,7 @@ class BigWorldGraph {
   }
 
   init(options = {}) {
-    options = Object.assign({ locale: 'fr', fetchFakeData: false }, options)
+    options = Object.assign({ locale: 'fr', fetchFakeData: false }, options);
     window.i18n = i18n(options.locale);
 
     loader.addListener(STATES.BUILDING_GRAPH, data =>

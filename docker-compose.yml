@@ -59,12 +59,12 @@ services:
     networks:
       - app-tier
   frontend:
+    image: majdigital/bigworldgraph_frontend
+    container_name: bigworldgraph_frontend
     build: ./frontend/
-    image: bigworldgraph_frontend
+    command: sh -c 'npm run start'
     ports:
-        - "8080:8080"
-    networks:
-        - app-tier
+      - "8080:8080"
     volumes:
-        - ./frontend:/frontend
-        - /frontend/node_modules
+      - ./frontend:/usr/app/
+      - /usr/app/node_modules/

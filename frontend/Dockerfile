@@ -1,15 +1,9 @@
-FROM jmfirth/webpack:wheezy
+FROM node:10-alpine
 
-ENV NPM_CONFIG_LOGLEVEL warn
-# 2: create directory:
-RUN mkdir -p /frontend
-COPY . /frontend
+ENV HOST 0.0.0.0
 
-WORKDIR /frontend
+WORKDIR /usr/app/
 
-RUN yarn
-# 4: expose port
+COPY . .
 
-EXPOSE 8080
-
-CMD ["yarn", "start"]
+RUN npm ci

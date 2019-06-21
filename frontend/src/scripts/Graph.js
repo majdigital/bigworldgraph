@@ -1,5 +1,5 @@
 'use strict';
-import Viva from './vendor/vivagraphjs';
+import './vendor/vivagraphjs';
 import { loader, STATES } from './Loader';
 import { details } from './Details';
 import { settings } from './Settings';
@@ -76,13 +76,13 @@ export default class Graph {
         ui.append(circle);
         ui.append(svgText);
 
-        $(circle).on('mouseenter', () => {
+        circle.addEventListener('mouseenter', () => {
           this.highlightRelated(node.id, true);
         });
-        $(circle).on('mouseout', () => {
+        circle.addEventListener('mouseout', () => {
           this.highlightRelated(node.id, false);
         });
-        $(circle).on('click', () => {
+        circle.addEventListener('click', () => {
           this.nodeClicked(node.id);
         });
         return ui;
@@ -156,40 +156,30 @@ export default class Graph {
   highlightRelated(nodeId, isOn) {
     var nodeUI = this.graphics.getNodeUI(nodeId);
     if (nodeUI) {
-      isOn
-        ? $(nodeUI)
-            .removeClass('off')
-            .addClass('on')
-        : $(nodeUI)
-            .removeClass('on')
-            .addClass('off');
+      nodeUI.classList.remove(isOn ? 'off' : 'on');
+      nodeUI.classList.add(isOn ? 'on' : 'off');
     }
 
     this.graph.forEachLinkedNode(nodeId, (node, link) => {
       var linkUI = this.graphics.getLinkUI(link.id);
       if (linkUI) {
-        isOn
-          ? $(linkUI)
-              .removeClass('off')
-              .addClass('on')
-          : $(linkUI)
-              .removeClass('on')
-              .addClass('off');
+        linkUI.classList.remove(isOn ? 'off': 'on');
+        linkUI.classList.add(isOn ? 'on': 'off');
       }
     });
   }
 
   nodeClicked(nodeId) {
     // console.log('node clicked', nodeId);
-    var toKeep = this.getLinkedNodes(nodeId);
+    const toKeep = this.getLinkedNodes(nodeId);
     // var linksToKeep = this.getLinks(nodeId);
-    var node = this.graph.getNode(nodeId);
+    const node = this.graph.getNode(nodeId);
     toKeep.push(node);
 
     this.graph.forEachNode(node => {
-      let nodeUi = this.graphics.getNodeUI(node.id);
-      nodeUi.attr('fill', '#000000');
-      $(nodeUi).removeClass('active');
+      const nodeUi = this.graphics.getNodeUI(node.id);
+      nodeUi.setAttribute('fill', '#000000');
+      nodeUi.classList.remove('active');
       // $(nodeUi).removeClass('hide active').addClass('hide');
     });
 
@@ -210,9 +200,9 @@ export default class Graph {
     // let pos = this.layout.getNodePosition(nodeId);
     // this.renderer.moveTo(pos.x, pos.y);
 
-    let nodeUi = this.graphics.getNodeUI(nodeId);
-    nodeUi.attr('fill', this.getNodeColor(node));
-    $(nodeUi).addClass('active');
+    const nodeUi = this.graphics.getNodeUI(nodeId);
+    nodeUi.setAttribute('fill', this.getNodeColor(node));
+    nodeUi.classList.add('active');
 
     details.data = node.data;
     // this.renderer.resume();
@@ -227,27 +217,25 @@ export default class Graph {
   }
 
   filterNodes(data) {
-    var newCat = data.cat;
+    const newCat = data.cat;
 
-    var toKeep = this.getCategoryNodes(newCat);
+    const toKeep = this.getCategoryNodes(newCat);
 
     this.graph.forEachNode(node => {
-      let nodeUi = this.graphics.getNodeUI(node.id);
-      nodeUi.attr('fill', '#000000');
-      $(nodeUi)
-        .removeClass('hide active')
-        .addClass('hide');
+      const nodeUi = this.graphics.getNodeUI(node.id);
+      nodeUi.setAttribute('fill', '#000000');
+      nodeUi.classList.remove('active');
+      nodeUi.classList.add('hide');
     });
     toKeep.map((item, index) => {
-      let nodeUi = this.graphics.getNodeUI(item.id);
-      $(nodeUi)
-        .removeClass('hide')
-        .addClass('show');
+      const nodeUi = this.graphics.getNodeUI(item.id);
+      nodeUi.classList.remove('hide');
+      nodeUi.classList.add('show');
     });
 
     this.graph.forEachLink(link => {
-      let linkUi = this.graphics.getLinkUI(link.id);
-      $(linkUi).addClass('hide');
+      const linkUi = this.graphics.getLinkUI(link.id);
+      linkUi.classList.add('hide');
     });
 
     this.renderer.resume();
@@ -259,19 +247,19 @@ export default class Graph {
 
   resetNodes() {
     this.graph.forEachNode(node => {
-      let nodeUi = this.graphics.getNodeUI(node.id);
+      const nodeUi = this.graphics.getNodeUI(node.id);
       nodeUi.attr('fill', '#000000');
-      $(nodeUi).removeClass('hide active');
+      nodeUi.classList.remove('hide', 'active');
     });
     this.graph.forEachLink(link => {
-      let linkUi = this.graphics.getLinkUI(link.id);
-      $(linkUi).removeClass('hide');
+      const linkUi = this.graphics.getLinkUI(link.id);
+      linkUi.classList.remove('hide');
     });
     settings.close();
     this.renderer.moveTo(0, 0);
     this.renderer.resume();
 
-    details.element.removeClass('on open');
+    details.element.classList.remove('on', 'open');
     details.state = false;
 
     setTimeout(() => {
