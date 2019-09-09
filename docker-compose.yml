@@ -62,7 +62,7 @@ services:
     image: majdigital/bigworldgraph_frontend
     container_name: bigworldgraph_frontend
     build: ./frontend/
-    command: sh -c 'npm run start'
+    command: sh -c 'npm run dev'
     ports:
       - "8080:8080"
     volumes:

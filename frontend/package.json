@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "A data visualization project",
   "scripts": {
+    "dev": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
     "build": "webpack --config webpack/webpack.config.prod.js  --colors",
-    "start": "webpack-dev-server --open --config webpack/webpack.config.dev.js",
-    "serve": "http-server build -p 3000"
+    "start": "http-server build -p 8080"
   },
   "repository": {
     "type": "git",
