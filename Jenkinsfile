@@ -49,7 +49,7 @@ pipeline {
 
     stage('Run') {
       steps {
-        sh "npm run start &"
+        sh "npm start &"
       }
     }
 
@@ -73,6 +73,7 @@ pipeline {
             }
           }
         }
+      }
     }
 
     stage('Deploy') {
