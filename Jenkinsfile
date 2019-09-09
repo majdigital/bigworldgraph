@@ -90,6 +90,8 @@ pipeline {
         script {
           dir("frontend") {
             echo("Deploying to $DEPLOY_APP")
+            sh "pwd"
+            sh "ls -alh"
             sh "clever deploy -a $DEPLOY_APP -f"
             echo("Project available on $DEPLOY_APP")
           }
