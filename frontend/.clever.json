@@ -1,1 +1,11 @@
-{"apps":[{"app_id":"app_ed3813d1-508f-480d-8b0c-dcbf67131a9a","deploy_url":"https://push-par-clevercloud-customers.services.clever-cloud.com/app_ed3813d1-508f-480d-8b0c-dcbf67131a9a.git","name":"Big world graph frontend staging","alias":"staging","org_id":"orga_38bfdb4c-26a3-4b51-b9fc-429c76bb0630"}]}
+{
+  "apps": [
+    {
+      "app_id": "app_ed3813d1-508f-480d-8b0c-dcbf67131a9a",
+      "deploy_url": "https://push-par-clevercloud-customers.services.clever-cloud.com/app_ed3813d1-508f-480d-8b0c-dcbf67131a9a.git",
+      "name": "Big world graph frontend staging",
+      "alias": "staging",
+      "org_id": "orga_38bfdb4c-26a3-4b51-b9fc-429c76bb0630"
+    }
+  ]
+}

@@ -92,6 +92,7 @@ pipeline {
             echo("Deploying to $DEPLOY_APP")
             sh "pwd"
             sh "ls -alh"
+            sh "cat .clever.json"
             sh "clever deploy -a $DEPLOY_APP -f"
             echo("Project available on $DEPLOY_APP")
           }
