@@ -40,16 +40,19 @@ pipeline {
 
     stage('Build') {
       steps {
-        sh "clever env -a $DEPLOY_APP > .env"
-        sh "cd frontend"
-        sh "npm ci"
-        sh "npm run build"
+        dir("frontend") {
+          sh "clever env -a $DEPLOY_APP > .env"
+          sh "npm ci"
+          sh "npm run build"
+        }
       }
     }
 
     stage('Run') {
       steps {
-        sh "npm start &"
+        dir("frontend") {
+          sh "npm start &"
+        }
       }
     }
 
@@ -85,9 +88,11 @@ pipeline {
 
       steps {
         script {
-          echo("Deploying to $DEPLOY_APP")
-          sh "clever deploy -a $DEPLOY_APP -f"
-          echo("Project available on $DEPLOY_APP")
+          dir("frontend") {
+            echo("Deploying to $DEPLOY_APP")
+            sh "clever deploy -a $DEPLOY_APP -f"
+            echo("Project available on $DEPLOY_APP")
+          }
         }
       }
     }
