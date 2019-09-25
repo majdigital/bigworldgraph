@@ -1,9 +1,6 @@
 #!groovy
 @Library('Utilities') _
 
-DEPLOY_APP_STAGING = "staging"
-DEPLOY_APP_PRODUCTION = "production"
-
 pipeline {
   agent { label 'clevercloud-node-builder' }
 
@@ -61,18 +58,7 @@ pipeline {
         timeout(5) {
           waitUntil {
             script {
-              def status = sh script: "curl -I -s localhost:${PORT}", returnStatus: true
-              // If status == 0, it has deployed. If status == 7, connection refused. If status <> 0 && <> 7, error
-              if(status == 0) {
-                echo "Curl succeeded"
-                return true;
-              } else if(status == 7) {
-                echo "Curl got a connection refused, waiting.."
-                return false;
-              } else {
-                error "Curl exit code: " + status
-                return null;
-              }
+              testCurl("localhost:${PORT}")
             }
           }
         }
@@ -136,10 +122,10 @@ def isProduction() {
 
 def getDeployApp() {
   if (isStaging()) {
-    return DEPLOY_APP_STAGING
+    return 'staging'
   }
   if (isProduction()) {
-    return DEPLOY_APP_PRODUCTION
+    return 'production'
   }
   return null
 }
