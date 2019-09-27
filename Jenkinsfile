@@ -121,11 +121,8 @@ def isProduction() {
 }
 
 def getDeployApp() {
-  if (isStaging()) {
-    return 'staging'
-  }
   if (isProduction()) {
     return 'production'
   }
-  return null
+  return 'staging'
 }
