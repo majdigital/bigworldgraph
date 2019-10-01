@@ -76,9 +76,6 @@ pipeline {
         script {
           dir("frontend") {
             echo("Deploying to $DEPLOY_APP")
-            sh "pwd"
-            sh "ls -alh"
-            sh "cat .clever.json"
             sh "clever deploy -a $DEPLOY_APP -f"
             echo("Project available on $DEPLOY_APP")
           }
@@ -91,7 +88,9 @@ pipeline {
     always {
       echo 'Run regardless of the completion status of the Pipeline run.'
       script {
-        slackNotify(currentBuild.result)
+        if (isProduction() || isStaging()) {
+          slackNotify(currentBuild.result)
+        }
       }
     }
     changed {
