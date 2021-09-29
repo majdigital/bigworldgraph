@@ -1,4 +1,4 @@
-nltk==3.2.2
+nltk==3.6.3
 luigi==2.8.0
 pycorenlp==0.3.0
 pywikibot
